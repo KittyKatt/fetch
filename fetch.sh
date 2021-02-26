@@ -39,14 +39,15 @@ strip_sequences() {
 }
 
 fetchConfig () {
-	while read line; do 
-		if [[ $line =~ ^"["(.+)"]"$ ]]; then 
-			arrname=${BASH_REMATCH[1]}
-			declare -A $arrname
-		elif [[ $line =~ ^([_[:alpha:]][_[:alnum:]]*)"="(.*) ]]; then 
-			declare ${arrname}[${BASH_REMATCH[1]}]="${BASH_REMATCH[2]}"
+	while read line; do
+		if [[ $line =~ ^\[[[:alnum:]]+\] ]]; then
+			arrname="config_${line//[^[:alnum:]]/}"
+			declare -gA $arrname
+		elif [[ $line =~ ^([_[:alpha:]][_[:alnum:]]*)"="(.*) ]]; then
+			declare -g ${arrname}[${BASH_REMATCH[1]}]="${BASH_REMATCH[2]}"
+			# printf "\${${arrname}[${BASH_REMATCH[1]}]}  : %s\n" "${BASH_REMATCH[2]}"
 		fi
-	done < ${FETCH_DATA_USER_DIR}/${FETCH_CONFIG_FILENAME}
+	done < "${FETCH_DATA_USER_DIR}/${FETCH_CONFIG_FILENAME}"
 }
 
 getColor () {
@@ -99,7 +100,7 @@ detectKernel () {
     myKernel_machine="${kernel[2]}"
 
 	# pulled from neofetch source
-    if [[ "$kernel_name" == "Darwin" ]]; then
+    if [[ "$myKernel_name" == "Darwin" ]]; then
         # macOS can report incorrect versions unless this is 0.
         # https://github.com/dylanaraps/neofetch/issues/1607
         export SYSTEM_VERSION_COMPAT=0
@@ -114,13 +115,12 @@ detectKernel () {
             esac
         }
     fi
-	verboseOut "Finding kernel...found as '${myKernel}'"
+	verboseOut "Finding kernel...found as '${myKernel_name} ${myKernel_version} ${myKernel_machine}'"
 }
 
 detectOS () {
-	case "${myKernel}" in
-    case ${myKernel} in
-        Darwin)   myOS=$darwin_name ;;
+	case "${myKernel_name}" in
+        Darwin)   myOS=${darwin_name} ;;
         SunOS)    myOS=Solaris ;;
         Haiku)    myOS=Haiku ;;
         MINIX)    myOS=MINIX ;;
@@ -140,15 +140,14 @@ detectOS () {
             errorOut "Unknown OS detected, please report this issue."
         ;;
     esac
-
 	verboseOut "Finding OS...found as '${myOS}'"
 }
 
 # Distro Detection - Begin
 detectDistro () {
 	local distro_detect=""
-	if [[ -z "${distro}" ]]; then
-		distro="Unknown"
+	distro="Unknown"
+	if [[ "${myOS}" == "Linux" && "${distro}" == "Unknown" ]]; then
 		# LSB Release Check
 		if type -p lsb_release >/dev/null 2>&1; then
 			distro_detect="$(lsb_release -si)"
@@ -162,24 +161,6 @@ detectDistro () {
 						os_release="/etc/os-release";
 					elif [ -f /usr/lib/os-release ]; then
 						os_release="/usr/lib/os-release";
-					fi
-					if [[ -n "${os_release}" ]]; then
-						if grep -q 'antergos' /etc/os-release; then
-							distro="Antergos"
-							distro_release="n/a"
-						fi
-						if grep -q -i 'logos' /etc/os-release; then
-							distro="Logos"
-							distro_release="n/a"
-						fi
-						if grep -q -i 'swagarch' /etc/os-release; then
-							distro="SwagArch"
-							distro_release="n/a"
-						fi
-						if grep -q -i 'obrevenge' /etc/os-release; then
-							distro="OBRevenge"
-							distro_release="n/a"
-						fi
 					fi
 					;;
 				"ALDOS"|"Aldos")
@@ -197,16 +178,12 @@ detectDistro () {
 					distro_release=$(source /etc/lsb-release; echo "$DISTRIB_RELEASE")
 					distro_codename=$(source /etc/lsb-release; echo "$DISTRIB_CODENAME")
 					;;
-				"BLAG")
-					distro="BLAG"
-					distro_more="$(head -n1 /etc/fedora-release)"
-					;;
 				"Chakra")
 					distro="Chakra"
 					distro_release=""
 					;;
-                "CentOSStream")
-                    distro="CentOS Stream"
+				"CentOSStream")
+					distro="CentOS Stream"
 					;;
 				"BunsenLabs")
 					distro=$(source /etc/lsb-release; echo "$DISTRIB_ID")
@@ -214,11 +191,7 @@ detectDistro () {
 					distro_codename=$(source /etc/lsb-release; echo "$DISTRIB_CODENAME")
 					;;
 				"Debian")
-					if [[ -f /etc/crunchbang-lsb-release || -f /etc/lsb-release-crunchbang ]]; then
-						distro="CrunchBang"
-						distro_release=$(awk -F'=' '/^DISTRIB_RELEASE=/ {print $2}' /etc/lsb-release-crunchbang)
-						distro_codename=$(awk -F'=' '/^DISTRIB_DESCRIPTION=/ {print $2}' /etc/lsb-release-crunchbang)
-					elif [[ -f /etc/siduction-version ]]; then
+					if [[ -f /etc/siduction-version ]]; then
 						distro="Siduction"
 						distro_release="(Debian Sid)"
 						distro_codename=""
@@ -240,9 +213,8 @@ detectDistro () {
 						distro="Debian"
 					fi
 					;;
-				"DraugerOS")
-					distro = "DraugerOS"
-					fake_distro="${distro}"
+				"Deepin")
+					distro="Deepin"
 					;;
 				"elementary"|"elementary OS")
 					distro="elementary OS"
@@ -263,28 +235,18 @@ detectDistro () {
 					distro_codename=null
 					distro_release=null
 					;;
-				"Fuduntu")
-					distro="Fuduntu"
-					distro_codename=null
-					;;
-				"Fux")
-					distro="Fux"
-					distro_codename=null
-					;;
 				"Gentoo")
 					if [[ "$(lsb_release -sd)" =~ "Funtoo" ]]; then
 						distro="Funtoo"
 					else
 						distro="Gentoo"
 					fi
-
 					#detecting release stable/testing/experimental
 					if [[ -f /etc/portage/make.conf ]]; then
 						source /etc/portage/make.conf
 					elif [[ -d /etc/portage/make.conf ]]; then
 						source /etc/portage/make.conf/*
 					fi
-
 					case $ACCEPT_KEYWORDS in
 						[a-z]*) distro_release=stable       ;;
 						~*)     distro_release=testing      ;;
@@ -296,17 +258,6 @@ detectDistro () {
 					distro_codename="n/a"
 					distro_release="n/a"
 					;;
-				"januslinux"|"janus")
-					distro="januslinux"
-					;;
-				"LinuxDeepin")
-					distro="LinuxDeepin"
-					distro_codename=null
-					;;
-				"Uos")
-					distro="Uos"
-					distro_codename=null
-					;;
 				"Kali"|"Debian Kali Linux")
 					distro="Kali Linux"
 					if [[ "${distro_codename}" =~ "kali-rolling" ]]; then
@@ -317,27 +268,8 @@ detectDistro () {
 				"Lunar Linux"|"lunar")
 					distro="Lunar Linux"
 					;;
-				"MandrivaLinux")
-					distro="Mandriva"
-					case "${distro_codename}" in
-						"turtle"|"Henry_Farman"|"Farman"|"Adelie"|"pauillac")
-							distro="Mandriva-${distro_release}"
-							distro_codename=null
-							;;
-					esac
-					;;
 				"ManjaroLinux")
 					distro="Manjaro"
-					;;
-				"Mer")
-					distro="Mer"
-					if [[ -f /etc/os-release ]]; then
-						if grep -q 'SailfishOS' /etc/os-release; then
-							distro="SailfishOS"
-							distro_codename="$(grep 'VERSION=' /etc/os-release | cut -d '(' -f2 | cut -d ')' -f1)"
-							distro_release="$(awk -F'=' '/^VERSION=/ {print $2}' /etc/os-release)"
-						fi
-					fi
 					;;
 				"neon"|"KDE neon")
 					distro="KDE neon"
@@ -360,7 +292,7 @@ detectDistro () {
 						distro_codename="n/a"
 						distro_release="n/a"
 					#adding support for LMDE 3	
-					elif [[ "$(lsb_release -sd)" =~ "LMDE" ]]; then
+					elif [[ $(lsb_release -sd) =~ "LMDE" ]]; then
 						distro="LMDE"	
 					fi
 					;;
@@ -419,10 +351,6 @@ detectDistro () {
 						fi
 					done
 					;;
-				"Viperr")
-					distro="Viperr"
-					distro_codename=null
-					;;
 				"Void"|"VoidLinux")
 					distro="Void Linux"
 					distro_codename=""
@@ -431,15 +359,6 @@ detectDistro () {
 				"Zorin")
 					distro="Zorin OS"
 					distro_codename=""
-					;;
-				*)
-					if [ "x$(printf "${distro_detect}" | od -t x1 | sed -e 's/^\w*\ *//' | tr '\n' ' ' | grep 'eb b6 89 ec 9d 80 eb b3 84 ')" != "x" ]; then
-						distro="Red Star OS"
-						distro_codename="n/a"
-						distro_release=$(printf "${distro_release}" | grep -o '[0-9.]' | tr -d '\n')
-					else
-						distro="${distro_detect}"
-					fi
 					;;
 			esac
 			if [[ -n ${distro_release} && ${distro_release} != "n/a" ]]; then
@@ -462,26 +381,9 @@ detectDistro () {
 			if [ "$(uname -o 2>/dev/null)" ]; then
 				myOS="$(uname -o)"
 				case "$os" in
-					"Cygwin"|"FreeBSD"|"OpenBSD"|"NetBSD")
-						distro="$os"
-						fake_distro="${distro}"
-					;;
-					"DragonFly")
-						distro="DragonFlyBSD"
-						fake_distro="${distro}"
-					;;
 					"EndeavourOS")
 						distro="EndeavourOS"
 						fake_distro="${distro}"
-					;;
-					"Msys")
-						distro="Msys"
-						fake_distro="${distro}"
-						distro_more="${distro} $(uname -r | head -c 1)"
-					;;
-					"Haiku")
-						distro="Haiku"
-						distro_more="$(uname -v | awk '/^hrev/ {print $1}')"
 					;;
 					"GNU/Linux")
 						if type -p crux >/dev/null 2>&1; then
@@ -500,12 +402,6 @@ detectDistro () {
 						fi
 					;;
 				esac
-			fi
-			if [[ "${distro}" == "Cygwin" || "${distro}" == "Msys" ]]; then
-				# https://msdn.microsoft.com/en-us/library/ms724832%28VS.85%29.aspx
-				if wmic os get version | grep -q '^\(6\.[23]\|10\)'; then
-					fake_distro="Windows - Modern"
-				fi
 			fi
 			if [[ "${distro}" == "Unknown" ]]; then
 				if [ -f /etc/os-release ]; then
@@ -535,13 +431,11 @@ detectDistro () {
 					fi
 
 					# Hotfixes
-                    [[ "${distro}" == "Opensuse-tumbleweed" ]] && distro="openSUSE" && distro_more="Tumbleweed"
+					[[ "${distro}" == "Opensuse-tumbleweed" ]] && distro="openSUSE" && distro_more="Tumbleweed"
 					[[ "${distro}" == "Opensuse-leap" ]] && distro="openSUSE"
 					[[ "${distro}" == "void" ]] && distro="Void Linux"
 					[[ "${distro}" == "evolveos" ]] && distro="Evolve OS"
 					[[ "${distro}" == "Sulin" ]] && distro="Sulin"
-					[[ "${distro}" == "antergos" ]] && distro="Antergos"
-					[[ "${distro}" == "logos" ]] && distro="Logos"
 					[[ "${distro}" == "Arch" || "${distro}" == "Archarm" || "${distro}" == "archarm" ]] && distro="Arch Linux"
 					[[ "${distro}" == "elementary" ]] && distro="elementary OS"
 					[[ "${distro}" == "Fedora" && -d /etc/qubes-rpc ]] && distro="qubes" # Inner VM
@@ -596,24 +490,15 @@ detectDistro () {
 			fi
 
 			if [[ "${distro}" == "Unknown" ]] && [[ "${OSTYPE}" =~ "linux" || "${OSTYPE}" == "gnu" ]]; then
-				for di in arch chakra crunchbang-lsb evolveos exherbo fedora \
-							frugalware fux gentoo kogaion mageia obarun oracle \
-							pardus pclinuxos redhat redstar rosa SuSe; do
+				for di in arch chakra evolveos exherbo fedora \
+							frugalware gentoo kogaion mageia obarun oracle \
+							pardus pclinuxos redhat rosa SuSe; do
 					if [ -f /etc/$di-release ]; then
 						distro=$di
 						break
 					fi
 				done
-				if [[ "${distro}" == "crunchbang-lsb" ]]; then
-					distro="Crunchbang"
-				elif [[ "${distro}" == "gentoo" ]]; then
-					grep -q -i 'Funtoo' /etc/gentoo-release && distro="Funtoo"
-				elif [[ "${distro}" == "mandrake" ]] || [[ "${distro}" == "mandriva" ]]; then
-					grep -q -i 'PCLinuxOS' /etc/${distro}-release && distro="PCLinuxOS"
-				elif [[ "${distro}" == "fedora" ]]; then
-					grep -q -i 'Korora' /etc/fedora-release && distro="Korora"
-					grep -q -i 'BLAG' /etc/fedora-release && distro="BLAG" && distro_more="$(head -n1 /etc/fedora-release)"
-				elif [[ "${distro}" == "oracle" ]]; then
+				if [[ "${distro}" == "oracle" ]]; then
 					distro_more="$(sed 's/Oracle Linux //' /etc/oracle-release)"
 				elif [[ "${distro}" == "SuSe" ]]; then
 					distro="openSUSE"
@@ -626,17 +511,11 @@ detectDistro () {
 					if [[ "${distro_more}" =~ "Tumbleweed" ]]; then
 						distro_more="Tumbleweed"
 					fi
-				elif [[ "${distro}" == "redstar" ]]; then
-					distro_more=$(grep -o '[0-9.]' /etc/redstar-release | tr -d '\n')
 				elif [[ "${distro}" == "redhat" ]]; then
 					grep -q -i 'CentOS' /etc/redhat-release && distro="CentOS"
 					grep -q -i 'Scientific' /etc/redhat-release && distro="Scientific Linux"
 					grep -q -i 'EuroLinux' /etc/redhat-release && distro="EuroLinux"
 					grep -q -i 'PCLinuxOS' /etc/redhat-release && distro="PCLinuxOS"
-					if [ "x$(od -t x1 /etc/redhat-release | sed -e 's/^\w*\ *//' | tr '\n' ' ' | grep 'eb b6 89 ec 9d 80 eb b3 84 ')" != "x" ]; then
-						distro="Red Star OS"
-						distro_more=$(grep -o '[0-9.]' /etc/redhat-release | tr -d '\n')
-					fi
 				fi
 			fi
 
@@ -666,36 +545,6 @@ detectDistro () {
 						distro_more="$(cat /usr/share/doc/tc/release.txt)"
 					elif [ -f /etc/sabayon-edition ]; then distro="Sabayon"
 					fi
-				else
-					if [[ -x /usr/bin/sw_vers ]] && /usr/bin/sw_vers | grep -i 'Mac OS X' >/dev/null; then
-						distro="Mac OS X"
-					elif [[ -x /usr/bin/sw_vers ]] && /usr/bin/sw_vers | grep -i 'macOS' >/dev/null; then
-						distro="macOS"
-					elif [[ -f /var/run/dmesg.boot ]]; then
-						distro=$(awk 'BEGIN {
-							distro = "Unknown"
-						}
-						{
-							if ($0 ~ /DragonFly/) {
-								distro = "DragonFlyBSD"
-								exit
-							}
-							else if ($0 ~ /FreeBSD/) {
-								distro = "FreeBSD"
-								exit
-							}
-							else if ($0 ~ /NetBSD/) {
-								distro = "NetBSD"
-								exit
-							}
-							else if ($0 ~ /OpenBSD/) {
-								distro = "OpenBSD"
-								exit
-							}
-						} END {
-							print distro
-						}' /var/run/dmesg.boot)
-					fi
 				fi
 			fi
 
@@ -707,10 +556,6 @@ detectDistro () {
 					{
 						if ($0 ~ /"Hyperbola GNU\/Linux-libre"/) {
 							distro = "Hyperbola GNU/Linux-libre"
-							exit
-						}
-						else if ($0 ~ /"LinuxDeepin"/) {
-							distro = "LinuxDeepin"
 							exit
 						}
 						else if ($0 ~ /"Obarun"/) {
@@ -750,46 +595,54 @@ detectDistro () {
 				fi
 			fi
 		fi
-	fi
-
-	if [[ "${distro}" != "Haiku" ]]; then
-		if [[ ${BASH_VERSINFO[0]} -ge 4 ]]; then
-			if [[ ${BASH_VERSINFO[0]} -eq 4 && ${BASH_VERSINFO[1]} -gt 1 ]] || [[ ${BASH_VERSINFO[0]} -gt 4 ]]; then
-				distro=${distro,,}
-			else
-				distro="$(tr '[:upper:]' '[:lower:]' <<< "${distro}")"
-			fi
-		else
-			distro="$(tr '[:upper:]' '[:lower:]' <<< "${distro}")"
+	elif [[ "${myOS}" == "Windows" ]]; then
+		distro=$(wmic os get Caption)
+		distro=${distro/Caption}
+		distro=${distro/Microsoft }
+		if grep -q -i 'Microsoft' /proc/version 2>/dev/null || \
+			grep -q -i 'Microsoft' /proc/sys/kernel/osrelease 2>/dev/null
+		then
+			wsl="(on the Windows Subsystem for Linux)"
 		fi
+	elif [[ "${myOS}" =~ "[Mm]ac" ]]; then
+		case $osx_version in
+			10.4*)  distro="Mac OS X Tiger" ;;
+			10.5*)  distro="Mac OS X Leopard" ;;
+			10.6*)  distro="Mac OS X Snow Leopard" ;;
+			10.7*)  distro="Mac OS X Lion" ;;
+			10.8*)  distro="OS X Mountain Lion" ;;
+			10.9*)  distro="OS X Mavericks" ;;
+			10.10*) distro="OS X Yosemite" ;;
+			10.11*) distro="OS X El Capitan" ;;
+			10.12*) distro="macOS Sierra" ;;
+			10.13*) distro="macOS High Sierra" ;;
+			10.14*) distro="macOS Mojave" ;;
+			10.15*) distro="macOS Catalina" ;;
+			10.16*) distro="macOS Big Sur" ;;
+			11.0*)  distro="macOS Big Sur" ;;
+			*)      distro="macOS" ;;
+		esac
 	fi
 
 	case $distro in
 		aldos) distro="ALDOS";;
 		alpine) distro="Alpine Linux" ;;
 		amzn|amazon|amazon*linux) distro="Amazon Linux" ;;
-		antergos) distro="Antergos" ;;
 		arch*linux*old) distro="Arch Linux - Old" ;;
 		arch|arch*linux) distro="Arch Linux" ;;
 		arch32) distro="Arch Linux 32" ;;
 		arcolinux|arcolinux*) distro="ArcoLinux" ;;
 		artix|artix*linux) distro="Artix Linux" ;;
 		blackpantheros|black*panther*) distro="blackPanther OS" ;;
-		blag) distro="BLAG" ;;
 		bunsenlabs) distro="BunsenLabs" ;;
 		centos) distro="CentOS" ;;
 		centos*stream) distro="CentOS Stream" ;;
 		chakra) distro="Chakra" ;;
-		chapeau) distro="Chapeau" ;;
 		chrome*|chromium*) distro="Chrome OS" ;;
-		crunchbang) distro="CrunchBang" ;;
 		crux) distro="CRUX" ;;
-		cygwin) distro="Cygwin" ;;
 		debian) distro="Debian" ;;
 		devuan) distro="Devuan" ;;
 		deepin) distro="Deepin" ;;
-		uos) distro="Uos" ;;
-		desaos) distro="DesaOS" ;;
 		dragonflybsd) distro="DragonFlyBSD" ;;
 		dragora) distro="Dragora" ;;
 		drauger*) distro="DraugerOS" ;;
@@ -802,44 +655,33 @@ detectDistro () {
 		freebsd) distro="FreeBSD" ;;
 		freebsd*old) distro="FreeBSD - Old" ;;
 		frugalware) distro="Frugalware" ;;
-		fuduntu) distro="Fuduntu" ;;
 		funtoo) distro="Funtoo" ;;
-		fux) distro="Fux" ;;
 		gentoo) distro="Gentoo" ;;
 		gnewsense) distro="gNewSense" ;;
 		guix*system) distro="Guix System" ;;
 		haiku) distro="Haiku" ;;
 		hyperbolagnu|hyperbolagnu/linux-libre|'hyperbola gnu/linux-libre'|hyperbola) distro="Hyperbola GNU/Linux-libre" ;;
-		januslinux) distro="januslinux" ;;
 		kali*linux) distro="Kali Linux" ;;
 		kaos) distro="KaOS";;
 		kde*neon|neon) distro="KDE neon" ;;
 		kogaion) distro="Kogaion" ;;
-		korora) distro="Korora" ;;
-		linuxdeepin) distro="LinuxDeepin" ;;
 		lmde) distro="LMDE" ;;
-		logos) distro="Logos" ;;
 		lunar|lunar*linux) distro="Lunar Linux";;
 		mac*os*x|os*x) distro="Mac OS X" ;;
         macos) distro="macOS" ;;
 		manjaro) distro="Manjaro" ;;
 		mageia) distro="Mageia" ;;
-		mandrake) distro="Mandrake" ;;
-		mandriva) distro="Mandriva" ;;
 		mer) distro="Mer" ;;
 		mint|linux*mint) distro="Mint" ;;
-		msys|msys2) distro="Msys" ;;
 		netbsd) distro="NetBSD" ;;
 		netrunner) distro="Netrunner" ;;
 		nix|nix*os) distro="NixOS" ;;
 		obarun) distro="Obarun" ;;
-		obrevenge) distro="OBRevenge" ;;
 		ol|oracle*linux) distro="Oracle Linux" ;;
 		openbsd) distro="OpenBSD" ;;
 		opensuse) distro="openSUSE" ;;
 		os*elbrus) distro="OS Elbrus" ;;
 		parabolagnu|parabolagnu/linux-libre|'parabola gnu/linux-libre'|parabola) distro="Parabola GNU/Linux-libre" ;;
-		pardus) distro="Pardus" ;;
 		parrot|parrot*security) distro="Parrot Security" ;;
 		pclinuxos|pclos) distro="PCLinuxOS" ;;
 		peppermint) distro="Peppermint" ;;
@@ -849,23 +691,18 @@ detectDistro () {
 		raspbian) distro="Raspbian" ;;
 		red*hat*|rhel) distro="Red Hat Enterprise Linux" ;;
 		rosa) distro="ROSA" ;;
-		red*star|red*star*os) distro="Red Star OS" ;;
 		sabayon) distro="Sabayon" ;;
 		sailfish|sailfish*os) distro="SailfishOS" ;;
 		scientific*) distro="Scientific Linux" ;;
 		siduction) distro="Siduction" ;;
-		slackware) distro="Slackware" ;;
 		smgl|source*mage|source*mage*gnu*linux) distro="Source Mage GNU/Linux" ;;
 		solus) distro="Solus" ;;
 		sparky|sparky*linux) distro="SparkyLinux" ;;
 		steam|steam*os) distro="SteamOS" ;;
 		suse*linux*enterprise) distro="SUSE Linux Enterprise" ;;
-		swagarch) distro="SwagArch" ;;
 		tinycore|tinycore*linux) distro="TinyCore" ;;
 		trisquel) distro="Trisquel";;
-		grombyangos) distro="GrombyangOS" ;;
 		ubuntu) distro="Ubuntu";;
-		viperr) distro="Viperr" ;;
 		void*linux) distro="Void Linux" ;;
 		zorin*) distro="Zorin OS" ;;
 		endeavour*) distro="EndeavourOS" ;;
@@ -873,12 +710,6 @@ detectDistro () {
 
 	if [[ -n ${distro_more} ]]; then
 		distro="${distro} ${distro_more}"
-	fi
-
-	if grep -q -i 'Microsoft' /proc/version 2>/dev/null || \
-		grep -q -i 'Microsoft' /proc/sys/kernel/osrelease 2>/dev/null
-	then
-		wsl="(on the Windows Subsystem for Linux)"
 	fi
 
 	verboseOut "Finding distribution...found as '${distro}'"
@@ -897,11 +728,18 @@ detecthost () {
 	verboseOut "Finding hostname and user...found as '${myUser}@${myHost}'"
 }
 
-
 fetchConfig
 
+detectKernel
+detectOS
 detectDistro
+for i in userinfo; do
+	_arr="config_${i}[display]"
+	[[ "${!ref}" == "on" ]] && echo "$i"
+done
+echo "fetch! You are ${myUser}@${myHost}!"
 echo "fetch! You're on ${distro}."
+echo "fetch! You're using ${myKernel_name}."
 # Distro Detection - End
 
 ((extglob_set)) && shopt -u extglob
