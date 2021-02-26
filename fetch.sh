@@ -37,6 +37,12 @@ strip_sequences() {
 
     printf '%s\n' "$strip"
 }
+trim() {
+    set -f
+    set -- $*
+    printf '%s\n' "${*//[[:space:]]/}"
+    set +f
+}
 
 fetchConfig () {
 	while read line; do
@@ -598,7 +604,8 @@ detectDistro () {
 	elif [[ "${myOS}" == "Windows" ]]; then
 		distro=$(wmic os get Caption)
 		distro=${distro/Caption}
-		distro=${distro/Microsoft }
+		distro=$(trim ${distro/Microsoft })
+  		[[ $distro =~ [[:space:]](.*) ]] && distro=${BASH_REMATCH[1]}
 		if grep -q -i 'Microsoft' /proc/version 2>/dev/null || \
 			grep -q -i 'Microsoft' /proc/sys/kernel/osrelease 2>/dev/null
 		then
