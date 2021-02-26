@@ -1,10 +1,17 @@
 #!/usr/bin/env bash
 
 FETCH_DATA_DIR="/usr/share/fetch"
-FETCH_DATA_USER_DIR="${HOME}/.config/fetch"
+FETCH_DATA_USER_DIR="${XDG_CONFIG_HOME:-$HOME}/.config/fetch"
+FETCH_CONFIG_FILENAME="config"
+LC_ALL=C
+LANG=C
+export GIO_EXTRA_MODULES=/usr/lib/x86_64-linux-gnu/gio/modules/
+
+# Set shopt extglob for filename-like globbing in case statements. Check if exttglob was set before and store that as a variable.
+shopt -q extglob; extglob_set=$?
+((extglob_set)) && shopt -s extglob
 
 verbosity="1"
-
 verboseOut () {
 	if [[ "${verbosity}" -eq "1" ]]; then
 		printf '\033[1;31m:: \033[0m%s\n' "${1}"
@@ -12,11 +19,129 @@ verboseOut () {
 }
 errorOut () {
 	printf '\033[1;37m[[ \033[1;31m! \033[1;37m]] \033[0m%s\n' "${1}"
+	exit 1
 }
 stderrOut () {
 	while IFS='' read -r line; do
 		printf '\033[1;37m[[ \033[1;31m! \033[1;37m]] \033[0m%s\n' "${line}"
 	done
+}
+# Taken from neofetch
+strip_sequences() {
+    strip="${1//$'\e['3[0-9]m}"
+    strip="${strip//$'\e['[0-9]m}"
+    strip="${strip//\\e\[[0-9]m}"
+    strip="${strip//$'\e['38\;5\;[0-9]m}"
+    strip="${strip//$'\e['38\;5\;[0-9][0-9]m}"
+    strip="${strip//$'\e['38\;5\;[0-9][0-9][0-9]m}"
+
+    printf '%s\n' "$strip"
+}
+
+fetchConfig () {
+	while read line; do 
+		if [[ $line =~ ^"["(.+)"]"$ ]]; then 
+			arrname=${BASH_REMATCH[1]}
+			declare -A $arrname
+		elif [[ $line =~ ^([_[:alpha:]][_[:alnum:]]*)"="(.*) ]]; then 
+			declare ${arrname}[${BASH_REMATCH[1]}]="${BASH_REMATCH[2]}"
+		fi
+	done < ${FETCH_DATA_USER_DIR}/${FETCH_CONFIG_FILENAME}
+}
+
+getColor () {
+	local tmp_color=""
+	if [[ -n "$1" ]]; then
+		if [[ ${BASH_VERSINFO[0]} -ge 4 ]]; then
+			if [[ ${BASH_VERSINFO[0]} -eq 4 && ${BASH_VERSINFO[1]} -gt 1 ]] || [[ ${BASH_VERSINFO[0]} -gt 4 ]]; then
+				tmp_color=${1,,}
+			else
+				tmp_color="$(tr '[:upper:]' '[:lower:]' <<< "${1}")"
+			fi
+		else
+			tmp_color="$(tr '[:upper:]' '[:lower:]' <<< "${1}")"
+		fi
+
+		case "${tmp_color}" in
+			# Standards
+			'black')					color_ret='\033[0m\033[30m';;
+			'red')						color_ret='\033[0m\033[31m';;
+			'green')					color_ret='\033[0m\033[32m';;
+			'brown')					color_ret='\033[0m\033[33m';;
+			'blue')						color_ret='\033[0m\033[34m';;
+			'purple')					color_ret='\033[0m\033[35m';;
+			'cyan')						color_ret='\033[0m\033[36m';;
+			'yellow')					color_ret='\033[0m\033[1;33m';;
+			'white')					color_ret='\033[0m\033[1;37m';;
+			# Bolds
+			'dark grey'|'dark gray')	color_ret='\033[0m\033[1;30m';;
+			'light red')				color_ret='\033[0m\033[1;31m';;
+			'light green')				color_ret='\033[0m\033[1;32m';;
+			'light blue')				color_ret='\033[0m\033[1;34m';;
+			'light purple')				color_ret='\033[0m\033[1;35m';;
+			'light cyan')				color_ret='\033[0m\033[1;36m';;
+			'light grey'|'light gray')	color_ret='\033[0m\033[37m';;
+			# 256 Color Support
+			(?([1])?([0-9])[0-9])		color_ret="$(colorize ${tmp_color})";;
+			(?([2])?([0-4])[0-9])		color_ret="$(colorize ${tmp_color})";;
+			(?([2])?([5])[0-6])			color_ret="$(colorize ${tmp_color})";;
+			*)							errorOut "That color will not work"; exit 1;;
+		esac
+
+		[[ -n "${color_ret}" ]] && printf "${color_ret}"
+	fi
+}
+
+detectKernel () {
+    IFS=" " read -ra kernel <<< "$(uname -srm)"
+    myKernel_name="${kernel[0]}"
+    myKernel_version="${kernel[1]}"
+    myKernel_machine="${kernel[2]}"
+
+	# pulled from neofetch source
+    if [[ "$kernel_name" == "Darwin" ]]; then
+        # macOS can report incorrect versions unless this is 0.
+        # https://github.com/dylanaraps/neofetch/issues/1607
+        export SYSTEM_VERSION_COMPAT=0
+
+        IFS=$'\n' read -d "" -ra sw_vers <<< "$(awk -F'<|>' '/key|string/ {print $3}' \
+                            "/System/Library/CoreServices/SystemVersion.plist")"
+        for ((i=0;i<${#sw_vers[@]};i+=2)) {
+            case ${sw_vers[i]} in
+                ProductName)          darwin_name=${sw_vers[i+1]} ;;
+                ProductVersion)       osx_version=${sw_vers[i+1]} ;;
+                ProductBuildVersion)  osx_build=${sw_vers[i+1]}   ;;
+            esac
+        }
+    fi
+	verboseOut "Finding kernel...found as '${myKernel}'"
+}
+
+detectOS () {
+	case "${myKernel}" in
+    case ${myKernel} in
+        Darwin)   myOS=$darwin_name ;;
+        SunOS)    myOS=Solaris ;;
+        Haiku)    myOS=Haiku ;;
+        MINIX)    myOS=MINIX ;;
+        AIX)      myOS=AIX ;;
+        IRIX*)    myOS=IRIX ;;
+        FreeMiNT) myOS=FreeMiNT ;;
+        Linux|GNU*)
+            myOS=Linux
+        ;;
+        *BSD|DragonFly|Bitrig)
+            myOS=BSD
+        ;;
+        CYGWIN*|MSYS*|MINGW*)
+            myOS=Windows
+        ;;
+        *)
+            errorOut "Unknown OS detected, please report this issue."
+        ;;
+    esac
+
+	verboseOut "Finding OS...found as '${myOS}'"
 }
 
 # Distro Detection - Begin
@@ -24,7 +149,7 @@ detectDistro () {
 	local distro_detect=""
 	if [[ -z "${distro}" ]]; then
 		distro="Unknown"
-		# LSB Release or MCST Version Check
+		# LSB Release Check
 		if type -p lsb_release >/dev/null 2>&1; then
 			distro_detect="$(lsb_release -si)"
 			distro_release="$(lsb_release -sr)"
@@ -335,7 +460,7 @@ detectDistro () {
 				fi
 			fi
 			if [ "$(uname -o 2>/dev/null)" ]; then
-				os="$(uname -o)"
+				myOS="$(uname -o)"
 				case "$os" in
 					"Cygwin"|"FreeBSD"|"OpenBSD"|"NetBSD")
 						distro="$os"
@@ -755,6 +880,8 @@ detectDistro () {
 	then
 		wsl="(on the Windows Subsystem for Linux)"
 	fi
+
+	verboseOut "Finding distribution...found as '${distro}'"
 }
 
 # Host and User detection - Begin
@@ -770,6 +897,11 @@ detecthost () {
 	verboseOut "Finding hostname and user...found as '${myUser}@${myHost}'"
 }
 
+
+fetchConfig
+
 detectDistro
 echo "fetch! You're on ${distro}."
 # Distro Detection - End
+
+((extglob_set)) && shopt -u extglob
