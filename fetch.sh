@@ -735,7 +735,7 @@ detectOS
 detectDistro
 for i in userinfo kernel distro; do
 	_arr="config_${i}[display]"
-	[[ "$(eval ${!_arr})" == "on" ]] && echo "$i"
+	[[ "${!_arr}" == "on" ]] && echo "$i"
 done
 echo "fetch! You are ${myHost}!"
 echo "fetch! You're on ${distro}."
