@@ -44,7 +44,7 @@ fetchConfig () {
 			arrname="config_${line//[^[:alnum:]]/}"
 			declare -gA $arrname
 		elif [[ $line =~ ^([_[:alpha:]][_[:alnum:]]*)"="(.*) ]]; then
-			declare -g ${arrname}[${BASH_REMATCH[1]}]="${BASH_REMATCH[2]}"
+			declare -g ${arrname}[${BASH_REMATCH[1]}]="${BASH_REMATCH[2]//\"}"
 			# printf "\${${arrname}[${BASH_REMATCH[1]}]}  : %s\n" "${BASH_REMATCH[2]}"
 		fi
 	done < "${FETCH_DATA_USER_DIR}/${FETCH_CONFIG_FILENAME}"
@@ -733,11 +733,11 @@ fetchConfig
 detectKernel
 detectOS
 detectDistro
-for i in userinfo; do
+for i in userinfo kernel distro; do
 	_arr="config_${i}[display]"
-	[[ "${!ref}" == "on" ]] && echo "$i"
+	[[ "$(eval ${!_arr})" == "on" ]] && echo "$i"
 done
-echo "fetch! You are ${myUser}@${myHost}!"
+echo "fetch! You are ${myHost}!"
 echo "fetch! You're on ${distro}."
 echo "fetch! You're using ${myKernel_name}."
 # Distro Detection - End
