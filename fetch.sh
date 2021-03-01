@@ -124,6 +124,24 @@ detect_kernel () {
             esac
         }
     fi
+
+	case ${config_kernel[short]} in
+		on)
+			myKernel="${myKernel_version}"
+			;;
+		off)
+			myKernel="${myKernel_name} ${myKernel_version}"
+			;;
+		auto)
+			if [[ ${config_global[short]} == 'on' ]]; then
+				myKernel="${myKernel_version}"
+			else
+				myKernel="${myKernel_name} ${myKernel_version}"
+			fi
+			;;
+	esac
+
+
 	verboseOut "Finding kernel...found as '${myKernel_name} ${myKernel_version} ${myKernel_machine}'"
 }
 
