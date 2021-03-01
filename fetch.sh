@@ -142,7 +142,7 @@ detect_kernel () {
 	esac
 
 
-	verboseOut "Finding kernel...found as '${myKernel_name} ${myKernel_version} ${myKernel_machine}'"
+	verboseOut "Finding kernel...found as '${myKernel}'"
 }
 
 detect_os () {
@@ -879,7 +879,7 @@ for i in userinfo distro uptime; do
 done
 echo "fetch! You are ${myUserInfo}!"
 echo "fetch! You're on ${distro}."
-echo "fetch! You're using ${myKernel_name}."
+echo "fetch! You're using ${myKernel} on ${myOS}."
 echo "fetch! You've been up for ${myUptime}."
 
 ((extglob_set)) && shopt -u extglob
