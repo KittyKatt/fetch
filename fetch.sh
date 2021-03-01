@@ -99,7 +99,7 @@ getColor () {
 	fi
 }
 
-detectKernel () {
+detect_kernel () {
     IFS=" " read -ra kernel <<< "$(uname -srm)"
     myKernel_name="${kernel[0]}"
     myKernel_version="${kernel[1]}"
@@ -124,7 +124,7 @@ detectKernel () {
 	verboseOut "Finding kernel...found as '${myKernel_name} ${myKernel_version} ${myKernel_machine}'"
 }
 
-detectOS () {
+detect_os () {
 	case "${myKernel_name}" in
         Darwin)   myOS=${darwin_name} ;;
         SunOS)    myOS=Solaris ;;
@@ -150,7 +150,7 @@ detectOS () {
 }
 
 # Distro Detection - Begin
-detectDistro () {
+detect_distro () {
 	local distro_detect=""
 	distro="Unknown"
 	if [[ "${myOS}" == "Linux" && "${distro}" == "Unknown" ]]; then
@@ -723,7 +723,7 @@ detectDistro () {
 }
 
 # Host and User detection - Begin
-detecthost () {
+detect_userinfo () {
 	myUser=${USER}
 	myHost=${HOSTNAME}
 	if [[ -z "$USER" ]]; then
@@ -737,12 +737,11 @@ detecthost () {
 
 fetchConfig
 
-detectKernel
-detectOS
-detectDistro
-for i in userinfo kernel distro; do
+detect_kernel
+detect_os
+for i in userinfo distro; do
 	_arr="config_${i}[display]"
-	[[ "${!_arr}" == "on" ]] && echo "$i"
+	[[ "${!_arr}" == "on" ]] && eval detect_${i}
 done
 echo "fetch! You are ${myHost}!"
 echo "fetch! You're on ${distro}."
