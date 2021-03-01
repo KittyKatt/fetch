@@ -15,7 +15,6 @@ fi
 shopt -q extglob; extglob_set=$?
 ((extglob_set)) && shopt -s extglob
 
-verbosity="1"
 verboseOut () {
 	if [[ "${verbosity}" -eq "1" ]]; then
 		printf '\033[1;31m:: \033[0m%s\n' "${1}"
