@@ -710,16 +710,29 @@ detect_distro () {
 			endeavour*) distro="EndeavourOS" ;;
 		esac
 
-		if [[ ${config_distro[short]} == 'auto' || ${config_distro[short]} == 'off' ]]; then
-			[[ -n ${distro_release} ]] && distro="${distro} ${distro_release}"
-			[[ -n ${distro_release} ]] && distro="${distro} ${distro_codename}"
-		elif [ ${config_distro[short]} == 'version' ]; then
-			[[ -n ${distro_release} ]] && distro="${distro} ${distro_release}"
-		elif [ ${config_distro[short]} == 'codename' ]; then
-			[[ -n ${distro_codename} ]] && distro="${distro} ${distro_codename}"
-		elif [ ${config_distro[short]} == 'on' ]; then
-			distro="${distro}"
-		fi
+		case ${config_distro[short]} in
+			on)
+				distro="${distro}"
+				;;
+			off)
+				[[ -n ${distro_release} ]] && distro="${distro} ${distro_release}"
+				[[ -n ${distro_release} ]] && distro="${distro} ${distro_codename}"
+				;;
+			version)
+				[[ -n ${distro_release} ]] && distro="${distro} ${distro_release}"
+				;;
+			codename)
+				[[ -n ${distro_codename} ]] && distro="${distro} ${distro_codename}"
+				;;
+			auto)
+				if [[ ${config_global[short]} == 'on' ]];
+					distro="${distro}"
+				else
+					[[ -n ${distro_release} ]] && distro="${distro} ${distro_release}"
+					[[ -n ${distro_release} ]] && distro="${distro} ${distro_codename}"
+				fi
+				;;
+		esac
 	fi
 
 	verboseOut "Finding distribution...found as '${distro}'"
