@@ -725,7 +725,7 @@ detect_distro () {
 				[[ -n ${distro_codename} ]] && distro="${distro} ${distro_codename}"
 				;;
 			auto)
-				if [[ ${config_global[short]} == 'on' ]];
+				if [[ ${config_global[short]} == 'on' ]]; then
 					distro="${distro}"
 				else
 					[[ -n ${distro_release} ]] && distro="${distro} ${distro_release}"
