@@ -759,6 +759,45 @@ detect_userinfo () {
 	verboseOut "Finding user info...found as '${myUserInfo}'"
 }
 
+detectuptime () {
+	if [[ "${distro}" == "Mac OS X" || "${distro}" == "macOS" || "${distro}" == "FreeBSD" || "${distro}" == "DragonFlyBSD" ]]; then
+		boot=$(sysctl -n kern.boottime | cut -d "=" -f 2 | cut -d "," -f 1)
+		now=$(date +%s)
+		myUptime=$((now-boot))
+	elif [[ "${distro}" == "OpenBSD" ]]; then
+		boot=$(sysctl -n kern.boottime)
+		now=$(date +%s)
+		myUptime=$((now - boot))
+	elif [[ "${distro}" == "Haiku" ]]; then
+		myUptime=$(uptime | awk -F', up ' '{gsub(/ *hours?,/, "h"); gsub(/ *minutes?/, "m"); print $2;}')
+	else
+		if [[ -f /proc/uptime ]]; then
+			myUptime=$(</proc/uptime)
+			myUptime=${myUptime//.*}
+		fi
+	fi
+
+	if [[ -n ${myUptime} ]] && [[ "${distro}" != "Haiku" ]]; then
+		mins=$((myUptime/60%60))
+		hours=$((myUptime/3600%24))
+		days=$((myUptime/86400))
+		myUptime="${mins}m"
+		if [ "${hours}" -ne "0" ]; then
+			myUptime="${hours}h ${myUptime}"
+		fi
+		if [ "${days}" -ne "0" ]; then
+			myUptime="${days}d ${myUptime}"
+		fi
+	else
+		if [[ "$distro" =~ "NetBSD" ]]; then
+			myUptime=$(awk -F. '{print $1}' /proc/uptime)
+		elif [[ "$distro" =~ "BSD" ]]; then
+			myUptime=$(uptime | awk '{$1=$2=$(NF-6)=$(NF-5)=$(NF-4)=$(NF-3)=$(NF-2)=$(NF-1)=$NF=""; sub(" days","d");sub(",","");sub(":","h ");sub(",","m"); print}')
+		fi
+	fi
+	verboseOut "Finding current uptime...found as '${myUptime}'"
+}
+
 # Execution flag detection
 case $1 in
 	--help) displayHelp; exit 0;;
@@ -780,7 +819,7 @@ fetchConfig "${FETCH_CONFIG}"
 
 detect_kernel
 detect_os
-for i in userinfo distro; do
+for i in userinfo distro uptime; do
 	_arr="config_${i}[display]"
 	if [[ "${!_arr}" =~ "on" ]]; then eval detect_${i}; fi
 done
