@@ -760,41 +760,78 @@ detect_userinfo () {
 }
 
 detect_uptime () {
-	if [[ "${distro}" == "Mac OS X" || "${distro}" == "macOS" || "${distro}" == "FreeBSD" || "${distro}" == "DragonFlyBSD" ]]; then
-		boot=$(sysctl -n kern.boottime | cut -d "=" -f 2 | cut -d "," -f 1)
-		now=$(date +%s)
-		myUptime=$((now-boot))
-	elif [[ "${distro}" == "OpenBSD" ]]; then
-		boot=$(sysctl -n kern.boottime)
-		now=$(date +%s)
-		myUptime=$((now - boot))
-	elif [[ "${distro}" == "Haiku" ]]; then
-		myUptime=$(uptime | awk -F', up ' '{gsub(/ *hours?,/, "h"); gsub(/ *minutes?/, "m"); print $2;}')
-	else
-		if [[ -f /proc/uptime ]]; then
-			myUptime=$(</proc/uptime)
-			myUptime=${myUptime//.*}
-		fi
-	fi
+	# get seconds up since boot
+	case $myOS in
+		"Mac OS X"|"macOS"|BSD)
+			boot=$(sysctl -n kern.boottime)
+			[[ ${boot} =~ [0-9]+ ]] && boot=${BASH_REMATCH[0]}
+			now=$(date +%s)
+			_seconds=$((now-boot))
+			;;
+		Linux|Windows|[G|g][N|n][U|u])
+			if [[ -f /proc/uptime ]]; then
+				_seconds=$(</proc/uptime)
+				_seconds=${_seconds//.*}
+			else
+				boot=$(date -d"$(uptime -s)" +%s)
+				now=$(date +%s)
+				_seconds=$((now - boot))
+			fi
+			;;
+		Haiku)
+			_seconds=$(($(system_time) / 1000000))
+			;;
+	esac
 
-	if [[ -n ${myUptime} ]] && [[ "${distro}" != "Haiku" ]]; then
-		mins=$((myUptime/60%60))
-		hours=$((myUptime/3600%24))
-		days=$((myUptime/86400))
-		myUptime="${mins}m"
-		if [ "${hours}" -ne "0" ]; then
-			myUptime="${hours}h ${myUptime}"
-		fi
-		if [ "${days}" -ne "0" ]; then
-			myUptime="${days}d ${myUptime}"
-		fi
-	else
-		if [[ "$distro" =~ "NetBSD" ]]; then
-			myUptime=$(awk -F. '{print $1}' /proc/uptime)
-		elif [[ "$distro" =~ "BSD" ]]; then
-			myUptime=$(uptime | awk '{$1=$2=$(NF-6)=$(NF-5)=$(NF-4)=$(NF-3)=$(NF-2)=$(NF-1)=$NF=""; sub(" days","d");sub(",","");sub(":","h ");sub(",","m"); print}')
-		fi
-	fi
+	# math!
+	_mins="$((_seconds/ 60 % 60)) minutes"
+	_hours="$((_seconds / 3600 % 24)) hours"
+	_days="$((_seconds / 86400)) days"
+
+	# get rid of plurals
+	((${_mins/ *} == 1)) && _mins=${_mins/s}
+	((${_hours/ *} == 1)) && _hours=${_hours/s}
+	((${_days/ *} == 1)) && _days=${_days/s}
+
+	# don't output if field is empty
+    ((${_mins/ *} == 0)) && unset _mins
+    ((${_hours/ *} == 0)) && unset _hours
+    ((${_days/ *} == 0)) && unset _days
+
+	# build the uptime line
+    myUptime=${_days:+$_days, }${_hours:+$_hours, }$_mins
+    myUptime=${myUptime%', '}
+    myUptime=${myUptime:-$_seconds seconds}
+
+	# shorthand
+	case ${config_uptime[short]} in
+		on)
+			myUptime=${myUptime/ minutes/ mins}
+			myUptime=${myUptime/ minute/ min}
+			myUptime=${myUptime/ seconds/ secs}
+			;;
+		tiny)
+			myUptime=${myUptime/ days/d}
+			myUptime=${myUptime/ day/d}
+			myUptime=${myUptime/ hours/h}
+			myUptime=${myUptime/ hour/h}
+			myUptime=${myUptime/ minutes/m}
+			myUptime=${myUptime/ minute/m}
+			myUptime=${myUptime/ seconds/s}
+			myUptime=${myUptime//,}
+			;;
+		off)
+			:
+			;;
+		auto)
+			if [ ${config_global[short]} == 'on' ]; then
+				myUptime=${myUptime/ minutes/ mins}
+				myUptime=${myUptime/ minute/ min}
+				myUptime=${myUptime/ seconds/ secs}
+			fi
+			;;
+	esac
+
 	verboseOut "Finding current uptime...found as '${myUptime}'"
 }
 
@@ -827,6 +864,5 @@ echo "fetch! You are ${myUserInfo}!"
 echo "fetch! You're on ${distro}."
 echo "fetch! You're using ${myKernel_name}."
 echo "fetch! You've been up for ${myUptime}."
-# Distro Detection - End
 
 ((extglob_set)) && shopt -u extglob
