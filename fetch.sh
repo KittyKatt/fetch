@@ -714,7 +714,7 @@ detect_distro () {
 			on)
 				distro="${distro}"
 				;;
-			off)
+			full)
 				[[ -n ${distro_release} ]] && distro="${distro} ${distro_release}"
 				[[ -n ${distro_release} ]] && distro="${distro} ${distro_codename}"
 				;;
