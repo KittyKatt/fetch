@@ -356,11 +356,7 @@ detect_distro () {
 						distro="SparkyLinux"
 						;;
 					"Ubuntu")
-						for each in "${ubuntu_codenames[@]}"; do
-							if [[ "${each,,}" =~ "${distro_codename,,}" ]]; then
-								distro_codename="$each"
-							fi
-						done
+						distro="Ubuntu"
 						;;
 					"Void"|"VoidLinux")
 						distro="Void Linux"
@@ -708,7 +704,7 @@ detect_distro () {
 			suse*linux*enterprise) distro="SUSE Linux Enterprise" ;;
 			tinycore|tinycore*linux) distro="TinyCore" ;;
 			trisquel) distro="Trisquel";;
-			ubuntu) . ./lib/Linux/Ubuntu/ubuntu.sh; distro="Ubuntu";;
+			ubuntu) . ./lib/Linux/Ubuntu/ubuntu/extra.sh; distro="Ubuntu";;
 			void*linux) distro="Void Linux" ;;
 			zorin*) distro="Zorin OS" ;;
 			endeavour*) distro="EndeavourOS" ;;
