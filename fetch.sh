@@ -756,14 +756,14 @@ while getopts ":hD:F:" flags; do
 	case $flags in
 		h) displayHelp; exit 0 ;;
 		D) distro="${OPTARG}" ;;
-		F) FETCH_CONFIG="${OPTARGS}" ;;
+		F) FETCH_CONFIG="${OPTARG}" ;;
 		:) errorOut "Error: You're missing an argument somewhere. Exiting."; exit 1 ;;
 		?) errorOut "Error: Invalid flag somewhere. Exiting."; exit 1 ;;
 		*) errorOut "Error"; exit 1 ;;
 	esac
 done
 
-[[ -n $FETCH_CONFIG ]] && FETCH_CONFIG="${FETCH_DATA_USER_DIR}/${FETCH_CONFIG_FILENAME}"
+[[ -z $FETCH_CONFIG ]] && FETCH_CONFIG="${FETCH_DATA_USER_DIR}/${FETCH_CONFIG_FILENAME}"
 fetchConfig "${FETCH_CONFIG}"
 
 detect_kernel
