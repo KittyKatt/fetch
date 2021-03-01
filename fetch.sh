@@ -708,19 +708,19 @@ detect_distro () {
 			suse*linux*enterprise) distro="SUSE Linux Enterprise" ;;
 			tinycore|tinycore*linux) distro="TinyCore" ;;
 			trisquel) distro="Trisquel";;
-			ubuntu) distro="Ubuntu";;
+			ubuntu) . ./lib/Linux/Ubuntu/ubuntu.sh; distro="Ubuntu";;
 			void*linux) distro="Void Linux" ;;
 			zorin*) distro="Zorin OS" ;;
 			endeavour*) distro="EndeavourOS" ;;
 		esac
 
-		if [ ${config_distro[short]} == 'auto' || ${config_distro[short]} == 'off' ]; then
+		if [[ ${config_distro[short]} == 'auto' || ${config_distro[short]} == 'off' ]]; then
 			[[ -n ${distro_release} ]] && distro="${distro} ${distro_release}"
 			[[ -n ${distro_release} ]] && distro="${distro} (${distro_codename})"
 		elif [ ${config_distro[short]} == 'version' ]; then
 			[[ -n ${distro_release} ]] && distro="${distro} ${distro_release}"
 		elif [ ${config_distro[short]} == 'codename' ]; then
-			[[ -n ${distro_codename} ]] && distro="${distro} (${distro_codename})"
+			[[ -n ${distro_codename} ]] && distro="${distro} ${distro_codename}"
 		elif [ ${config_distro[short]} == 'on' ]; then
 			continue
 		fi
