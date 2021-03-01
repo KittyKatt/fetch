@@ -716,7 +716,7 @@ detect_distro () {
 
 		if [[ ${config_distro[short]} == 'auto' || ${config_distro[short]} == 'off' ]]; then
 			[[ -n ${distro_release} ]] && distro="${distro} ${distro_release}"
-			[[ -n ${distro_release} ]] && distro="${distro} (${distro_codename})"
+			[[ -n ${distro_release} ]] && distro="${distro} ${distro_codename}"
 		elif [ ${config_distro[short]} == 'version' ]; then
 			[[ -n ${distro_release} ]] && distro="${distro} ${distro_release}"
 		elif [ ${config_distro[short]} == 'codename' ]; then
