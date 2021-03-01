@@ -626,7 +626,7 @@ detect_distro () {
 			esac
 		fi
 
-		case $distro in
+		case ${distro,,} in
 			aldos) distro="ALDOS";;
 			alpine) distro="Alpine Linux" ;;
 			amzn|amazon|amazon*linux) distro="Amazon Linux" ;;
@@ -704,7 +704,7 @@ detect_distro () {
 			suse*linux*enterprise) distro="SUSE Linux Enterprise" ;;
 			tinycore|tinycore*linux) distro="TinyCore" ;;
 			trisquel) distro="Trisquel";;
-			ubuntu) . ./lib/Linux/Ubuntu/ubuntu/extra.sh; distro="Ubuntu";;
+			ubuntu) . lib/Linux/Ubuntu/ubuntu/extra.sh; distro="Ubuntu";;
 			void*linux) distro="Void Linux" ;;
 			zorin*) distro="Zorin OS" ;;
 			endeavour*) distro="EndeavourOS" ;;
