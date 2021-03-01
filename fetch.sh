@@ -759,7 +759,7 @@ detect_userinfo () {
 	verboseOut "Finding user info...found as '${myUserInfo}'"
 }
 
-detectuptime () {
+detect_uptime () {
 	if [[ "${distro}" == "Mac OS X" || "${distro}" == "macOS" || "${distro}" == "FreeBSD" || "${distro}" == "DragonFlyBSD" ]]; then
 		boot=$(sysctl -n kern.boottime | cut -d "=" -f 2 | cut -d "," -f 1)
 		now=$(date +%s)
@@ -826,6 +826,7 @@ done
 echo "fetch! You are ${myUserInfo}!"
 echo "fetch! You're on ${distro}."
 echo "fetch! You're using ${myKernel_name}."
+echo "fetch! You've been up for ${myUptime}."
 # Distro Detection - End
 
 ((extglob_set)) && shopt -u extglob
