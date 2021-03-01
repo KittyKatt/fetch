@@ -718,7 +718,7 @@ detect_distro () {
 		elif [ ${config_distro[short]} == 'codename' ]; then
 			[[ -n ${distro_codename} ]] && distro="${distro} ${distro_codename}"
 		elif [ ${config_distro[short]} == 'on' ]; then
-			continue
+			distro="${distro}"
 		fi
 	fi
 
