@@ -5,7 +5,11 @@ FETCH_DATA_USER_DIR="${XDG_CONFIG_HOME:-$HOME}/.config/fetch"
 FETCH_CONFIG_FILENAME="config"
 LC_ALL=C
 LANG=C
-export GIO_EXTRA_MODULES=/usr/lib/x86_64-linux-gnu/gio/modules/
+# https://github.com/KittyKatt/screenFetch/issues/549
+if [[ "${OSTYPE}" =~ "linux" || "${OSTYPE}" == "gnu" ]]; then
+	# issue seems to affect Ubuntu; add LSB directories if it appears on other distros too
+	export GIO_EXTRA_MODULES="/usr/lib/x86_64-linux-gnu/gio/modules:/usr/lib/i686-linux-gnu/gio/modules:$GIO_EXTRA_MODULES"
+fi
 
 # Set shopt extglob for filename-like globbing in case statements. Check if exttglob was set before and store that as a variable.
 shopt -q extglob; extglob_set=$?
@@ -51,9 +55,9 @@ fetchConfig () {
 			declare -gA $arrname
 		elif [[ $line =~ ^([_[:alpha:]][_[:alnum:]]*)"="(.*) ]]; then
 			declare -g ${arrname}[${BASH_REMATCH[1]}]="${BASH_REMATCH[2]//\"}"
-			# printf "\${${arrname}[${BASH_REMATCH[1]}]}  : %s\n" "${BASH_REMATCH[2]}"
+			#printf "\${${arrname}[${BASH_REMATCH[1]}]}  : %s\n" "${BASH_REMATCH[2]}"
 		fi
-	done < "${FETCH_DATA_USER_DIR}/${FETCH_CONFIG_FILENAME}"
+	done < "${1}"
 }
 
 getColor () {
@@ -724,26 +728,51 @@ detect_distro () {
 
 # Host and User detection - Begin
 detect_userinfo () {
-	myUser=${USER}
-	myHost=${HOSTNAME}
-	if [[ -z "$USER" ]]; then
-		myUser=$(whoami)
+	if [[ "${config_userinfo[display_user]}" =~ "on" ]]; then
+		myUser=${USER}
+		if [[ -z "$USER" ]]; then
+			myUser=$(whoami)
+		fi
+		myUserInfo="${myUser}"
 	fi
-	if [[ "${distro}" == "Mac OS X" || "${distro}" == "macOS" ]]; then
-		myHost=${myHost/.local}
+
+	if [[ "${config_userinfo[display_hostname]}" =~ "on" ]]; then
+		myHost="${HOSTNAME}"
+		if [[ "${distro}" == "Mac OS X" || "${distro}" == "macOS" ]]; then
+			myHost=${myHost/.local}
+		fi
+		if [[ -n ${myUserInfo} ]]; then myUserInfo="${myUserInfo}@${myHost}"
+		else myUserInfo="${myHost}"; fi
 	fi
-	verboseOut "Finding hostname and user...found as '${myUser}@${myHost}'"
+	verboseOut "Finding user info...found as '${myUserInfo}'"
 }
 
-fetchConfig
+# Execution flag detection
+case $1 in
+	--help) displayHelp; exit 0;;
+	--version) displayVersion; exit 0;;
+esac
+while getopts ":hD:F:" flags; do
+	case $flags in
+		h) displayHelp; exit 0 ;;
+		D) distro="${OPTARG}" ;;
+		F) FETCH_CONFIG="${OPTARGS}" ;;
+		:) errorOut "Error: You're missing an argument somewhere. Exiting."; exit 1 ;;
+		?) errorOut "Error: Invalid flag somewhere. Exiting."; exit 1 ;;
+		*) errorOut "Error"; exit 1 ;;
+	esac
+done
+
+[[ -n $FETCH_CONFIG ]] && FETCH_CONFIG="${FETCH_DATA_USER_DIR}/${FETCH_CONFIG_FILENAME}"
+fetchConfig "${FETCH_CONFIG}"
 
 detect_kernel
 detect_os
 for i in userinfo distro; do
 	_arr="config_${i}[display]"
-	[[ "${!_arr}" == "on" ]] && eval detect_${i}
+	if [[ "${!_arr}" =~ "on" ]]; then eval detect_${i}; fi
 done
-echo "fetch! You are ${myHost}!"
+echo "fetch! You are ${myUserInfo}!"
 echo "fetch! You're on ${distro}."
 echo "fetch! You're using ${myKernel_name}."
 # Distro Detection - End
