@@ -17,7 +17,7 @@ shopt -q extglob; extglob_set=$?
 
 verboseOut () {
 	# shellcheck disable=SC2154
-	if [[ "${config_global[verbosity]}" -eq "1" ]]; then
+	if [ "${config_global[verbosity]}" -eq "1" ]; then
 		printf '\033[1;31m:: \033[0m%s\n' "${1}"
 	fi
 }
@@ -39,7 +39,7 @@ strip_sequences() {
     strip="${strip//$'\e['38\;5\;[0-9][0-9]m}"
     strip="${strip//$'\e['38\;5\;[0-9][0-9][0-9]m}"
 
-    printf '%s\n' "$strip"
+    printf '%s\n' "${strip}"
 }
 trim() {
     set -f
@@ -51,10 +51,10 @@ trim() {
 
 fetchConfig () {
 	while read -r line; do
-		if [[ $line =~ ^\[[[:alnum:]]+\] ]]; then
+		if [[ ${line} =~ ^\[[[:alnum:]]+\] ]]; then
 			arrname="config_${line//[^[:alnum:]]/}"
 			declare -gA "$arrname"
-		elif [[ $line =~ ^([_[:alpha:]][_[:alnum:]]*)"="(.*) ]]; then
+		elif [[ ${line} =~ ^([_[:alpha:]][_[:alnum:]]*)"="(.*) ]]; then
 			# shellcheck disable=SC2086
 			declare -g ${arrname}[${BASH_REMATCH[1]}]="${BASH_REMATCH[2]//\"}"
 			#printf "\${${arrname}[${BASH_REMATCH[1]}]}  : %s\n" "${BASH_REMATCH[2]}"
@@ -64,9 +64,9 @@ fetchConfig () {
 
 getColor () {
 	local tmp_color=""
-	if [[ -n "$1" ]]; then
-		if [[ ${BASH_VERSINFO[0]} -ge 4 ]]; then
-			if [[ ${BASH_VERSINFO[0]} -eq 4 && ${BASH_VERSINFO[1]} -gt 1 ]] || [[ ${BASH_VERSINFO[0]} -gt 4 ]]; then
+	if [ -n "${1}" ]; then
+		if [ "${BASH_VERSINFO[0]}" -ge 4 ]; then
+			if [[ ${BASH_VERSINFO[0]} -eq 4 && ${BASH_VERSINFO[1]} -gt 1 ]] || [ "${BASH_VERSINFO[0]}" -gt 4 ]; then
 				tmp_color=${1,,}
 			else
 				tmp_color="$(tr '[:upper:]' '[:lower:]' <<< "${1}")"
@@ -101,7 +101,7 @@ getColor () {
 			*)							errorOut "That color will not work"; exit 1;;
 		esac
 
-		[[ -n "${color_ret}" ]] && printf '%s' "${color_ret}"
+		[ -n "${color_ret}" ] && printf '%s' "${color_ret}"
 	fi
 }
 
@@ -112,7 +112,7 @@ detect_kernel () {
     myKernel_machine="${kernel[2]}"
 
 	# pulled from neofetch source
-    if [[ "$myKernel_name" == "Darwin" ]]; then
+    if [ "${myKernel_name}" == "Darwin" ]; then
         # macOS can report incorrect versions unless this is 0.
         # https://github.com/dylanaraps/neofetch/issues/1607
         export SYSTEM_VERSION_COMPAT=0
@@ -147,7 +147,7 @@ detect_kernel () {
 	esac
 
 
-	verboseOut "Finding kernel...found as '${myKernel}'"
+	verboseOut "Finding kernel...found as '${myKernel}'."
 }
 
 detect_os () {
@@ -172,21 +172,21 @@ detect_os () {
             errorOut "Unknown OS detected, please report this issue."
         ;;
     esac
-	verboseOut "Finding OS...found as '${myOS}'"
+	verboseOut "Finding OS...found as '${myOS}'."
 }
 
 # Distro Detection - Begin
 detect_distro () {
-	if [[ -z "${distro}" ]]; then
-		local distro_detect=""
+	if [ -z "${distro}" ]; then
+		local distro_detect=
 		distro="Unknown"
-		if [[ "${myOS}" == "Linux" && "${distro}" == "Unknown" ]]; then
+		if [ "${myOS}" == "Linux" ] && [ "${distro}" == "Unknown" ]; then
 			# LSB Release Check
 			if type -p lsb_release >/dev/null 2>&1; then
 				distro_detect="$(lsb_release -si)"
 				distro_release="$(lsb_release -sr)"
 				distro_codename="$(lsb_release -sc)"
-				case "${distro_detect}" in
+				case ${distro_detect} in
 					"archlinux"|"Arch Linux"|"arch"|"Arch"|"archarm")
 						distro="Arch Linux"
 						unset distro_release
@@ -202,9 +202,9 @@ detect_distro () {
 						distro="Artix"
 						;;
 					"blackPantherOS"|"blackPanther"|"blackpanther"|"blackpantheros")
-						distro=$(source /etc/lsb-release; echo "$DISTRIB_ID")
-						distro_release=$(source /etc/lsb-release; echo "$DISTRIB_RELEASE")
-						distro_codename=$(source /etc/lsb-release; echo "$DISTRIB_CODENAME")
+						distro=$(source /etc/lsb-release; echo "${DISTRIB_ID}")
+						distro_release=$(source /etc/lsb-release; echo "${DISTRIB_RELEASE}")
+						distro_codename=$(source /etc/lsb-release; echo "${DISTRIB_CODENAME}")
 						;;
 					"Chakra")
 						distro="Chakra"
@@ -214,9 +214,9 @@ detect_distro () {
 						distro="CentOS Stream"
 						;;
 					"BunsenLabs")
-						distro=$(source /etc/lsb-release; echo "$DISTRIB_ID")
-						distro_release=$(source /etc/lsb-release; echo "$DISTRIB_RELEASE")
-						distro_codename=$(source /etc/lsb-release; echo "$DISTRIB_CODENAME")
+						distro=$(source /etc/lsb-release; echo "${DISTRIB_ID}")
+						distro_release=$(source /etc/lsb-release; echo "${DISTRIB_RELEASE}")
+						distro_codename=$(source /etc/lsb-release; echo "${DISTRIB_CODENAME}")
 						;;
 					"Debian")
 						distro="Debian"
@@ -326,17 +326,17 @@ detect_distro () {
 			fi
 
 			# Existing File Check
-			if [ "$distro" == "Unknown" ]; then
-				if [[ -e "/etc/mcst_version" ]]; then
+			if [ "${distro}" == "Unknown" ]; then
+				if [ -e "/etc/mcst_version" ]; then
 					distro="OS Elbrus"
 					distro_release="$(tail -n 1 /etc/mcst_version)"
-					if [[ -n ${distro_release} ]]; then
-						distro_more="$distro_release"
+					if [ -n "${distro_release}" ]; then
+						distro_more="${distro_release}"
 					fi
 				fi
 				if [ "$(uname -o 2>/dev/null)" ]; then
 					os="$(uname -o)"
-					case "$os" in
+					case ${os} in
 						"EndeavourOS")
 							distro="EndeavourOS"
 							fake_distro="${distro}"
@@ -359,23 +359,23 @@ detect_distro () {
 						;;
 					esac
 				fi
-				if [[ "${distro}" == "Unknown" ]]; then
+				if [ "${distro}" == "Unknown" ]; then
 					if [ -f /etc/os-release ]; then
 						os_release="/etc/os-release";
 					elif [ -f /usr/lib/os-release ]; then
 						os_release="/usr/lib/os-release";
 					fi
-					if [[ -n ${os_release} ]]; then
+					if [ -n "${os_release}" ]; then
 						distrib_id=$(<${os_release});
-						for l in $distrib_id; do
+						for l in ${distrib_id}; do
 							if [[ ${l} =~ ^ID= ]]; then
 								distrib_id=${l//*=}
 								distrib_id=${distrib_id//\"/}
 								break 1
 							fi
 						done
-						if [[ -n ${distrib_id} ]]; then
-							if [[ ${BASH_VERSINFO[0]} -ge 4 ]]; then
+						if [ -n "${distrib_id}" ]; then
+							if [ "${BASH_VERSINFO[0]}" -ge 4 ]; then
 								distrib_id=$(for i in ${distrib_id}; do echo -n "${i^} "; done)
 								distro=${distrib_id% }
 								unset distrib_id
@@ -387,20 +387,20 @@ detect_distro () {
 						fi
 
 						# Hotfixes
-						[[ "${distro}" == "Opensuse-tumbleweed" ]] && distro="openSUSE" && distro_more="Tumbleweed"
-						[[ "${distro}" == "Opensuse-leap" ]] && distro="openSUSE"
-						[[ "${distro}" == "void" ]] && distro="Void Linux"
-						[[ "${distro}" == "evolveos" ]] && distro="Evolve OS"
-						[[ "${distro}" == "Sulin" ]] && distro="Sulin"
+						[ "${distro}" == "Opensuse-tumbleweed" ] && distro="openSUSE" && distro_more="Tumbleweed"
+						[ "${distro}" == "Opensuse-leap" ] && distro="openSUSE"
+						[ "${distro}" == "void" ] && distro="Void Linux"
+						[ "${distro}" == "evolveos" ] && distro="Evolve OS"
+						[ "${distro}" == "Sulin" ] && distro="Sulin"
 						[[ "${distro}" == "Arch" || "${distro}" == "Archarm" || "${distro}" == "archarm" ]] && distro="Arch Linux"
-						[[ "${distro}" == "elementary" ]] && distro="elementary OS"
+						[ "${distro}" == "elementary" ] && distro="elementary OS"
 						[[ "${distro}" == "Fedora" && -d /etc/qubes-rpc ]] && distro="qubes" # Inner VM
 						[[ "${distro}" == "Ol" || "${distro}" == "ol" ]] && distro="Oracle Linux"
 						if [[ "${distro}" == "Oracle Linux" && -f /etc/oracle-release ]]; then
 							distro_more="$(sed 's/Oracle Linux //' /etc/oracle-release)"
 						fi
 						# Upstream problem, SL and so EL is using rhel ID in os-release
-						if [[ "${distro}" == "rhel" ]] || [[ "${distro}" == "Rhel" ]]; then
+						if [ "${distro}" == "rhel" ] || [ "${distro}" == "Rhel" ]; then
 							distro="Red Hat Enterprise Linux"
 							if grep -q 'Scientific' /etc/os-release; then
 								distro="Scientific Linux"
@@ -411,12 +411,12 @@ detect_distro () {
 
 						[ "${distro}" == "Neon" ] && distro="KDE neon"
 						[[ "${distro}" == "SLED" || "${distro}" == "sled" || "${distro}" == "SLES" || "${distro}" == "sles" ]] && distro="SUSE Linux Enterprise"
-						if [[ "${distro}" == "SUSE Linux Enterprise" && -f /etc/os-release ]]; then
+						if [ "${distro}" == "SUSE Linux Enterprise" ] && [ -f /etc/os-release ]; then
 							distro_more="$(awk -F'=' '/^VERSION_ID=/ {print $2}' /etc/os-release | tr -d '"')"
 						fi
-						if [[ "${distro}" == "Debian" && -f /usr/bin/pveversion ]]; then
+						if [ "${distro}" == "Debian" ] && [ -f /usr/bin/pveversion ]; then
 							distro="Proxmox VE"
-							distro_codename="n/a"
+							unset distro_codename
 							distro_release="$(/usr/bin/pveversion | grep -oP 'pve-manager\/\K\d+\.\d+')"
 						fi
 					fi
@@ -445,18 +445,18 @@ detect_distro () {
 					}')
 				fi
 
-				if [[ "${distro}" == "Unknown" ]] && [[ "${OSTYPE}" =~ "linux" || "${OSTYPE}" == "gnu" ]]; then
+				if [ "${distro}" == "Unknown" ] && [[ "${OSTYPE}" =~ "linux" || "${OSTYPE}" == "gnu" ]]; then
 					for di in arch chakra evolveos exherbo fedora \
 								frugalware gentoo kogaion mageia obarun oracle \
 								pardus pclinuxos redhat rosa SuSe; do
-						if [ -f /etc/$di-release ]; then
-							distro=$di
+						if [ -f /etc/${di}-release ]; then
+							distro=${di}
 							break
 						fi
 					done
-					if [[ "${distro}" == "oracle" ]]; then
+					if [ "${distro}" == "oracle" ]; then
 						distro_more="$(sed 's/Oracle Linux //' /etc/oracle-release)"
-					elif [[ "${distro}" == "SuSe" ]]; then
+					elif [ "${distro}" == "SuSe" ]; then
 						distro="openSUSE"
 						if [ -f /etc/os-release ]; then
 							if grep -q -i 'SUSE Linux Enterprise' /etc/os-release ; then
@@ -467,7 +467,7 @@ detect_distro () {
 						if [[ "${distro_more}" =~ "Tumbleweed" ]]; then
 							distro_more="Tumbleweed"
 						fi
-					elif [[ "${distro}" == "redhat" ]]; then
+					elif [ "${distro}" == "redhat" ]; then
 						grep -q -i 'CentOS' /etc/redhat-release && distro="CentOS"
 						grep -q -i 'Scientific' /etc/redhat-release && distro="Scientific Linux"
 						grep -q -i 'EuroLinux' /etc/redhat-release && distro="EuroLinux"
@@ -475,7 +475,7 @@ detect_distro () {
 					fi
 				fi
 
-				if [[ "${distro}" == "Unknown" ]]; then
+				if [ "${distro}" == "Unknown" ]; then
 					if [[ "${OSTYPE}" =~ "linux" || "${OSTYPE}" == "gnu" ]]; then
 						if [ -f /etc/debian_version ]; then
 							if [ -f /etc/issue ]; then
@@ -504,8 +504,8 @@ detect_distro () {
 					fi
 				fi
 
-				if [[ "${distro}" == "Unknown" ]] && [[ "${OSTYPE}" =~ "linux" || "${OSTYPE}" == "gnu" ]]; then
-					if [[ -f /etc/issue ]]; then
+				if [ "${distro}" == "Unknown" ] && [[ "${OSTYPE}" =~ "linux" || "${OSTYPE}" == "gnu" ]]; then
+					if [ -f /etc/issue ]; then
 						distro=$(awk 'BEGIN {
 							distro = "Unknown"
 						}
@@ -536,14 +536,14 @@ detect_distro () {
 					fi
 				fi
 
-				if [[ "${distro}" == "Unknown" ]] && [[ "${OSTYPE}" =~ "linux" || "${OSTYPE}" == "gnu" ]]; then
-					if [[ -f /etc/system-release ]]; then
+				if [ "${distro}" == "Unknown" ] && [[ "${OSTYPE}" =~ "linux" || "${OSTYPE}" == "gnu" ]]; then
+					if [ -f /etc/system-release ]; then
 						if grep -q -i 'Scientific Linux' /etc/system-release; then
 							distro="Scientific Linux"
 						elif grep -q -i 'Oracle Linux' /etc/system-release; then
 							distro="Oracle Linux"
 						fi
-					elif [[ -f /etc/lsb-release ]]; then
+					elif [ -f /etc/lsb-release ]; then
 						if grep -q -i 'CHROMEOS_RELEASE_NAME' /etc/lsb-release; then
 							distro="$(awk -F'=' '/^CHROMEOS_RELEASE_NAME=/ {print $2}' /etc/lsb-release)"
 							distro_more="$(awk -F'=' '/^CHROMEOS_RELEASE_VERSION=/ {print $2}' /etc/lsb-release)"
@@ -551,7 +551,7 @@ detect_distro () {
 					fi
 				fi
 			fi
-		elif [[ "${myOS}" == "Windows" ]]; then
+		elif [ "${myOS}" == "Windows" ]; then
 			distro=$(wmic os get Caption)
 			distro=${distro/Caption}
 			distro=$(trim "${distro/Microsoft }")
@@ -689,22 +689,22 @@ detect_distro () {
 				:
 				;;
 			full)
-				[[ -n ${distro_release} ]] && distro="${distro} ${distro_release}"
-				[[ -n ${distro_release} ]] && distro="${distro} ${distro_codename}"
+				[ -n "${distro_release}" ] && distro="${distro} ${distro_release}"
+				[ -n "${distro_release}" ] && distro="${distro} ${distro_codename}"
 				;;
 			version)
-				[[ -n ${distro_release} ]] && distro="${distro} ${distro_release}"
+				[ -n "${distro_release}" ] && distro="${distro} ${distro_release}"
 				;;
 			codename)
-				[[ -n ${distro_codename} ]] && distro="${distro} ${distro_codename}"
+				[ -n "${distro_codename}" ] && distro="${distro} ${distro_codename}"
 				;;
 			auto)
 				# shellcheck disable=SC2154
-				if [[ ${config_global[short]} == 'on' ]]; then
+				if [[ ${config_global[short]} =~ 'on' ]]; then
 					:
 				else
-					[[ -n ${distro_release} ]] && distro="${distro} ${distro_release}"
-					[[ -n ${distro_release} ]] && distro="${distro} ${distro_codename}"
+					[ -n "${distro_release}" ] && distro="${distro} ${distro_release}"
+					[ -n "${distro_release}" ] && distro="${distro} ${distro_codename}"
 				fi
 				;;
 		esac
@@ -712,7 +712,7 @@ detect_distro () {
 		[[ ${config_distro[os_arch]} =~ 'on' ]] && distro="${distro} ${myKernel_machine}"
 	fi
 
-	verboseOut "Finding distribution...found as '${distro}'"
+	verboseOut "Finding distribution...found as '${distro}'."
 }
 
 # Host and User detection - Begin
@@ -720,7 +720,7 @@ detect_userinfo () {
 	# shellcheck disable=SC2154
 	if [[ "${config_userinfo[display_user]}" =~ "on" ]]; then
 		myUser=${USER}
-		if [[ -z "$USER" ]]; then
+		if [ -z "$USER" ]; then
 			myUser=$(whoami)
 		fi
 		myUserInfo="${myUser}"
@@ -729,18 +729,18 @@ detect_userinfo () {
 	# shellcheck disable=SC2154
 	if [[ "${config_userinfo[display_hostname]}" =~ "on" ]]; then
 		myHost="${HOSTNAME}"
-		if [[ "${distro}" == "Mac OS X" || "${distro}" == "macOS" ]]; then
+		if [ "${distro}" == "Mac OS X" ] || [ "${distro}" == "macOS" ]; then
 			myHost=${myHost/.local}
 		fi
-		if [[ -n ${myUserInfo} ]]; then myUserInfo="${myUserInfo}@${myHost}"
+		if [ -n "${myUserInfo}" ]; then myUserInfo="${myUserInfo}@${myHost}"
 		else myUserInfo="${myHost}"; fi
 	fi
-	verboseOut "Finding user info...found as '${myUserInfo}'"
+	verboseOut "Finding user info...found as '${myUserInfo}'."
 }
 
 detect_uptime () {
 	# get seconds up since boot
-	case $myOS in
+	case ${myOS} in
 		"Mac OS X"|"macOS"|BSD)
 			boot=$(sysctl -n kern.boottime)
 			[[ ${boot} =~ [0-9]+ ]] && boot=${BASH_REMATCH[0]}
@@ -748,7 +748,7 @@ detect_uptime () {
 			_seconds=$((now-boot))
 			;;
 		Linux|Windows|[G|g][N|n][U|u])
-			if [[ -f /proc/uptime ]]; then
+			if [ -f /proc/uptime ]; then
 				_seconds=$(</proc/uptime)
 				_seconds=${_seconds//.*}
 			else
@@ -805,7 +805,7 @@ detect_uptime () {
 			;;
 		auto)
 			# shellcheck disable=SC2154
-			if [ "${config_global[short]}" == 'on' ]; then
+			if [[ "${config_global[short]}" =~ 'on' ]]; then
 				myUptime=${myUptime/ minutes/ mins}
 				myUptime=${myUptime/ minute/ min}
 				myUptime=${myUptime/ seconds/ secs}
@@ -813,16 +813,16 @@ detect_uptime () {
 			;;
 	esac
 
-	verboseOut "Finding current uptime...found as '${myUptime}'"
+	verboseOut "Finding current uptime...found as '${myUptime}'."
 }
 
 # Execution flag detection
-case $1 in
+case ${1} in
 	--help) displayHelp; exit 0;;
 	--version) displayVersion; exit 0;;
 esac
 while getopts ":hD:F:" flags; do
-	case $flags in
+	case ${flags} in
 		h) displayHelp; exit 0 ;;
 		D) distro="${OPTARG}" ;;
 		F) FETCH_CONFIG="${OPTARG}" ;;
@@ -832,7 +832,7 @@ while getopts ":hD:F:" flags; do
 	esac
 done
 
-[[ -z $FETCH_CONFIG ]] && FETCH_CONFIG="${FETCH_DATA_USER_DIR}/${FETCH_CONFIG_FILENAME}"
+[ -z "${FETCH_CONFIG}" ] && FETCH_CONFIG="${FETCH_DATA_USER_DIR}/${FETCH_CONFIG_FILENAME}"
 fetchConfig "${FETCH_CONFIG}"
 
 detect_kernel
