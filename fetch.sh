@@ -998,13 +998,15 @@ detect_packages () {
 
 detect_shell () {
 	# get configuration on whether full shell path should be displayed
+	# shellcheck disable=SC2154
 	case ${config_shell[path]} in
 		on) shell_type="${SHELL}" ;;
 		off) shell_type="${SHELL##*/}" ;;
 	esac
 
 	# if version_info is off, then return what we have now
-	[ "${config_shell[version]}" != "on" ] && myShell="${shell_type}"; return
+	# shellcheck disable=SC2154
+	[ "${config_shell[version]}" != "on" ] && myShell="${shell_type}" && return
 
 	# get shell versions
 	myShell="${shell_type} "
