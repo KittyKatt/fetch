@@ -856,7 +856,7 @@ detect_packages () {
 			_has kiss			&& _tot kiss 1
 			_has cpt-list		&& _tot cpt-list
 			_has pacman-key		&& _tot pacman -Qq --color never
-			_has apt			&& _tot apt list --installed
+			_has apt			&& _tot dpkg-query -W 	# dpkg-query is much faster than apt
 			_has rpm			&& _tot rpm -qa
 			_has xbps-query		&& _tot xbps-query -list
 			_has apk			&& _tot apk info
