@@ -123,12 +123,12 @@ _randcolor () {
 
 detect_kernel () {
     IFS=" " read -ra kernel <<< "$(uname -srm)"
-    myKernel_name="${kernel[0]}"
-    myKernel_version="${kernel[1]}"
-    myKernel_machine="${kernel[2]}"
+    kernel_name="${kernel[0]}"
+    kernel_version="${kernel[1]}"
+    kernel_machine="${kernel[2]}"
 
 	# pulled from neofetch source
-    if [ "${myKernel_name}" == "Darwin" ]; then
+    if [ "${kernel_name}" == "Darwin" ]; then
         # macOS can report incorrect versions unless this is 0.
         # https://github.com/dylanaraps/neofetch/issues/1607
         export SYSTEM_VERSION_COMPAT=0
@@ -147,55 +147,55 @@ detect_kernel () {
 	# shellcheck disable=SC2154
 	case ${config_kernel[short]} in
 		on)
-			myKernel="${myKernel_version}"
+			my_kernel="${kernel_version}"
 			;;
 		off)
-			myKernel="${myKernel_name} ${myKernel_version}"
+			my_kernel="${kernel_name} ${kernel_version}"
 			;;
 		auto)
 			# shellcheck disable=SC2154
 			if [[ ${config_global[short]} =~ 'on' ]]; then
-				myKernel="${myKernel_version}"
+				my_kernel="${kernel_version}"
 			else
-				myKernel="${myKernel_name} ${myKernel_version}"
+				my_kernel="${kernel_name} ${kernel_version}"
 			fi
 			;;
 	esac
 
-	verboseOut "Finding kernel...found as '${myKernel}'."
+	verboseOut "Finding kernel...found as '${my_kernel}'."
 }
 
 detect_os () {
-	case "${myKernel_name}" in
-        Darwin)   myOS=${darwin_name} ;;
-        SunOS)    myOS=Solaris ;;
-        Haiku)    myOS=Haiku ;;
-        MINIX)    myOS=MINIX ;;
-        AIX)      myOS=AIX ;;
-        IRIX*)    myOS=IRIX ;;
-        FreeMiNT) myOS=FreeMiNT ;;
+	case "${kernel_name}" in
+        Darwin)   my_os=${darwin_name} ;;
+        SunOS)    my_os=Solaris ;;
+        Haiku)    my_os=Haiku ;;
+        MINIX)    my_os=MINIX ;;
+        AIX)      my_os=AIX ;;
+        IRIX*)    my_os=IRIX ;;
+        FreeMiNT) my_os=FreeMiNT ;;
         Linux|GNU*)
-            myOS=Linux
+            my_os=Linux
         ;;
         *BSD|DragonFly|Bitrig)
-            myOS=BSD
+            my_os=BSD
         ;;
         CYGWIN*|MSYS*|MINGW*)
-            myOS=Windows
+            my_os=Windows
         ;;
         *)
             errorOut "Unknown OS detected, please report this issue."
         ;;
     esac
-	verboseOut "Finding OS...found as '${myOS}'."
+	verboseOut "Finding OS...found as '${my_os}'."
 }
 
 # Distro Detection - Begin
 detect_distro () {
-	if [ -z "${distro}" ]; then
+	if [ -z "${my_distro}" ]; then
 		local distro_detect=
-		distro="Unknown"
-		if [ "${myOS}" == "Linux" ] && [ "${distro}" == "Unknown" ]; then
+		my_distro="Unknown"
+		if [ "${my_os}" == "Linux" ] && [ "${my_distro}" == "Unknown" ]; then
 			# LSB Release Check
 			if type -p lsb_release >/dev/null 2>&1; then
 				distro_detect="$(lsb_release -si)"
@@ -203,147 +203,147 @@ detect_distro () {
 				distro_codename="$(lsb_release -sc)"
 				case ${distro_detect} in
 					"archlinux"|"Arch Linux"|"arch"|"Arch"|"archarm")
-						distro="Arch Linux"
+						my_distro="Arch Linux"
 						unset distro_release
 						;;
 					"ALDOS"|"Aldos")
-						distro="ALDOS"
+						my_distro="ALDOS"
 						;;
 					"ArcoLinux")
-						distro="ArcoLinux"
+						my_distro="ArcoLinux"
 						unset distro_release
 						;;
 					"artixlinux"|"Artix Linux"|"artix"|"Artix"|"Artix release")
-						distro="Artix"
+						my_distro="Artix"
 						;;
 					"blackPantherOS"|"blackPanther"|"blackpanther"|"blackpantheros")
-						distro=$(source /etc/lsb-release; echo "${DISTRIB_ID}")
+						my_distro=$(source /etc/lsb-release; echo "${DISTRIB_ID}")
 						distro_release=$(source /etc/lsb-release; echo "${DISTRIB_RELEASE}")
 						distro_codename=$(source /etc/lsb-release; echo "${DISTRIB_CODENAME}")
 						;;
 					"Chakra")
-						distro="Chakra"
+						my_distro="Chakra"
 						unset distro_release
 						;;
 					"CentOSStream")
-						distro="CentOS Stream"
+						my_distro="CentOS Stream"
 						;;
 					"BunsenLabs")
-						distro=$(source /etc/lsb-release; echo "${DISTRIB_ID}")
+						my_distro=$(source /etc/lsb-release; echo "${DISTRIB_ID}")
 						distro_release=$(source /etc/lsb-release; echo "${DISTRIB_RELEASE}")
 						distro_codename=$(source /etc/lsb-release; echo "${DISTRIB_CODENAME}")
 						;;
 					"Debian")
-						distro="Debian"
+						my_distro="Debian"
 						;;
 					"Deepin")
-						distro="Deepin"
+						my_distro="Deepin"
 						;;
 					"elementary"|"elementary OS")
-						distro="elementary OS"
+						my_distro="elementary OS"
 						;;
 					"EvolveOS")
-						distro="Evolve OS"
+						my_distro="Evolve OS"
 						;;
 					"Sulin")
-						distro="Sulin"
+						my_distro="Sulin"
 						distro_release=$(awk -F'=' '/^ID_LIKE=/ {print $2}' /etc/os-release)
 						distro_codename="Roolling donkey" # this is not wrong :D
 						;;
 					"KaOS"|"kaos")
-						distro="KaOS"
+						my_distro="KaOS"
 						;;
 					"frugalware")
-						distro="Frugalware"
+						my_distro="Frugalware"
 						unset distro_codename
 						unset distro_release
 						;;
 					"Gentoo")
-						distro="Gentoo"
+						my_distro="Gentoo"
 						;;
 					"Hyperbola GNU/Linux-libre"|"Hyperbola")
-						distro="Hyperbola GNU/Linux-libre"
+						my_distro="Hyperbola GNU/Linux-libre"
 						unset distro_codename
 						unset distro_release
 						;;
 					"Kali"|"Debian Kali Linux")
-						distro="Kali Linux"
+						my_distro="Kali Linux"
 						if [[ "${distro_codename}" =~ "kali-rolling" ]]; then
 							unset distro_codename
 							unset distro_release
 						fi
 						;;
 					"Lunar Linux"|"lunar")
-						distro="Lunar Linux"
+						my_distro="Lunar Linux"
 						;;
 					"ManjaroLinux")
-						distro="Manjaro"
+						my_distro="Manjaro"
 						;;
 					"neon"|"KDE neon")
-						distro="KDE neon"
+						my_distro="KDE neon"
 						unset distro_codename
 						unset distro_release
 						;;
 					"Ol"|"ol"|"Oracle Linux")
-						distro="Oracle Linux"
+						my_distro="Oracle Linux"
 						[ -f /etc/oracle-release ] && distro_release="$(sed 's/Oracle Linux //' /etc/oracle-release)"
 						;;
 					"LinuxMint")
-						distro="Mint"
+						my_distro="Mint"
 						;;
 					"openSUSE"|"openSUSE project"|"SUSE LINUX"|"SUSE"|*SUSELinuxEnterprise*)
-						distro="openSUSE"
+						my_distro="openSUSE"
 						;;
 					"Parabola GNU/Linux-libre"|"Parabola")
-						distro="Parabola GNU/Linux-libre"
+						my_distro="Parabola GNU/Linux-libre"
 						unset distro_codename
 						unset distro_release
 						;;
 					"Parrot"|"Parrot Security")
-						distro="Parrot Security"
+						my_distro="Parrot Security"
 						;;
 					"PCLinuxOS")
-						distro="PCLinuxOS"
+						my_distro="PCLinuxOS"
 						unset distro_codename
 						unset distro_release
 						;;
 					"Peppermint")
-						distro="Peppermint"
+						my_distro="Peppermint"
 						unset distro_codename
 						;;
 					"rhel"|*RedHatEnterprise*)
-						distro="Red Hat Enterprise Linux"
+						my_distro="Red Hat Enterprise Linux"
 						;;
 					"RosaDesktopFresh")
-						distro="ROSA"
+						my_distro="ROSA"
 						distro_release=$(grep 'VERSION=' /etc/os-release | cut -d ' ' -f3 | cut -d "\"" -f1)
 						distro_codename=$(grep 'PRETTY_NAME=' /etc/os-release | cut -d ' ' -f4,4)
 						;;
 					"SailfishOS")
-						distro="SailfishOS"
+						my_distro="SailfishOS"
 						;;
 					"Sparky"|"SparkyLinux")
-						distro="SparkyLinux"
+						my_distro="SparkyLinux"
 						;;
 					"Ubuntu")
-						distro="Ubuntu"
+						my_distro="Ubuntu"
 						;;
 					"Void"|"VoidLinux")
-						distro="Void Linux"
+						my_distro="Void Linux"
 						unset distro_codename
 						unset distro_release
 						;;
 					"Zorin")
-						distro="Zorin OS"
+						my_distro="Zorin OS"
 						unset distro_codename
 						;;
 				esac
 			fi
 
 			# Existing File Check
-			if [ "${distro}" == "Unknown" ]; then
+			if [ "${my_distro}" == "Unknown" ]; then
 				if [ -e "/etc/mcst_version" ]; then
-					distro="OS Elbrus"
+					my_distro="OS Elbrus"
 					distro_release="$(tail -n 1 /etc/mcst_version)"
 					if [ -n "${distro_release}" ]; then
 						distro_more="${distro_release}"
@@ -353,28 +353,28 @@ detect_distro () {
 					os="$(uname -o)"
 					case ${os} in
 						"EndeavourOS")
-							distro="EndeavourOS"
-							fake_distro="${distro}"
+							my_distro="EndeavourOS"
+							fake_my_distro="${my_distro}"
 						;;
 						"GNU/Linux")
 							if type -p crux >/dev/null 2>&1; then
-								distro="CRUX"
+								my_distro="CRUX"
 								distro_more="$(crux | awk '{print $3}')"
 							fi
 							if type -p nixos-version >/dev/null 2>&1; then
-								distro="NixOS"
+								my_distro="NixOS"
 								distro_more="$(nixos-version)"
 							fi
 							if type -p sorcery >/dev/null 2>&1; then
-								distro="SMGL"
+								my_distro="SMGL"
 							fi
 							if (type -p guix && type -p herd) >/dev/null 2>&1; then
-								distro="Guix System"
+								my_distro="Guix System"
 							fi
 						;;
 					esac
 				fi
-				if [ "${distro}" == "Unknown" ]; then
+				if [ "${my_distro}" == "Unknown" ]; then
 					if [ -f /etc/os-release ]; then
 						os_release="/etc/os-release";
 					elif [ -f /usr/lib/os-release ]; then
@@ -392,54 +392,54 @@ detect_distro () {
 						if [ -n "${distrib_id}" ]; then
 							if [ "${BASH_VERSINFO[0]}" -ge 4 ]; then
 								distrib_id=$(for i in ${distrib_id}; do echo -n "${i^} "; done)
-								distro=${distrib_id% }
+								my_distro=${distrib_id% }
 								unset distrib_id
 							else
 								distrib_id=$(for i in ${distrib_id}; do FIRST_LETTER=$(echo -n "${i:0:1}" | tr "[:lower:]" "[:upper:]"); echo -n "${FIRST_LETTER}${i:1} "; done)
-								distro=${distrib_id% }
+								my_distro=${distrib_id% }
 								unset distrib_id
 							fi
 						fi
 
 						# Hotfixes
-						[ "${distro}" == "Opensuse-tumbleweed" ] && distro="openSUSE" && distro_more="Tumbleweed"
-						[ "${distro}" == "Opensuse-leap" ] && distro="openSUSE"
-						[ "${distro}" == "void" ] && distro="Void Linux"
-						[ "${distro}" == "evolveos" ] && distro="Evolve OS"
-						[ "${distro}" == "Sulin" ] && distro="Sulin"
-						[[ "${distro}" == "Arch" || "${distro}" == "Archarm" || "${distro}" == "archarm" ]] && distro="Arch Linux"
-						[ "${distro}" == "elementary" ] && distro="elementary OS"
-						[[ "${distro}" == "Fedora" && -d /etc/qubes-rpc ]] && distro="qubes" # Inner VM
-						[[ "${distro}" == "Ol" || "${distro}" == "ol" ]] && distro="Oracle Linux"
-						if [[ "${distro}" == "Oracle Linux" && -f /etc/oracle-release ]]; then
+						[ "${my_distro}" == "Opensuse-tumbleweed" ] && my_distro="openSUSE" && distro_more="Tumbleweed"
+						[ "${my_distro}" == "Opensuse-leap" ] && my_distro="openSUSE"
+						[ "${my_distro}" == "void" ] && my_distro="Void Linux"
+						[ "${my_distro}" == "evolveos" ] && my_distro="Evolve OS"
+						[ "${my_distro}" == "Sulin" ] && my_distro="Sulin"
+						[[ "${my_distro}" == "Arch" || "${my_distro}" == "Archarm" || "${my_distro}" == "archarm" ]] && my_distro="Arch Linux"
+						[ "${my_distro}" == "elementary" ] && my_distro="elementary OS"
+						[[ "${my_distro}" == "Fedora" && -d /etc/qubes-rpc ]] && my_distro="qubes" # Inner VM
+						[[ "${my_distro}" == "Ol" || "${my_distro}" == "ol" ]] && my_distro="Oracle Linux"
+						if [[ "${my_distro}" == "Oracle Linux" && -f /etc/oracle-release ]]; then
 							distro_more="$(sed 's/Oracle Linux //' /etc/oracle-release)"
 						fi
 						# Upstream problem, SL and so EL is using rhel ID in os-release
-						if [ "${distro}" == "rhel" ] || [ "${distro}" == "Rhel" ]; then
-							distro="Red Hat Enterprise Linux"
+						if [ "${my_distro}" == "rhel" ] || [ "${my_distro}" == "Rhel" ]; then
+							my_distro="Red Hat Enterprise Linux"
 							if grep -q 'Scientific' /etc/os-release; then
-								distro="Scientific Linux"
+								my_distro="Scientific Linux"
 							elif grep -q 'EuroLinux' /etc/os-release; then
-								distro="EuroLinux"
+								my_distro="EuroLinux"
 							fi
 						fi	
 
-						[ "${distro}" == "Neon" ] && distro="KDE neon"
-						[[ "${distro}" == "SLED" || "${distro}" == "sled" || "${distro}" == "SLES" || "${distro}" == "sles" ]] && distro="SUSE Linux Enterprise"
-						if [ "${distro}" == "SUSE Linux Enterprise" ] && [ -f /etc/os-release ]; then
+						[ "${my_distro}" == "Neon" ] && my_distro="KDE neon"
+						[[ "${my_distro}" == "SLED" || "${my_distro}" == "sled" || "${my_distro}" == "SLES" || "${my_distro}" == "sles" ]] && my_distro="SUSE Linux Enterprise"
+						if [ "${my_distro}" == "SUSE Linux Enterprise" ] && [ -f /etc/os-release ]; then
 							distro_more="$(awk -F'=' '/^VERSION_ID=/ {print $2}' /etc/os-release | tr -d '"')"
 						fi
-						if [ "${distro}" == "Debian" ] && [ -f /usr/bin/pveversion ]; then
-							distro="Proxmox VE"
+						if [ "${my_distro}" == "Debian" ] && [ -f /usr/bin/pveversion ]; then
+							my_distro="Proxmox VE"
 							unset distro_codename
 							distro_release="$(/usr/bin/pveversion | grep -oP 'pve-manager\/\K\d+\.\d+')"
 						fi
 					fi
 				fi
 
-				if [[ "${distro}" == "Unknown" && "${OSTYPE}" =~ "linux" && -f /etc/lsb-release ]]; then
+				if [[ "${my_distro}" == "Unknown" && "${OSTYPE}" =~ "linux" && -f /etc/lsb-release ]]; then
 					LSB_RELEASE=$(</etc/lsb-release)
-					distro=$(echo "${LSB_RELEASE}" | awk 'BEGIN {
+					my_distro=$(echo "${LSB_RELEASE}" | awk 'BEGIN {
 						distro = "Unknown"
 					}
 					{
@@ -460,68 +460,68 @@ detect_distro () {
 					}')
 				fi
 
-				if [ "${distro}" == "Unknown" ] && [[ "${OSTYPE}" =~ "linux" || "${OSTYPE}" == "gnu" ]]; then
+				if [ "${my_distro}" == "Unknown" ] && [[ "${OSTYPE}" =~ "linux" || "${OSTYPE}" == "gnu" ]]; then
 					for di in arch chakra evolveos exherbo fedora \
 								frugalware gentoo kogaion mageia obarun oracle \
 								pardus pclinuxos redhat rosa SuSe; do
 						if [ -f /etc/${di}-release ]; then
-							distro=${di}
+							my_distro=${di}
 							break
 						fi
 					done
-					if [ "${distro}" == "oracle" ]; then
+					if [ "${my_distro}" == "oracle" ]; then
 						distro_more="$(sed 's/Oracle Linux //' /etc/oracle-release)"
-					elif [ "${distro}" == "SuSe" ]; then
-						distro="openSUSE"
+					elif [ "${my_distro}" == "SuSe" ]; then
+						my_distro="openSUSE"
 						if [ -f /etc/os-release ]; then
 							if grep -q -i 'SUSE Linux Enterprise' /etc/os-release ; then
-								distro="SUSE Linux Enterprise"
+								my_distro="SUSE Linux Enterprise"
 								distro_more=$(awk -F'=' '/^VERSION_ID=/ {print $2}' /etc/os-release | tr -d '"')
 							fi
 						fi
 						if [[ "${distro_more}" =~ "Tumbleweed" ]]; then
 							distro_more="Tumbleweed"
 						fi
-					elif [ "${distro}" == "redhat" ]; then
-						grep -q -i 'CentOS' /etc/redhat-release && distro="CentOS"
-						grep -q -i 'Scientific' /etc/redhat-release && distro="Scientific Linux"
-						grep -q -i 'EuroLinux' /etc/redhat-release && distro="EuroLinux"
-						grep -q -i 'PCLinuxOS' /etc/redhat-release && distro="PCLinuxOS"
+					elif [ "${my_distro}" == "redhat" ]; then
+						grep -q -i 'CentOS' /etc/redhat-release && my_distro="CentOS"
+						grep -q -i 'Scientific' /etc/redhat-release && my_distro="Scientific Linux"
+						grep -q -i 'EuroLinux' /etc/redhat-release && my_distro="EuroLinux"
+						grep -q -i 'PCLinuxOS' /etc/redhat-release && my_distro="PCLinuxOS"
 					fi
 				fi
 
-				if [ "${distro}" == "Unknown" ]; then
+				if [ "${my_distro}" == "Unknown" ]; then
 					if [[ "${OSTYPE}" =~ "linux" || "${OSTYPE}" == "gnu" ]]; then
 						if [ -f /etc/debian_version ]; then
 							if [ -f /etc/issue ]; then
 								if grep -q -i 'gNewSense' /etc/issue ; then
-									distro="gNewSense"
+									my_distro="gNewSense"
 								elif grep -q -i 'KDE neon' /etc/issue ; then
-									distro="KDE neon"
+									my_distro="KDE neon"
 									distro_more="$(cut -d ' ' -f3 /etc/issue)"
 								else
-									distro="Debian"
+									my_distro="Debian"
 								fi
 							fi
 							if grep -q -i 'Kali' /etc/debian_version ; then
-								distro="Kali Linux"
+								my_distro="Kali Linux"
 							fi
-						elif [ -f /etc/NIXOS ]; then distro="NixOS"
+						elif [ -f /etc/NIXOS ]; then my_distro="NixOS"
 						elif [ -f /etc/dragora-version ]; then
-							distro="Dragora"
+							my_distro="Dragora"
 							distro_more="$(cut -d, -f1 /etc/dragora-version)"
-						elif [ -f /etc/slackware-version ]; then distro="Slackware"
+						elif [ -f /etc/slackware-version ]; then my_distro="Slackware"
 						elif [ -f /usr/share/doc/tc/release.txt ]; then
-							distro="TinyCore"
+							my_distro="TinyCore"
 							distro_more="$(cat /usr/share/doc/tc/release.txt)"
-						elif [ -f /etc/sabayon-edition ]; then distro="Sabayon"
+						elif [ -f /etc/sabayon-edition ]; then my_distro="Sabayon"
 						fi
 					fi
 				fi
 
-				if [ "${distro}" == "Unknown" ] && [[ "${OSTYPE}" =~ "linux" || "${OSTYPE}" == "gnu" ]]; then
+				if [ "${my_distro}" == "Unknown" ] && [[ "${OSTYPE}" =~ "linux" || "${OSTYPE}" == "gnu" ]]; then
 					if [ -f /etc/issue ]; then
-						distro=$(awk 'BEGIN {
+						my_distro=$(awk 'BEGIN {
 							distro = "Unknown"
 						}
 						{
@@ -551,147 +551,147 @@ detect_distro () {
 					fi
 				fi
 
-				if [ "${distro}" == "Unknown" ] && [[ "${OSTYPE}" =~ "linux" || "${OSTYPE}" == "gnu" ]]; then
+				if [ "${my_distro}" == "Unknown" ] && [[ "${OSTYPE}" =~ "linux" || "${OSTYPE}" == "gnu" ]]; then
 					if [ -f /etc/system-release ]; then
 						if grep -q -i 'Scientific Linux' /etc/system-release; then
-							distro="Scientific Linux"
+							my_distro="Scientific Linux"
 						elif grep -q -i 'Oracle Linux' /etc/system-release; then
-							distro="Oracle Linux"
+							my_distro="Oracle Linux"
 						fi
 					elif [ -f /etc/lsb-release ]; then
 						if grep -q -i 'CHROMEOS_RELEASE_NAME' /etc/lsb-release; then
-							distro="$(awk -F'=' '/^CHROMEOS_RELEASE_NAME=/ {print $2}' /etc/lsb-release)"
+							my_distro="$(awk -F'=' '/^CHROMEOS_RELEASE_NAME=/ {print $2}' /etc/lsb-release)"
 							distro_more="$(awk -F'=' '/^CHROMEOS_RELEASE_VERSION=/ {print $2}' /etc/lsb-release)"
 						fi
 					fi
 				fi
 			fi
-		elif [ "${myOS}" == "Windows" ]; then
-			distro=$(wmic os get Caption)
-			distro=${distro/Caption}
-			distro=$(trim "${distro/Microsoft }")
-			[[ $distro =~ [[:space:]](.*) ]] && distro=${BASH_REMATCH[1]}
-			distro=${distro%%+([[:space:]])}
-		elif [[ "${myOS}" =~ [Mm]ac ]]; then
+		elif [ "${my_os}" == "Windows" ]; then
+			my_distro=$(wmic os get Caption)
+			my_distro=${my_distro/Caption}
+			my_distro=$(trim "${my_distro/Microsoft }")
+			[[ $distro =~ [[:space:]](.*) ]] && my_distro=${BASH_REMATCH[1]}
+			my_distro=${my_distro%%+([[:space:]])}
+		elif [[ "${my_os}" =~ [Mm]ac ]]; then
 			case $osx_version in
-				10.4*)  distro="Mac OS X Tiger" ;;
-				10.5*)  distro="Mac OS X Leopard" ;;
-				10.6*)  distro="Mac OS X Snow Leopard" ;;
-				10.7*)  distro="Mac OS X Lion" ;;
-				10.8*)  distro="OS X Mountain Lion" ;;
-				10.9*)  distro="OS X Mavericks" ;;
-				10.10*) distro="OS X Yosemite" ;;
-				10.11*) distro="OS X El Capitan" ;;
-				10.12*) distro="macOS Sierra" ;;
-				10.13*) distro="macOS High Sierra" ;;
-				10.14*) distro="macOS Mojave" ;;
-				10.15*) distro="macOS Catalina" ;;
-				10.16*) distro="macOS Big Sur" ;;
-				11.0*)  distro="macOS Big Sur" ;;
-				*)      distro="macOS" ;;
+				10.4*)  my_distro="Mac OS X Tiger" ;;
+				10.5*)  my_distro="Mac OS X Leopard" ;;
+				10.6*)  my_distro="Mac OS X Snow Leopard" ;;
+				10.7*)  my_distro="Mac OS X Lion" ;;
+				10.8*)  my_distro="OS X Mountain Lion" ;;
+				10.9*)  my_distro="OS X Mavericks" ;;
+				10.10*) my_distro="OS X Yosemite" ;;
+				10.11*) my_distro="OS X El Capitan" ;;
+				10.12*) my_distro="macOS Sierra" ;;
+				10.13*) my_distro="macOS High Sierra" ;;
+				10.14*) my_distro="macOS Mojave" ;;
+				10.15*) my_distro="macOS Catalina" ;;
+				10.16*) my_distro="macOS Big Sur" ;;
+				11.0*)  my_distro="macOS Big Sur" ;;
+				*)      my_distro="macOS" ;;
 			esac
 		fi
 
-		case ${distro,,} in
-			aldos) distro="ALDOS";;
-			alpine) distro="Alpine Linux" ;;
-			amzn|amazon|amazon*linux) distro="Amazon Linux" ;;
-			arch*linux*old) distro="Arch Linux - Old" ;;
-			arch|arch*linux) distro="Arch Linux" ;;
-			arch32) distro="Arch Linux 32" ;;
-			arcolinux|arcolinux*) distro="ArcoLinux" ;;
-			artix|artix*linux) distro="Artix Linux" ;;
-			blackpantheros|black*panther*) distro="blackPanther OS" ;;
-			bunsenlabs) distro="BunsenLabs" ;;
-			centos) distro="CentOS" ;;
-			centos*stream) distro="CentOS Stream" ;;
-			chakra) distro="Chakra" ;;
-			chrome*|chromium*) distro="Chrome OS" ;;
-			crux) distro="CRUX" ;;
+		case ${my_distro,,} in
+			aldos) my_distro="ALDOS";;
+			alpine) my_distro="Alpine Linux" ;;
+			amzn|amazon|amazon*linux) my_distro="Amazon Linux" ;;
+			arch*linux*old) my_distro="Arch Linux - Old" ;;
+			arch|arch*linux) my_distro="Arch Linux" ;;
+			arch32) my_distro="Arch Linux 32" ;;
+			arcolinux|arcolinux*) my_distro="ArcoLinux" ;;
+			artix|artix*linux) my_distro="Artix Linux" ;;
+			blackpantheros|black*panther*) my_distro="blackPanther OS" ;;
+			bunsenlabs) my_distro="BunsenLabs" ;;
+			centos) my_distro="CentOS" ;;
+			centos*stream) my_distro="CentOS Stream" ;;
+			chakra) my_distro="Chakra" ;;
+			chrome*|chromium*) my_distro="Chrome OS" ;;
+			crux) my_distro="CRUX" ;;
 			debian) 
-				distro="Debian"
+				my_distro="Debian"
 				. lib/Linux/Debian/debian/extra.sh
 				;;
-			devuan) distro="Devuan" ;;
-			deepin) distro="Deepin" ;;
-			dragonflybsd) distro="DragonFlyBSD" ;;
-			dragora) distro="Dragora" ;;
-			drauger*) distro="DraugerOS" ;;
-			elementary|'elementary os') distro="elementary OS";;
-			eurolinux) distro="EuroLinux" ;;
-			evolveos) distro="Evolve OS" ;;
-			sulin) distro="Sulin" ;;
-			exherbo|exherbo*linux) distro="Exherbo" ;;
-			fedora) distro="Fedora" ;;
-			freebsd) distro="FreeBSD" ;;
-			freebsd*old) distro="FreeBSD - Old" ;;
-			frugalware) distro="Frugalware" ;;
-			funtoo) distro="Funtoo" ;;
+			devuan) my_distro="Devuan" ;;
+			deepin) my_distro="Deepin" ;;
+			dragonflybsd) my_distro="DragonFlyBSD" ;;
+			dragora) my_distro="Dragora" ;;
+			drauger*) my_distro="DraugerOS" ;;
+			elementary|'elementary os') my_distro="elementary OS";;
+			eurolinux) my_distro="EuroLinux" ;;
+			evolveos) my_distro="Evolve OS" ;;
+			sulin) my_distro="Sulin" ;;
+			exherbo|exherbo*linux) my_distro="Exherbo" ;;
+			fedora) my_distro="Fedora" ;;
+			freebsd) my_distro="FreeBSD" ;;
+			freebsd*old) my_distro="FreeBSD - Old" ;;
+			frugalware) my_distro="Frugalware" ;;
+			funtoo) my_distro="Funtoo" ;;
 			gentoo)
-				distro="Gentoo"
+				my_distro="Gentoo"
 				. lib/Linux/Gentoo/gentoo/extra.sh
 				;;
-			gnewsense) distro="gNewSense" ;;
-			guix*system) distro="Guix System" ;;
-			haiku) distro="Haiku" ;;
-			hyperbolagnu|hyperbolagnu/linux-libre|'hyperbola gnu/linux-libre'|hyperbola) distro="Hyperbola GNU/Linux-libre" ;;
-			kali*linux) distro="Kali Linux" ;;
-			kaos) distro="KaOS";;
+			gnewsense) my_distro="gNewSense" ;;
+			guix*system) my_distro="Guix System" ;;
+			haiku) my_distro="Haiku" ;;
+			hyperbolagnu|hyperbolagnu/linux-libre|'hyperbola gnu/linux-libre'|hyperbola) my_distro="Hyperbola GNU/Linux-libre" ;;
+			kali*linux) my_distro="Kali Linux" ;;
+			kaos) my_distro="KaOS";;
 			kde*neon|neon)
-				distro="KDE neon"
+				my_distro="KDE neon"
 				. lib/Linux/Ubuntu/kdeneon/extra.sh
 				;;
-			kogaion) distro="Kogaion" ;;
-			lmde) distro="LMDE" ;;
-			lunar|lunar*linux) distro="Lunar Linux";;
-			manjaro) distro="Manjaro" ;;
-			mageia) distro="Mageia" ;;
-			mer) distro="Mer" ;;
+			kogaion) my_distro="Kogaion" ;;
+			lmde) my_distro="LMDE" ;;
+			lunar|lunar*linux) my_distro="Lunar Linux";;
+			manjaro) my_distro="Manjaro" ;;
+			mageia) my_distro="Mageia" ;;
+			mer) my_distro="Mer" ;;
 			mint|linux*mint)
-				distro="Mint"
+				my_distro="Mint"
 				. lib/Linux/Ubuntu/mint/extra.sh
 				;;
-			netbsd) distro="NetBSD" ;;
-			netrunner) distro="Netrunner" ;;
-			nix|nix*os) distro="NixOS" ;;
-			obarun) distro="Obarun" ;;
-			ol|oracle*linux) distro="Oracle Linux" ;;
-			openbsd) distro="OpenBSD" ;;
+			netbsd) my_distro="NetBSD" ;;
+			netrunner) my_distro="Netrunner" ;;
+			nix|nix*os) my_distro="NixOS" ;;
+			obarun) my_distro="Obarun" ;;
+			ol|oracle*linux) my_distro="Oracle Linux" ;;
+			openbsd) my_distro="OpenBSD" ;;
 			*suse*) 
-				distro="openSUSE"
+				my_distro="openSUSE"
 				. lib/Linux/SUSE/suse/extra.sh
 				;;
-			os*elbrus) distro="OS Elbrus" ;;
-			parabolagnu|parabolagnu/linux-libre|'parabola gnu/linux-libre'|parabola) distro="Parabola GNU/Linux-libre" ;;
-			parrot|parrot*security) distro="Parrot Security" ;;
-			pclinuxos|pclos) distro="PCLinuxOS" ;;
-			peppermint) distro="Peppermint" ;;
-			proxmox|proxmox*ve) distro="Proxmox VE" ;;
-			pureos) distro="PureOS" ;;
-			qubes) distro="Qubes OS" ;;
-			raspbian) distro="Raspbian" ;;
-			red*hat*|rhel) distro="Red Hat Enterprise Linux" ;;
-			rosa) distro="ROSA" ;;
-			sabayon) distro="Sabayon" ;;
+			os*elbrus) my_distro="OS Elbrus" ;;
+			parabolagnu|parabolagnu/linux-libre|'parabola gnu/linux-libre'|parabola) my_distro="Parabola GNU/Linux-libre" ;;
+			parrot|parrot*security) my_distro="Parrot Security" ;;
+			pclinuxos|pclos) my_distro="PCLinuxOS" ;;
+			peppermint) my_distro="Peppermint" ;;
+			proxmox|proxmox*ve) my_distro="Proxmox VE" ;;
+			pureos) my_distro="PureOS" ;;
+			qubes) my_distro="Qubes OS" ;;
+			raspbian) my_distro="Raspbian" ;;
+			red*hat*|rhel) my_distro="Red Hat Enterprise Linux" ;;
+			rosa) my_distro="ROSA" ;;
+			sabayon) my_distro="Sabayon" ;;
 			sailfish|sailfish*os)
-				distro="SailfishOS"
+				my_distro="SailfishOS"
 				. lib/Linux/Independent/sailfish/extra.sh
 				;;
-			scientific*) distro="Scientific Linux" ;;
-			siduction) distro="Siduction" ;;
-			smgl|source*mage|source*mage*gnu*linux) distro="Source Mage GNU/Linux" ;;
-			solus) distro="Solus" ;;
-			sparky|sparky*linux) distro="SparkyLinux" ;;
-			steam|steam*os) distro="SteamOS" ;;
-			tinycore|tinycore*linux) distro="TinyCore" ;;
-			trisquel) distro="Trisquel";;
+			scientific*) my_distro="Scientific Linux" ;;
+			siduction) my_distro="Siduction" ;;
+			smgl|source*mage|source*mage*gnu*linux) my_distro="Source Mage GNU/Linux" ;;
+			solus) my_distro="Solus" ;;
+			sparky|sparky*linux) my_distro="SparkyLinux" ;;
+			steam|steam*os) my_distro="SteamOS" ;;
+			tinycore|tinycore*linux) my_distro="TinyCore" ;;
+			trisquel) my_distro="Trisquel";;
 			ubuntu) 
-				distro="Ubuntu"
+				my_distro="Ubuntu"
 				. lib/Linux/Ubuntu/ubuntu/extra.sh
 				;;
-			void*linux) distro="Void Linux" ;;
-			zorin*) distro="Zorin OS" ;;
-			endeavour*) distro="EndeavourOS" ;;
+			void*linux) my_distro="Void Linux" ;;
+			zorin*) my_distro="Zorin OS" ;;
+			endeavour*) my_distro="EndeavourOS" ;;
 		esac
 
 		# shellcheck disable=SC2154
@@ -700,58 +700,58 @@ detect_distro () {
 				:
 				;;
 			full)
-				[ -n "${distro_release}" ] && distro="${distro} ${distro_release}"
-				[ -n "${distro_release}" ] && distro="${distro} ${distro_codename}"
+				[ -n "${distro_release}" ] && my_distro="${my_distro} ${distro_release}"
+				[ -n "${distro_release}" ] && my_distro="${my_distro} ${distro_codename}"
 				;;
 			version)
-				[ -n "${distro_release}" ] && distro="${distro} ${distro_release}"
+				[ -n "${distro_release}" ] && my_distro="${my_distro} ${distro_release}"
 				;;
 			codename)
-				[ -n "${distro_codename}" ] && distro="${distro} ${distro_codename}"
+				[ -n "${distro_codename}" ] && my_distro="${my_distro} ${distro_codename}"
 				;;
 			auto)
 				# shellcheck disable=SC2154
 				if [[ ${config_global[short]} =~ 'on' ]]; then
 					:
 				else
-					[ -n "${distro_release}" ] && distro="${distro} ${distro_release}"
-					[ -n "${distro_release}" ] && distro="${distro} ${distro_codename}"
+					[ -n "${distro_release}" ] && my_distro="${my_distro} ${distro_release}"
+					[ -n "${distro_release}" ] && my_distro="${my_distro} ${distro_codename}"
 				fi
 				;;
 		esac
 
-		[[ ${config_distro[os_arch]} =~ 'on' ]] && distro="${distro} ${myKernel_machine}"
+		[[ ${config_distro[os_arch]} =~ 'on' ]] && my_distro="${my_distro} ${kernel_machine}"
 	fi
 
-	verboseOut "Finding distribution...found as '${distro}'."
+	verboseOut "Finding distribution...found as '${my_distro}'."
 }
 
 # Host and User detection - Begin
 detect_userinfo () {
 	# shellcheck disable=SC2154
 	if [[ "${config_userinfo[display_user]}" =~ "on" ]]; then
-		myUser=${USER}
+		my_user=${USER}
 		if [ -z "$USER" ]; then
-			myUser=$(whoami)
+			my_user=$(whoami)
 		fi
-		myUserInfo="${myUser}"
+		my_userinfo="${my_user}"
 	fi
 
 	# shellcheck disable=SC2154
 	if [[ "${config_userinfo[display_hostname]}" =~ "on" ]]; then
-		myHost="${HOSTNAME}"
-		if [ "${distro}" == "Mac OS X" ] || [ "${distro}" == "macOS" ]; then
-			myHost=${myHost/.local}
+		my_host="${HOSTNAME}"
+		if [ "${my_distro}" == "Mac OS X" ] || [ "${my_distro}" == "macOS" ]; then
+			my_host=${my_host/.local}
 		fi
-		if [ -n "${myUserInfo}" ]; then myUserInfo="${myUserInfo}@${myHost}"
-		else myUserInfo="${myHost}"; fi
+		if [ -n "${my_userinfo}" ]; then my_userinfo="${my_userinfo}@${my_host}"
+		else my_userinfo="${my_host}"; fi
 	fi
-	verboseOut "Finding user info...found as '${myUserInfo}'."
+	verboseOut "Finding user info...found as '${my_userinfo}'."
 }
 
 detect_uptime () {
 	# get seconds up since boot
-	case ${myOS} in
+	case ${my_os} in
 		"Mac OS X"|"macOS"|BSD)
 			boot=$(sysctl -n kern.boottime)
 			[[ ${boot} =~ [0-9]+ ]] && boot=${BASH_REMATCH[0]}
@@ -840,11 +840,11 @@ detect_packages () {
     # _pac: If packages > 0, log package manager name.
     # _tot: Count lines in command output.
     _has() { type -p "${1}" >/dev/null && manager=${1}; }
-    _dir() { ((myPackages+=$#)); _pac "$(($#-pkgs_h))"; }
+    _dir() { ((my_packages+=$#)); _pac "$(($#-pkgs_h))"; }
     _pac() { ((${1} > 0)) && { managers+=("${1} (${manager})"); manager_string+="${manager}, "; }; }
     _tot() {
 		IFS=$'\n' read -d "" -ra pkgs <<< "$("$@" 2>/dev/null)";
-		((myPackages+=${#pkgs[@]}));
+		((my_packages+=${#pkgs[@]}));
 		_pac "$((${#pkgs[@]}-pkgs_h))";
     }
 
@@ -852,14 +852,14 @@ detect_packages () {
     [[ -f /bedrock/etc/bedrock-release && $PATH == */bedrock/cross/* ]] && {
         _tot() {
             IFS=$'\n' read -d "" -ra pkgs <<< "$(for s in $(brl list); do strat -r "$s" "$@"; done)"
-            ((myPackages+="${#pkgs[@]}"))
+            ((my_packages+="${#pkgs[@]}"))
 			_pac "$((${#pkgs[@]}-pkgs_h))";
         }
         br_prefix="/bedrock/strata/*"
     }
 
 	# get total packages based on OS value
-	case $myOS in
+	case $my_os in
 		Linux|BSD|Solaris)
 			# simple commands
 			_has kiss			&& _tot kiss 1
@@ -874,7 +874,7 @@ detect_packages () {
 			_has lvu			&& _tot lvu installed
 			_has tce-status		&& _tot tce-status -lvu
 			_has pkg_info		&& _tot pkg_info
-			_has tazpkg			&& pkgs_h=6 _tot tazpkg list && ((myPackages-=6))
+			_has tazpkg			&& pkgs_h=6 _tot tazpkg list && ((my_packages-=6))
 			_has sorcery		&& _tot gaze installed
 			_has alps			&& _tot alps showinstalled
 			_has butch			&& _tot butch list
@@ -904,7 +904,7 @@ detect_packages () {
 			}
 
 			# Complex commands
-            _has kpm-pkg 		&& ((myPackages+=$(kpm  --get-selections | grep -cv deinstall$)))
+            _has kpm-pkg 		&& ((my_packages+=$(kpm  --get-selections | grep -cv deinstall$)))
 			_has guix 			&& {
                 manager=guix-system && _tot guix package -p "/run/current-system/profile" -I
                 manager=guix-user   && _tot guix package -I
@@ -924,11 +924,11 @@ detect_packages () {
             _has pkginfo && _tot pkginfo -i
 
 			# BSD-like package detection
-            case ${myKernel_name} in
+            case ${kernel_name} in
                 FreeBSD|DragonFly) _has pkg && _tot pkg info ;;
                 *)
                     _has pkg && _dir /var/db/pkg/*
-                    ((myPackages == 0)) && _has pkg && _tot pkg list
+                    ((my_packages == 0)) && _has pkg && _tot pkg list
                 ;;
             esac
 
@@ -940,14 +940,14 @@ detect_packages () {
             # Snap hangs if the command is run without the daemon running.
             # Only run snap if the daemon is also running.
             _has snap && pgrep -x snapd >/dev/null && \
-				pkgs_h=1 _tot snap list && ((myPackages-=1))
+				pkgs_h=1 _tot snap list && ((my_packages-=1))
 
             # This is the only standard location for appimages.
             # See: https://github.com/AppImage/AppImageKit/wiki
             manager=appimage && _has appimaged && _dir ~/.local/bin/*.appimage
 			;;
 		"Mac OS X"|"macOS")
-            _has port  && pkgs_h=1 _tot port installed && ((myPackages-=1))
+            _has port  && pkgs_h=1 _tot port installed && ((my_packages-=1))
             _has brew  && _dir /usr/local/Cellar/*
             _has nix-store && {
                 nix-user-pkgs() {
@@ -959,13 +959,13 @@ detect_packages () {
             }
 			;;
         Windows)
-            case ${myKernel_name} in
+            case ${kernel_name} in
                 CYGWIN*) _has cygcheck && _tot cygcheck -cd ;;
                 MSYS*)   _has pacman   && _tot pacman -Qq --color never ;;
             esac
 
             # Scoop environment throws errors if `tot scoop list` is used
-            _has scoop && pkgs_h=1 _dir ~/scoop/apps/* && ((myPackages-=1))
+            _has scoop && pkgs_h=1 _dir ~/scoop/apps/* && ((my_packages-=1))
 
 			# Count chocolatey packages.
 			_has choco && _dir /c/ProgramData/chocolatey/lib/*
@@ -974,12 +974,12 @@ detect_packages () {
 			;;
         Haiku)
             _has pkgman && _dir /boot/system/package-links/*
-            myPackages=${myPackages/pkgman/depot}
+            my_packages=${my_packages/pkgman/depot}
 			;;
 	esac
 
-	if ((myPackages == 0)); then
-		unset myPackages
+	if ((my_packages == 0)); then
+		unset my_packages
 	else
 		# shellcheck disable=SC2154
 		case ${config_packages[managers]} in
@@ -987,18 +987,18 @@ detect_packages () {
 				:
 				;;
 			split)
-				printf -v myPackages '%s, ' "${managers[@]}"
-				myPackages=${myPackages%,*}
+				printf -v my_packages '%s, ' "${managers[@]}"
+				my_packages=${my_packages%,*}
 				;;
 			on)
-				myPackages+=" (${manager_string%,*})"
+				my_packages+=" (${manager_string%,*})"
 				;;
 		esac
 		# replace pacman-key with pacman
-		myPackages=${myPackages/pacman-key/pacman}
+		my_packages=${my_packages/pacman-key/pacman}
 	fi
 
-	verboseOut "Finding current package count...found as '${myPackages}'."
+	verboseOut "Finding current package count...found as '${my_packages}'."
 }
 
 detect_shell () {
@@ -1011,77 +1011,77 @@ detect_shell () {
 
 	# if version_info is off, then return what we have now
 	# shellcheck disable=SC2154
-	[ "${config_shell[version]}" != "on" ] && myShell="${shell_type}" && return
+	[ "${config_shell[version]}" != "on" ] && my_shell="${shell_type}" && return
 
 	# get shell versions
-	myShell="${shell_type} "
+	my_shell="${shell_type} "
 	case ${shell_name:=${SHELL##*/}} in
 		bash)
 			[[ ${BASH_VERSION} ]] || BASH_VERSION=$("${SHELL}" -c "printf %s \"\$BASH_VERSION\"")
-			myShell+="${BASH_VERSION/-*}"
+			my_shell+="${BASH_VERSION/-*}"
 			;;
 		sh|ash|dash|es) ;;
 		*ksh)
-			myShell+=$("${SHELL}" -c "printf %s \"\$KSH_VERSION\"")
-			myShell=${myShell/ * KSH}
-			myShell=${myShell/version}
+			my_shell+=$("${SHELL}" -c "printf %s \"\$KSH_VERSION\"")
+			my_shell=${my_shell/ * KSH}
+			my_shell=${my_shell/version}
 			;;
 		osh)
 			if [[ ${OIL_VERSION} ]]; then
-				myShell+=${OIL_VERSION}
+				my_shell+=${OIL_VERSION}
 			else
-				myShell+=$("${SHELL}" -c "printf %s \"\$OIL_VERSION\"")
+				my_shell+=$("${SHELL}" -c "printf %s \"\$OIL_VERSION\"")
 			fi
 			;;
 		tcsh)
-			myShell+=$("${SHELL}" -c "printf %s \$tcsh")
+			my_shell+=$("${SHELL}" -c "printf %s \$tcsh")
 			;;
 		yash)
-			myShell+=$("${SHELL}" --version 2>&1)
-			myShell=${myShell/ ${shell_name}}
-			myShell=${myShell/ Yet another shell}
-			myShell=${myShell/Copyright*}
+			my_shell+=$("${SHELL}" --version 2>&1)
+			my_shell=${my_shell/ ${shell_name}}
+			my_shell=${my_shell/ Yet another shell}
+			my_shell=${my_shell/Copyright*}
 			;;
 		fish)
 			[[ "${FISH_VERSION}" ]] || FISH_VERSION=$("${SHELL}" -c "printf %s \"\$FISH_VERSION\"")
-			myShell+="${FISH_VERSION}"
+			my_shell+="${FISH_VERSION}"
 			;;
 		*)
-			myShell+=$("${SHELL}" --version 2>&1)
-			myShell=${myShell/ ${shell_name}}
+			my_shell+=$("${SHELL}" --version 2>&1)
+			my_shell=${my_shell/ ${shell_name}}
 			;;
 	esac
 
     # remove unwanted
-    myShell=${myShell/, version}
-    myShell=${myShell/xonsh\//xonsh }
-    myShell=${myShell/options*}
-    myShell=${myShell/\(*\)}
+    my_shell=${my_shell/, version}
+    my_shell=${my_shell/xonsh\//xonsh }
+    my_shell=${my_shell/options*}
+    my_shell=${my_shell/\(*\)}
 
-	verboseOut "Finding current shell...found as '${myShell}'."
+	verboseOut "Finding current shell...found as '${my_shell}'."
 }
 
 detect_cpu () {
-	case ${myOS} in
+	case ${my_os} in
 		"Mac OS X"|"macOS")
-			myCPU="$(sysctl -n machdep.cpu.brand_string)"
+			my_cpu="$(sysctl -n machdep.cpu.brand_string)"
 			_cores=$(sysctl -n hw.logicalcpu_max)
 			;;
 		"Linux" | "Windows" )
 			_file="/proc/cpuinfo"
-			case ${myKernel_machine} in
+			case ${kernel_machine} in
                 "frv" | "hppa" | "m68k" | "openrisc" | "or"* | "powerpc" | "ppc"* | "sparc"*)
-                    myCPU="$(awk -F':' '/^cpu\t|^CPU/ {printf $2; exit}' "${_file}")"
+                    my_cpu="$(awk -F':' '/^cpu\t|^CPU/ {printf $2; exit}' "${_file}")"
 					;;
                 "s390"*)
-                    myCPU="$(awk -F'=' '/machine/ {print $4; exit}' "${_file}")"
+                    my_cpu="$(awk -F'=' '/machine/ {print $4; exit}' "${_file}")"
 					;;	
                 "ia64" | "m32r")
-                    myCPU="$(awk -F':' '/model/ {print $2; exit}' "${_file}")"
-                    [[ -z "$myCPU" ]] && myCPU="$(awk -F':' '/family/ {printf $2; exit}' "${_file}")"
+                    my_cpu="$(awk -F':' '/model/ {print $2; exit}' "${_file}")"
+                    [[ -z "$my_cpu" ]] && my_cpu="$(awk -F':' '/family/ {printf $2; exit}' "${_file}")"
 					;;
                 *)
-                    myCPU="$(awk -F '\\s*: | @' \
+                    my_cpu="$(awk -F '\\s*: | @' \
                             '/model name|Hardware|Processor|^cpu model|chip type|^cpu type/ {
                             cpu=$2; if ($1 == "Hardware") exit } END { print cpu }' "${_file}")"
 							;;
@@ -1122,27 +1122,27 @@ detect_cpu () {
 	esac
 
     # Remove un-needed patterns from cpu output.
-    myCPU="${myCPU//(TM)}"
-    myCPU="${myCPU//(tm)}"
-    myCPU="${myCPU//(R)}"
-    myCPU="${myCPU//(r)}"
-	myCPU="${myCPU//?([+[:space:]])CPU}"
-    myCPU="${myCPU//Processor}"
-    myCPU="${myCPU//Dual-Core}"
-    myCPU="${myCPU//Quad-Core}"
-    myCPU="${myCPU//Six-Core}"
-    myCPU="${myCPU//Eight-Core}"
-    myCPU="${myCPU//[1-9][0-9]-Core}"
-    myCPU="${myCPU//[0-9]-Core}"
-    myCPU="${myCPU//, * Compute Cores}"
-    myCPU="${myCPU//Core / }"
-    myCPU="${myCPU//(\"AuthenticAMD\"*)}"
-    myCPU="${myCPU//with Radeon * Graphics}"
-    myCPU="${myCPU//, altivec supported}"
-    myCPU="${myCPU//FPU*}"
-    myCPU="${myCPU//Chip Revision*}"
-    myCPU="${myCPU//Technologies, Inc}"
-    myCPU="${myCPU//Core2/Core 2}"
+    my_cpu="${my_cpu//(TM)}"
+    my_cpu="${my_cpu//(tm)}"
+    my_cpu="${my_cpu//(R)}"
+    my_cpu="${my_cpu//(r)}"
+	my_cpu="${my_cpu//?([+[:space:]])CPU}"
+    my_cpu="${my_cpu//Processor}"
+    my_cpu="${my_cpu//Dual-Core}"
+    my_cpu="${my_cpu//Quad-Core}"
+    my_cpu="${my_cpu//Six-Core}"
+    my_cpu="${my_cpu//Eight-Core}"
+    my_cpu="${my_cpu//[1-9][0-9]-Core}"
+    my_cpu="${my_cpu//[0-9]-Core}"
+    my_cpu="${my_cpu//, * Compute Cores}"
+    my_cpu="${my_cpu//Core / }"
+    my_cpu="${my_cpu//(\"AuthenticAMD\"*)}"
+    my_cpu="${my_cpu//with Radeon * Graphics}"
+    my_cpu="${my_cpu//, altivec supported}"
+    my_cpu="${my_cpu//FPU*}"
+    my_cpu="${my_cpu//Chip Revision*}"
+    my_cpu="${my_cpu//Technologies, Inc}"
+    my_cpu="${my_cpu//Core2/Core 2}"
 
     # Trim spaces from core and speed output
     _cores="${_cores//[[:space:]]}"
@@ -1150,26 +1150,26 @@ detect_cpu () {
 
     # Remove CPU brand from the output.
     if [ "${config_cpu[brand]}" == "off" ]; then
-        myCPU="${myCPU/AMD }"
-        myCPU="${myCPU/Intel }"
-        myCPU="${myCPU/Core? Duo }"
-        myCPU="${myCPU/Qualcomm }"
+        my_cpu="${my_cpu/AMD }"
+        my_cpu="${my_cpu/Intel }"
+        my_cpu="${my_cpu/Core? Duo }"
+        my_cpu="${my_cpu/Qualcomm }"
     fi
 
     # Add CPU cores to the output.
     [[ "${config_cpu[cores]}" != "off" && "${_cores}" ]] && \
-        case ${myOS} in
-            "Mac OS X"|"macOS") myCPU="${myCPU/@/(${_cores}) @}" ;;
-            *)                  myCPU="${myCPU} (${_cores})" ;;
+        case ${my_os} in
+            "Mac OS X"|"macOS") my_cpu="${my_cpu/@/(${_cores}) @}" ;;
+            *)                  my_cpu="${my_cpu} (${_cores})" ;;
         esac
 
     # Add CPU speed to the output.
     if [[ "${config_cpu[speed]}" != "off" && "${_speed}" ]]; then
         if (( _speed < 1000 )); then
-            myCPU="${myCPU} @ ${_speed}MHz"
+            my_cpu="${my_cpu} @ ${_speed}MHz"
         else
             _speed="${_speed:0:1}.${_speed:1}"
-            myCPU="${myCPU} @ ${_speed}GHz"
+            my_cpu="${my_cpu} @ ${_speed}GHz"
         fi
     fi
 
@@ -1182,10 +1182,14 @@ detect_cpu () {
 
         # Format the output
         _deg="[${_deg/${_deg: -1}}.${_deg: -1}°${config_cpu[temp]:-C}]"
-        myCPU="${myCPU} ${_deg}"
+        my_cpu="${my_cpu} ${_deg}"
     fi
 
-	verboseOut "Finding CPU...found as '${myCPU}'."
+	verboseOut "Finding CPU...found as '${my_cpu}'."
+}
+
+print_ascii () {
+	echo 'nothing here yet :('
 }
 
 usage() {
@@ -1215,7 +1219,7 @@ while getopts ":hvVD:" flags; do
 		h) usage; exit 0 ;;
 		V) versioninfo; exit 0 ;;
 		v) declare config_global[verbose]="on" ;;
-		D) distro="${OPTARG}" ;;
+		D) my_distro="${OPTARG}" ;;
 		:) errorOut "Error: You're missing an argument somewhere. Exiting."; exit 1 ;;
 		?) errorOut "Error: Invalid flag somewhere. Exiting."; exit 1 ;;
 		*) errorOut "Error"; exit 1 ;;
@@ -1228,12 +1232,14 @@ for i in userinfo distro uptime packages shell cpu; do
 	_arr="config_${i}[display]"
 	if [[ "${!_arr}" =~ "on" ]]; then eval detect_${i}; fi
 done
-echo "fetch! You are ${myUserInfo}!"
-echo "fetch! You're on ${distro}."
-echo "fetch! You're using ${myKernel} on ${myOS}."
-echo "fetch! You've been up for ${myUptime}."
-echo "fetch! Your current package count is: ${myPackages}."
-echo "fetch! You're using ${myShell}."
-echo "fetch! You're running on ${myCPU}."
+echo "fetch! You are ${my_userinfo}!"
+echo "fetch! You're on ${my_distro}."
+echo "fetch! You're using ${my_kernel} on ${my_os}."
+echo "fetch! You've been up for ${my_os}."
+echo "fetch! Your current package count is: ${my_packages}."
+echo "fetch! You're using ${my_shell}."
+echo "fetch! You're running on ${my_cpu}."
+
+print_ascii
 
 ((extglob_set)) && shopt -u extglob
