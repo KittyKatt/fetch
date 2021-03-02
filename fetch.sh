@@ -117,7 +117,7 @@ getColor () {
 }
 _randcolor () {
 	local color=
-	color=$((${RANDOM} % 255))
+	color=$(($RANDOM % 255))
 	echo "${color}"
 }
 
@@ -1090,13 +1090,15 @@ detect_cpu () {
 			_speed_dir="/sys/devices/system/cpu/cpu0/cpufreq"
 
 			# Select the right temperature file.
-			[[ -d /sys/class/hwmon/* ]] && \
+			[[ -d /sys/class/hwmon && "$(ls -A /sys/class/hwmon)" ]] && \
 				for temp_dir in /sys/class/hwmon/*; do
-					[[ "$(< "${temp_dir}/name")" =~ (cpu_thermal|coretemp|fam15h_power|k10temp) ]] && {
-						temp_dirs=("$temp_dir"/temp*_input)
-						temp_dir=${temp_dirs[0]}
-						break
-					}
+					if [ -n "${temp_dir}" ]; then
+						[[ "$(< "${temp_dir}/name")" =~ (cpu_thermal|coretemp|fam15h_power|k10temp) ]] && {
+							temp_dirs=("$temp_dir"/temp*_input)
+							temp_dir=${temp_dirs[0]}
+							break
+						}
+					fi
 				done
 
 			# Get CPU speed.
