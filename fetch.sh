@@ -50,11 +50,12 @@ trim() {
 }
 
 fetchConfig () {
-	while read line; do
+	while read -r line; do
 		if [[ $line =~ ^\[[[:alnum:]]+\] ]]; then
 			arrname="config_${line//[^[:alnum:]]/}"
-			declare -gA $arrname
+			declare -gA "$arrname"
 		elif [[ $line =~ ^([_[:alpha:]][_[:alnum:]]*)"="(.*) ]]; then
+			# shellcheck disable=SC2086
 			declare -g ${arrname}[${BASH_REMATCH[1]}]="${BASH_REMATCH[2]//\"}"
 			#printf "\${${arrname}[${BASH_REMATCH[1]}]}  : %s\n" "${BASH_REMATCH[2]}"
 		fi
@@ -100,7 +101,7 @@ getColor () {
 			*)							errorOut "That color will not work"; exit 1;;
 		esac
 
-		[[ -n "${color_ret}" ]] && printf '%s' ${color_ret}
+		[[ -n "${color_ret}" ]] && printf '%s' "${color_ret}"
 	fi
 }
 
@@ -707,6 +708,8 @@ detect_distro () {
 				fi
 				;;
 		esac
+
+		[[ ${config_distro[os_arch]} =~ 'on' ]] && distro="${distro} ${myKernel_machine}"
 	fi
 
 	verboseOut "Finding distribution...found as '${distro}'"
