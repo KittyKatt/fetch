@@ -832,11 +832,10 @@ detect_packages () {
     # _tot: Count lines in command output.
     _has() { type -p "${1}" >/dev/null && manager=${1}; }
     _dir() { ((myPackages+=$#)); _pac "$(($#-pkgs_h))"; }
-    _pac() { ((${1} > 0)) && { echo "$1"; managers+=("${1} (${manager})"); manager_string+="${manager}, "; }; }
+    _pac() { ((${1} > 0)) && { managers+=("${1} (${manager})"); manager_string+="${manager}, "; }; }
     _tot() {
 		IFS=$'\n' read -d "" -ra pkgs <<< "$("$@")";
 		((myPackages+=${#pkgs[@]}));
-		echo "_tot $myPackages = ${#pkgs[@]}"
 		_pac "$((${#pkgs[@]}-pkgs_h))";
     }
 
@@ -857,7 +856,7 @@ detect_packages () {
 			_has kiss			&& _tot kiss 1
 			_has cpt-list		&& _tot cpt-list
 			_has pacman-key		&& _tot pacman -Qq --color never
-			_has apt			&& _tot apt list
+			_has apt			&& _tot apt list --installed
 			_has rpm			&& _tot rpm -qa
 			_has xbps-query		&& _tot xbps-query -list
 			_has apk			&& _tot apk info
