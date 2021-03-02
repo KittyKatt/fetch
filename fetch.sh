@@ -17,7 +17,7 @@ shopt -q extglob; extglob_set=$?
 
 verboseOut () {
 	# shellcheck disable=SC2154
-	if [ "${config_global[verbosity]}" -eq "1" ]; then
+	if [[ ${config_global[verbose]} =~ "on" ]]; then
 		printf '\033[1;31m:: \033[0m%s\n' "${1}"
 	fi
 }
@@ -65,8 +65,8 @@ fetchConfig () {
 getColor () {
 	local tmp_color=""
 	if [ -n "${1}" ]; then
-		if [ "${BASH_VERSINFO[0]}" -ge 4 ]; then
-			if [[ ${BASH_VERSINFO[0]} -eq 4 && ${BASH_VERSINFO[1]} -gt 1 ]] || [ "${BASH_VERSINFO[0]}" -gt 4 ]; then
+		if [ "${BASH_VERSINFO[0]}" -ge '4' ]; then
+			if [[ ${BASH_VERSINFO[0]} -eq '4' && ${BASH_VERSINFO[1]} -gt '1' ]] || [ "${BASH_VERSINFO[0]}" -gt '4' ]; then
 				tmp_color=${1,,}
 			else
 				tmp_color="$(tr '[:upper:]' '[:lower:]' <<< "${1}")"
@@ -138,14 +138,16 @@ detect_kernel () {
 			;;
 		auto)
 			# shellcheck disable=SC2154
-			if [[ ${config_global[short]} == 'on' ]]; then
+			if [[ ${config_global[short]} =~ 'on' ]]; then
 				myKernel="${myKernel_version}"
 			else
 				myKernel="${myKernel_name} ${myKernel_version}"
 			fi
 			;;
+		*)
+			echo "nope"
+			;;
 	esac
-
 
 	verboseOut "Finding kernel...found as '${myKernel}'."
 }
