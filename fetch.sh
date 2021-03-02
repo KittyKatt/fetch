@@ -1086,7 +1086,7 @@ detect_cpu () {
 			_speed_dir="/sys/devices/system/cpu/cpu0/cpufreq"
 
 			# Select the right temperature file.
-			[[ -d /sys/class/hwmon/ ]] && \
+			[[ -d /sys/class/hwmon/* ]] && \
 				for temp_dir in /sys/class/hwmon/*; do
 					[[ "$(< "${temp_dir}/name")" =~ (cpu_thermal|coretemp|fam15h_power|k10temp) ]] && {
 						temp_dirs=("$temp_dir"/temp*_input)
