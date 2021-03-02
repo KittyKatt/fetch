@@ -70,6 +70,9 @@ fetchConfig () {
 	fi
 }
 
+colorize () {
+	printf $'\033[0m\033[38;5;%sm' "$1"
+}
 getColor () {
 	local tmp_color=""
 	if [ -n "${1}" ]; then
@@ -111,6 +114,11 @@ getColor () {
 
 		[ -n "${color_ret}" ] && printf '%s' "${color_ret}"
 	fi
+}
+_randcolor () {
+	local color=
+	color=$((${RANDOM} % 255))
+	echo "${color}"
 }
 
 detect_kernel () {
