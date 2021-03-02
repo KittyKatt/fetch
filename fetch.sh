@@ -1120,7 +1120,7 @@ detect_cpu () {
     myCPU="${myCPU//(tm)}"
     myCPU="${myCPU//(R)}"
     myCPU="${myCPU//(r)}"
-	myCPU="${myCPU//CPU[? ]}"
+	myCPU="${myCPU//?([+[:space:]])CPU}"
     myCPU="${myCPU//Processor}"
     myCPU="${myCPU//Dual-Core}"
     myCPU="${myCPU//Quad-Core}"
