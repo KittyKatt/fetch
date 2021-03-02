@@ -999,18 +999,49 @@ detect_packages () {
 detect_shell () {
 	# get configuration on whether full shell path should be displayed
 	case ${config_shell[path]} in
-		on) myShell="${SHELL} " ;;
-		off) myShell="${SHELL##*/} " ;;
+		on) shell_type="${SHELL}" ;;
+		off) shell_type="${SHELL##*/}" ;;
 	esac
 
 	# if version_info is off, then return what we have now
-	[ "${config_shell[version]}" != "on" ] && return
+	[ "${config_shell[version]}" != "on" ] && myShell="${shell_type}"; return
 
 	# get shell versions
-	case ${SHELL##*/} in
+	myShell="${shell_type} "
+	case ${shell_name:=${SHELL##*/}} in
 		bash)
-			[[ ${BASH_VERSION} ]] || BASH_VERSION=$("${SHELL}" -c "printf %s \"\${BASH_VERSION}\"")
-			myShell+=${BASH_VERSION/-*}
+			[[ ${BASH_VERSION} ]] || BASH_VERSION=$("${SHELL}" -c "printf %s \"\$BASH_VERSION\"")
+			myShell+="${BASH_VERSION/-*}"
+			;;
+		sh|ash|dash|es) ;;
+		*ksh)
+			myShell+=$("${SHELL}" -c "printf %s \"\$KSH_VERSION\"")
+			myShell=${myShell/ * KSH}
+			myShell=${myShell/version}
+			;;
+		osh)
+			if [[ ${OIL_VERSION} ]]; then
+				myShell+=${OIL_VERSION}
+			else
+				myShell+=$("${SHELL}" -c "printf %s \"\$OIL_VERSION\"")
+			fi
+			;;
+		tcsh)
+			myShell+=$("${SHELL}" -c "printf %s \$tcsh")
+			;;
+		yash)
+			myShell+=$("${SHELL}" --version 2>&1)
+			myShell=${myShell/ ${shell_name}}
+			myShell=${myShell/ Yet another shell}
+			myShell=${myShell/Copyright*}
+			;;
+		fish)
+			[[ "${FISH_VERSION}" ]] || FISH_VERSION=$("${SHELL}" -c "printf %s \"\$FISH_VERSION\"")
+			myShell+="${FISH_VERSION}"
+			;;
+		*)
+			myShell+=$("${SHELL}" --version 2>&1)
+			myShell=${myShell/ ${shell_name}}
 			;;
 	esac
 
