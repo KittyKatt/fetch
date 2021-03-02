@@ -834,7 +834,7 @@ detect_packages () {
     _dir() { ((myPackages+=$#)); _pac "$(($#-pkgs_h))"; }
     _pac() { ((${1} > 0)) && { managers+=("${1} (${manager})"); manager_string+="${manager}, "; }; }
     _tot() {
-		IFS=$'\n' read -d "" -ra pkgs <<< "$("$@")";
+		IFS=$'\n' read -d "" -ra pkgs <<< "$("$@" 2>/dev/null)";
 		((myPackages+=${#pkgs[@]}));
 		_pac "$((${#pkgs[@]}-pkgs_h))";
     }
