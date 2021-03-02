@@ -563,11 +563,7 @@ detect_distro () {
 			distro=${distro/Caption}
 			distro=$(trim "${distro/Microsoft }")
 			[[ $distro =~ [[:space:]](.*) ]] && distro=${BASH_REMATCH[1]}
-			if grep -q -i 'Microsoft' /proc/version 2>/dev/null || \
-				grep -q -i 'Microsoft' /proc/sys/kernel/osrelease 2>/dev/null
-			then
-				wsl="(on the Windows Subsystem for Linux)"
-			fi
+			distro=${distro%%+([[:space:]])}
 		elif [[ "${myOS}" =~ [Mm]ac ]]; then
 			case $osx_version in
 				10.4*)  distro="Mac OS X Tiger" ;;
