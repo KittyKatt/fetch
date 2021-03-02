@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+FETCH_VERSION="0.5"
 FETCH_DATA_DIR="/usr/share/fetch"
 FETCH_DATA_USER_DIR="${XDG_CONFIG_HOME:-$HOME}/.config/fetch"
 FETCH_CONFIG_FILENAME="config"
@@ -50,16 +51,21 @@ trim() {
 }
 
 fetchConfig () {
-	while read -r line; do
-		if [[ ${line} =~ ^\[[[:alnum:]]+\] ]]; then
-			arrname="config_${line//[^[:alnum:]]/}"
-			declare -gA "$arrname"
-		elif [[ ${line} =~ ^([_[:alpha:]][_[:alnum:]]*)"="(.*) ]]; then
-			# shellcheck disable=SC2086
-			declare -g ${arrname}[${BASH_REMATCH[1]}]="${BASH_REMATCH[2]//\"}"
-			#printf "\${${arrname}[${BASH_REMATCH[1]}]}  : %s\n" "${BASH_REMATCH[2]}"
-		fi
-	done < "${1}"
+	if [ -f "${1}" ]; then
+		while read -r line; do
+			if [[ ${line} =~ ^\[[[:alnum:]]+\] ]]; then
+				arrname="config_${line//[^[:alnum:]]/}"
+				declare -gA "$arrname"
+			elif [[ ${line} =~ ^([_[:alpha:]][_[:alnum:]]*)"="(.*) ]]; then
+				# shellcheck disable=SC2086
+				{
+					_arr=${arrname}[${BASH_REMATCH[1]}]
+					[ -z ${!_arr} ] && declare -g ${arrname}[${BASH_REMATCH[1]}]="${BASH_REMATCH[2]//\"}"
+					unset _arr
+				}
+			fi
+		done < "${1}"
+	fi
 }
 
 getColor () {
@@ -143,9 +149,6 @@ detect_kernel () {
 			else
 				myKernel="${myKernel_name} ${myKernel_version}"
 			fi
-			;;
-		*)
-			echo "nope"
 			;;
 	esac
 
@@ -991,24 +994,39 @@ detect_packages () {
 	verboseOut "Finding current package count...found as '${myPackages}'."
 }
 
+usage() {
+	printf "Help!\n"
+}
+
+versioninfo () {
+	printf 'fetch %s\n' "${FETCH_VERSION}"
+}
+
+# Catch configuration flag
+[[ "$*" != *--config* ]] && fetchConfig "${FETCH_DATA_USER_DIR}/${FETCH_CONFIG_FILENAME}"
+
 # Execution flag detection
 case ${1} in
-	--help) displayHelp; exit 0;;
-	--version) displayVersion; exit 0;;
+	--help) usage; exit 0;;
+	--version) versioninfo; exit 0;;
+	--config)
+		FETCH_CONFIG="${2}"
+		fetchConfig "${FETCH_CONFIG}"
+		shift
+		;;
 esac
-while getopts ":hD:F:" flags; do
+
+while getopts ":hvVD:" flags; do
 	case ${flags} in
-		h) displayHelp; exit 0 ;;
+		h) usage; exit 0 ;;
+		V) versioninfo; exit 0 ;;
+		v) declage -g ${config_global[verbosity]}="on" ;;
 		D) distro="${OPTARG}" ;;
-		F) FETCH_CONFIG="${OPTARG}" ;;
 		:) errorOut "Error: You're missing an argument somewhere. Exiting."; exit 1 ;;
 		?) errorOut "Error: Invalid flag somewhere. Exiting."; exit 1 ;;
 		*) errorOut "Error"; exit 1 ;;
 	esac
 done
-
-[ -z "${FETCH_CONFIG}" ] && FETCH_CONFIG="${FETCH_DATA_USER_DIR}/${FETCH_CONFIG_FILENAME}"
-fetchConfig "${FETCH_CONFIG}"
 
 detect_kernel
 detect_os
