@@ -65,6 +65,8 @@ fetchConfig () {
 				}
 			fi
 		done < "${1}"
+	else
+		errorOut "No configuration file specified"
 	fi
 }
 
@@ -994,6 +996,27 @@ detect_packages () {
 	verboseOut "Finding current package count...found as '${myPackages}'."
 }
 
+detect_shell () {
+	# get configuration on whether full shell path should be displayed
+	case ${config_shell[path]} in
+		on) myShell="${SHELL} " ;;
+		off) myShell="${SHELL##*/} " ;;
+	esac
+
+	# if version_info is off, then return what we have now
+	[ "${config_shell[version]}" != "on" ] && return
+
+	# get shell versions
+	case ${SHELL##*/} in
+		bash)
+			[[ ${BASH_VERSION} ]] || BASH_VERSION=$("${SHELL}" -c "printf %s \"\${BASH_VERSION}\"")
+			myShell+=${BASH_VERSION/-*}
+			;;
+	esac
+
+	verboseOut "Finding current shell...found as '$myShell'."
+}
+
 usage() {
 	printf "Help!\n"
 }
@@ -1012,7 +1035,7 @@ case ${1} in
 	--config)
 		FETCH_CONFIG="${2}"
 		fetchConfig "${FETCH_CONFIG}"
-		shift
+		shift 2
 		;;
 esac
 
@@ -1020,7 +1043,7 @@ while getopts ":hvVD:" flags; do
 	case ${flags} in
 		h) usage; exit 0 ;;
 		V) versioninfo; exit 0 ;;
-		v) declage -g ${config_global[verbosity]}="on" ;;
+		v) declare config_global[verbose]="on" ;;
 		D) distro="${OPTARG}" ;;
 		:) errorOut "Error: You're missing an argument somewhere. Exiting."; exit 1 ;;
 		?) errorOut "Error: Invalid flag somewhere. Exiting."; exit 1 ;;
@@ -1030,7 +1053,7 @@ done
 
 detect_kernel
 detect_os
-for i in userinfo distro uptime packages; do
+for i in userinfo distro uptime packages shell; do
 	_arr="config_${i}[display]"
 	if [[ "${!_arr}" =~ "on" ]]; then eval detect_${i}; fi
 done
@@ -1039,5 +1062,6 @@ echo "fetch! You're on ${distro}."
 echo "fetch! You're using ${myKernel} on ${myOS}."
 echo "fetch! You've been up for ${myUptime}."
 echo "fetch! Your current package count is: ${myPackages}."
+echo "fetch! You're using ${myShell}."
 
 ((extglob_set)) && shopt -u extglob
