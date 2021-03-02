@@ -935,7 +935,7 @@ detect_packages () {
 
             # Snap hangs if the command is run without the daemon running.
             # Only run snap if the daemon is also running.
-            _has snap && ps -e | grep -qFm 1 snapd >/dev/null && \
+            _has snap && pgrep -x snapd >/dev/null && \
 				pkgs_h=1 _tot snap list && ((myPackages-=1))
 
             # This is the only standard location for appimages.
@@ -977,6 +977,7 @@ detect_packages () {
 	if ((myPackages == 0)); then
 		unset myPackages
 	else
+		# shellcheck disable=SC2154
 		case ${config_packages[managers]} in
 			off)
 				:
@@ -1047,7 +1048,138 @@ detect_shell () {
 			;;
 	esac
 
-	verboseOut "Finding current shell...found as '$myShell'."
+    # remove unwanted
+    myShell=${myShell/, version}
+    myShell=${myShell/xonsh\//xonsh }
+    myShell=${myShell/options*}
+    myShell=${myShell/\(*\)}
+
+	verboseOut "Finding current shell...found as '${myShell}'."
+}
+
+detect_cpu () {
+	case ${myOS} in
+		"Mac OS X"|"macOS")
+			myCPU="$(sysctl -n machdep.cpu.brand_string)"
+			_cores=$(sysctl -n hw.logicalcpu_max)
+			;;
+		"Linux" | "Windows" )
+			_file="/proc/cpuinfo"
+			case ${myKernel_machine} in
+                "frv" | "hppa" | "m68k" | "openrisc" | "or"* | "powerpc" | "ppc"* | "sparc"*)
+                    myCPU="$(awk -F':' '/^cpu\t|^CPU/ {printf $2; exit}' "${_file}")"
+					;;
+                "s390"*)
+                    myCPU="$(awk -F'=' '/machine/ {print $4; exit}' "${_file}")"
+					;;	
+                "ia64" | "m32r")
+                    myCPU="$(awk -F':' '/model/ {print $2; exit}' "${_file}")"
+                    [[ -z "$myCPU" ]] && myCPU="$(awk -F':' '/family/ {printf $2; exit}' "${_file}")"
+					;;
+                *)
+                    myCPU="$(awk -F '\\s*: | @' \
+                            '/model name|Hardware|Processor|^cpu model|chip type|^cpu type/ {
+                            cpu=$2; if ($1 == "Hardware") exit } END { print cpu }' "${_file}")"
+							;;
+            esac
+
+			_speed_dir="/sys/devices/system/cpu/cpu0/cpufreq"
+
+			# Select the right temperature file.
+			[[ -d /sys/class/hwmon/ ]] && \
+				for temp_dir in /sys/class/hwmon/*; do
+					[[ "$(< "${temp_dir}/name")" =~ (cpu_thermal|coretemp|fam15h_power|k10temp) ]] && {
+						temp_dirs=("$temp_dir"/temp*_input)
+						temp_dir=${temp_dirs[0]}
+						break
+					}
+				done
+
+			# Get CPU speed.
+			if [ -d "${_speed_dir}" ]; then
+				# Fallback to bios_limit if $speed_type fails.
+				_speed="$(< "${_speed_dir}/bios_limit")" ||\
+				_speed="$(< "${_speed_dir}/scaling_max_freq")" ||\
+				_speed="$(< "${_speed_dir}/cpuinfo_max_freq")"
+				_speed="$((_speed / 1000))"
+			else
+				_speed="$(awk -F ': |\\.' '/cpu MHz|^clock/ {printf $2; exit}' "${_file}")"
+				_speed="${_speed/MHz}"
+			fi
+
+			# Get CPU temp.
+			[ -f "${temp_dir}" ] && _deg="$(($(< "${temp_dir}") * 100 / 10000))"
+
+			# Get CPU cores.
+			_cores="$(grep -c "^processor" "${_file}")"
+			;;
+	esac
+
+    # Remove un-needed patterns from cpu output.
+    myCPU="${myCPU//(TM)}"
+    myCPU="${myCPU//(tm)}"
+    myCPU="${myCPU//(R)}"
+    myCPU="${myCPU//(r)}"
+	myCPU="${myCPU//CPU[? ]}"
+    myCPU="${myCPU//Processor}"
+    myCPU="${myCPU//Dual-Core}"
+    myCPU="${myCPU//Quad-Core}"
+    myCPU="${myCPU//Six-Core}"
+    myCPU="${myCPU//Eight-Core}"
+    myCPU="${myCPU//[1-9][0-9]-Core}"
+    myCPU="${myCPU//[0-9]-Core}"
+    myCPU="${myCPU//, * Compute Cores}"
+    myCPU="${myCPU//Core / }"
+    myCPU="${myCPU//(\"AuthenticAMD\"*)}"
+    myCPU="${myCPU//with Radeon * Graphics}"
+    myCPU="${myCPU//, altivec supported}"
+    myCPU="${myCPU//FPU*}"
+    myCPU="${myCPU//Chip Revision*}"
+    myCPU="${myCPU//Technologies, Inc}"
+    myCPU="${myCPU//Core2/Core 2}"
+
+    # Trim spaces from core and speed output
+    _cores="${_cores//[[:space:]]}"
+    _speed="${_speed//[[:space:]]}"
+
+    # Remove CPU brand from the output.
+    if [ "${config_cpu[brand]}" == "off" ]; then
+        myCPU="${myCPU/AMD }"
+        myCPU="${myCPU/Intel }"
+        myCPU="${myCPU/Core? Duo }"
+        myCPU="${myCPU/Qualcomm }"
+    fi
+
+    # Add CPU cores to the output.
+    [[ "${config_cpu[cores]}" != "off" && "${_cores}" ]] && \
+        case ${myOS} in
+            "Mac OS X"|"macOS") myCPU="${myCPU/@/(${_cores}) @}" ;;
+            *)                  myCPU="${myCPU} (${_cores})" ;;
+        esac
+
+    # Add CPU speed to the output.
+    if [[ "${config_cpu[speed]}" != "off" && "${_speed}" ]]; then
+        if (( _speed < 1000 )); then
+            myCPU="${myCPU} @ ${_speed}MHz"
+        else
+            _speed="${_speed:0:1}.${_speed:1}"
+            myCPU="${myCPU} @ ${_speed}GHz"
+        fi
+    fi
+
+    # Add CPU temp to the output.
+    if [[ "${config_cpu[temp]}" != "off" && "${_deg}" ]]; then
+        _deg="${_deg//.}"
+
+        # Convert to Fahrenheit if enabled
+        [[ "${config_cpu[temp]}" == "F" ]] && _deg="$((_deg * 90 / 50 + 320))"
+
+        # Format the output
+        _deg="[${_deg/${_deg: -1}}.${_deg: -1}°${config_cpu[temp]:-C}]"
+        myCPU="${myCPU} ${_deg}"
+    fi
+
+	verboseOut "Finding CPU...found as '${myCPU}'."
 }
 
 usage() {
@@ -1086,7 +1218,7 @@ done
 
 detect_kernel
 detect_os
-for i in userinfo distro uptime packages shell; do
+for i in userinfo distro uptime packages shell cpu; do
 	_arr="config_${i}[display]"
 	if [[ "${!_arr}" =~ "on" ]]; then eval detect_${i}; fi
 done
@@ -1096,5 +1228,6 @@ echo "fetch! You're using ${myKernel} on ${myOS}."
 echo "fetch! You've been up for ${myUptime}."
 echo "fetch! Your current package count is: ${myPackages}."
 echo "fetch! You're using ${myShell}."
+echo "fetch! You're running on ${myCPU}."
 
 ((extglob_set)) && shopt -u extglob
