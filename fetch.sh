@@ -394,6 +394,7 @@ detect_distro () {
 						os_release="/usr/lib/os-release";
 					fi
 					if [ -n "${os_release}" ]; then
+						# shellcheck disable=SC2248
 						distrib_id="$(<${os_release})";
 						for l in ${distrib_id}; do
 							if [[ ${l} =~ ^ID= ]]; then
