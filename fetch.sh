@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 
 FETCH_VERSION="0.5"
-FETCH_DATA_DIR="/usr/share/fetch"
-FETCH_DATA_USER_DIR="${XDG_CONFIG_HOME:-$HOME}/.config/fetch"
+#FETCH_DATA_DIR="/usr/share/fetch"
+FETCH_DATA_USER_DIR="${XDG_CONFIG_HOME:-${HOME}}/.config/fetch"
 FETCH_CONFIG_FILENAME="config"
 LC_ALL=C
 LANG=C
 # https://github.com/KittyKatt/screenFetch/issues/549
-if [[ "${OSTYPE}" =~ "linux" || "${OSTYPE}" == "gnu" ]]; then
+if [[ "${OSTYPE}" =~ linux || "${OSTYPE}" == gnu ]]; then
 	# issue seems to affect Ubuntu; add LSB directories if it appears on other distros too
-	export GIO_EXTRA_MODULES="/usr/lib/x86_64-linux-gnu/gio/modules:/usr/lib/i686-linux-gnu/gio/modules:$GIO_EXTRA_MODULES"
+	export GIO_EXTRA_MODULES="/usr/lib/x86_64-linux-gnu/gio/modules:/usr/lib/i686-linux-gnu/gio/modules:${GIO_EXTRA_MODULES}"
 fi
 
 # Set shopt extglob for filename-like globbing in case statements. Check if exttglob was set before and store that as a variable.
@@ -55,7 +55,7 @@ fetchConfig () {
 		while read -r line; do
 			if [[ ${line} =~ ^\[[[:alnum:]]+\] ]]; then
 				arrname="config_${line//[^[:alnum:]]/}"
-				declare -gA "$arrname"
+				declare -gA "${arrname}"
 			elif [[ ${line} =~ ^([_[:alpha:]][_[:alnum:]]*)"="(.*) ]]; then
 				# shellcheck disable=SC2086
 				{
@@ -117,7 +117,7 @@ getColor () {
 }
 _randcolor () {
 	local color=
-	color=$(($RANDOM % 255))
+	color=$((RANDOM % 255))
 	echo "${color}"
 }
 
@@ -137,9 +137,10 @@ detect_kernel () {
                             "/System/Library/CoreServices/SystemVersion.plist")"
         for ((i=0;i<${#sw_vers[@]};i+=2)) {
             case ${sw_vers[i]} in
-                ProductName)          darwin_name=${sw_vers[i+1]} ;;
-                ProductVersion)       osx_version=${sw_vers[i+1]} ;;
-                ProductBuildVersion)  osx_build=${sw_vers[i+1]}   ;;
+                ProductName)			darwin_name=${sw_vers[i+1]} ;;
+                ProductVersion)			osx_version=${sw_vers[i+1]} ;;
+                ProductBuildVersion)	osx_build=${sw_vers[i+1]}   ;;
+				*)						: ;;
             esac
         }
     fi
@@ -160,6 +161,7 @@ detect_kernel () {
 				my_kernel="${kernel_name} ${kernel_version}"
 			fi
 			;;
+		*) : ;;
 	esac
 
 	verboseOut "Finding kernel...found as '${my_kernel}'."
@@ -217,9 +219,12 @@ detect_distro () {
 						my_distro="Artix"
 						;;
 					"blackPantherOS"|"blackPanther"|"blackpanther"|"blackpantheros")
-						my_distro=$(source /etc/lsb-release; echo "${DISTRIB_ID}")
-						distro_release=$(source /etc/lsb-release; echo "${DISTRIB_RELEASE}")
-						distro_codename=$(source /etc/lsb-release; echo "${DISTRIB_CODENAME}")
+						# shellcheck disable=SC2034
+						{
+							my_distro=$(source /etc/lsb-release; echo "${DISTRIB_ID}")
+							distro_release=$(source /etc/lsb-release; echo "${DISTRIB_RELEASE}")
+							distro_codename=$(source /etc/lsb-release; echo "${DISTRIB_CODENAME}")
+						}
 						;;
 					"Chakra")
 						my_distro="Chakra"
@@ -229,9 +234,12 @@ detect_distro () {
 						my_distro="CentOS Stream"
 						;;
 					"BunsenLabs")
-						my_distro=$(source /etc/lsb-release; echo "${DISTRIB_ID}")
-						distro_release=$(source /etc/lsb-release; echo "${DISTRIB_RELEASE}")
-						distro_codename=$(source /etc/lsb-release; echo "${DISTRIB_CODENAME}")
+						# shellcheck disable=SC2034
+						{
+							my_distro=$(source /etc/lsb-release; echo "${DISTRIB_ID}")
+							distro_release=$(source /etc/lsb-release; echo "${DISTRIB_RELEASE}")
+							distro_codename=$(source /etc/lsb-release; echo "${DISTRIB_CODENAME}")
+						}
 						;;
 					"Debian")
 						my_distro="Debian"
@@ -337,12 +345,15 @@ detect_distro () {
 						my_distro="Zorin OS"
 						unset distro_codename
 						;;
+					*)
+						my_distro="Unknown"
+						;;
 				esac
 			fi
 
 			# Existing File Check
 			if [ "${my_distro}" == "Unknown" ]; then
-				if [ -e "/etc/mcst_version" ]; then
+				if [ -f "/etc/mcst_version" ]; then
 					my_distro="OS Elbrus"
 					distro_release="$(tail -n 1 /etc/mcst_version)"
 					if [ -n "${distro_release}" ]; then
@@ -352,10 +363,7 @@ detect_distro () {
 				if [ "$(uname -o 2>/dev/null)" ]; then
 					os="$(uname -o)"
 					case ${os} in
-						"EndeavourOS")
-							my_distro="EndeavourOS"
-							fake_my_distro="${my_distro}"
-						;;
+						"EndeavourOS") my_distro="EndeavourOS" ;;
 						"GNU/Linux")
 							if type -p crux >/dev/null 2>&1; then
 								my_distro="CRUX"
@@ -371,9 +379,11 @@ detect_distro () {
 							if (type -p guix && type -p herd) >/dev/null 2>&1; then
 								my_distro="Guix System"
 							fi
+						*) : ;;
 						;;
 					esac
 				fi
+
 				if [ "${my_distro}" == "Unknown" ]; then
 					if [ -f /etc/os-release ]; then
 						os_release="/etc/os-release";
@@ -1028,6 +1038,7 @@ detect_shell () {
 			;;
 		osh)
 			if [[ ${OIL_VERSION} ]]; then
+				# shellcheck disable=SC2154
 				my_shell+=${OIL_VERSION}
 			else
 				my_shell+=$("${SHELL}" -c "printf %s \"\$OIL_VERSION\"")
@@ -1149,6 +1160,7 @@ detect_cpu () {
     _speed="${_speed//[[:space:]]}"
 
     # Remove CPU brand from the output.
+	# shellcheck disable=SC2154
     if [ "${config_cpu[brand]}" == "off" ]; then
         my_cpu="${my_cpu/AMD }"
         my_cpu="${my_cpu/Intel }"
@@ -1157,6 +1169,7 @@ detect_cpu () {
     fi
 
     # Add CPU cores to the output.
+	# shellcheck disable=SC2154
     [[ "${config_cpu[cores]}" != "off" && "${_cores}" ]] && \
         case ${my_os} in
             "Mac OS X"|"macOS") my_cpu="${my_cpu/@/(${_cores}) @}" ;;
@@ -1164,6 +1177,7 @@ detect_cpu () {
         esac
 
     # Add CPU speed to the output.
+	# shellcheck disable=SC2154
     if [[ "${config_cpu[speed]}" != "off" && "${_speed}" ]]; then
         if (( _speed < 1000 )); then
             my_cpu="${my_cpu} @ ${_speed}MHz"
@@ -1174,16 +1188,19 @@ detect_cpu () {
     fi
 
     # Add CPU temp to the output.
-    if [[ "${config_cpu[temp]}" != "off" && "${_deg}" ]]; then
-        _deg="${_deg//.}"
+	# shellcheck disable=SC2154
+	{
+		if [[ "${config_cpu[temp]}" != "off" && "${_deg}" ]]; then
+			_deg="${_deg//.}"
 
-        # Convert to Fahrenheit if enabled
-        [[ "${config_cpu[temp]}" == "F" ]] && _deg="$((_deg * 90 / 50 + 320))"
+			# Convert to Fahrenheit if enabled
+			[[ "${config_cpu[temp]}" == "F" ]] && _deg="$((_deg * 90 / 50 + 320))"
 
-        # Format the output
-        _deg="[${_deg/${_deg: -1}}.${_deg: -1}°${config_cpu[temp]:-C}]"
-        my_cpu="${my_cpu} ${_deg}"
-    fi
+			# Format the output
+			_deg="[${_deg/${_deg: -1}}.${_deg: -1}°${config_cpu[temp]:-C}]"
+			my_cpu="${my_cpu} ${_deg}"
+		fi
+	}
 
 	verboseOut "Finding CPU...found as '${my_cpu}'."
 }
