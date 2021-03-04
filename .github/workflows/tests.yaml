@@ -1,4 +1,4 @@
-name: "Test to make sure script does not error out"
+name: "Tests"
 on:
   pull_request:
   push:
@@ -10,16 +10,16 @@ jobs:
     steps:
     - uses: actions/checkout@v2.3.4
     - name: Testing exit code on Ubuntu
-      run: ./fetch.sh
+      run: ./fetch.sh --config sample.config.conf
   test-macos:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2.3.4
     - name: Testing exit code on macOS
-      run: bash fetch.sh
+      run: bash fetch.sh --config sample.config.conf
   test-windows:
     runs-on: windows-2019
     steps:
     - uses: actions/checkout@v2.3.4
     - name: Testing exit code on Windows
-      run: bash fetch.sh
+      run: bash fetch.sh --config sample.config.conf
