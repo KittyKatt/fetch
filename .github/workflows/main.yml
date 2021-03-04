@@ -1,0 +1,19 @@
+
+name: Shellcheck
+
+on:
+  push:
+    branches: [ master]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  shellcheck:
+    name: Shellcheck
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run ShellCheck
+      uses: lumaxis/shellcheck-problem-matchers@v1
+      run: shellcheck -a -o all -x -f gcc fetch.sh
