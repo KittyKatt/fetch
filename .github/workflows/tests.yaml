@@ -18,7 +18,7 @@ jobs:
     - name: Testing exit code on macOS
       run: |
         brew install bash
-        which -a bash
+        /usr/local/bin/bash fetch.sh --config sample.config.conf
   test-windows:
     runs-on: windows-2019
     steps:
