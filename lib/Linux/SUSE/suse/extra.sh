@@ -1,6 +1,6 @@
 if [ -f /etc/os-release ]; then
     if grep -q -i 'SUSE Linux Enterprise' /etc/os-release ; then
-        distro="SUSE Linux"
+        my_distro="SUSE Linux"
         distro_codename=
         distro_release=$(awk -F'=' '/^VERSION_ID=/ {print $2}' /etc/os-release | tr -d '"')
     fi
