@@ -1,5 +1,5 @@
 if [ "${distro_codename}" == "debian" ]; then
-    distro="LMDE"
+    my_distro="LMDE"
     distro_codename="n/a"
     distro_release="n/a"
 #adding support for LMDE 3	
