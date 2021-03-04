@@ -1,0 +1,27 @@
+name: "Test to make sure script does not error out"
+on:
+  pull_request:
+  push:
+    branches: [ master ]
+
+jobs:
+  test-ubuntu:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2.3.4
+    - name: Test fetch exit code
+      uses: ./fetch.sh
+  test-macos:
+    name: All formats
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2.3.4
+    - name: Test fetch exit code
+      uses: bash fetch.sh
+  test-macos:
+    name: All formats
+    runs-on: windows-2019
+    steps:
+    - uses: actions/checkout@v2.3.4
+    - name: Test fetch exit code
+      uses: bash fetch.sh
