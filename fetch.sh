@@ -16,6 +16,26 @@ fi
 shopt -q extglob; extglob_set=$?
 ((extglob_set)) && shopt -s extglob
 
+# Let's initialize our info array
+declare -A _info
+_infoarray () {
+	if [[ -n "${1}" ]]; then
+		local _tmp="${1}"
+		[[ "${2}" ]] && local _tmp="${1} ${2}"
+		if [[ "${#_info[@]}" -ge "0" ]]; then
+			_n=${#_info[@]}
+			_n=$((_n + 1))
+			_info[${_n}]="${_tmp}"
+			return
+		elif [[ -z "${_info[@]}" ]]; then
+			_info[0]="${_tmp}"
+			return
+		fi
+	else
+		return 1
+	fi
+}
+
 verboseOut () {
 	# shellcheck disable=SC2154
 	if [[ ${config_global[verbose]} =~ "on" ]]; then
@@ -167,6 +187,8 @@ detect_kernel () {
 		*) : ;;
 	esac
 
+	[[ -n "${my_kernel}" ]] && _infoarray "${config_kernel[subtitle]}${config_text[info_separator]} ${my_kernel}"
+
 	verboseOut "Finding kernel...found as '${my_kernel}'."
 }
 
@@ -192,6 +214,7 @@ detect_os () {
             errorOut "Unknown OS detected, please report this issue."
         ;;
     esac
+
 	verboseOut "Finding OS...found as '${my_os}'."
 }
 
@@ -585,8 +608,8 @@ detect_distro () {
 			my_distro=$(wmic os get Caption)
 			my_distro=${my_distro/Caption}
 			my_distro=$(trim "${my_distro/Microsoft }")
-			[[ ${my_distro} =~ [[:space:]](.*) ]] && my_distro=${BASH_REMATCH[1]}
 			my_distro=${my_distro%%+([[:space:]])}
+			[[ ${my_distro} =~ [[:space:]](.*) ]] && my_distro=${BASH_REMATCH[1]}
 		elif [[ "${my_os}" =~ [Mm]ac ]]; then
 			case ${osx_version} in
 				10.4*)  my_distro="Mac OS X Tiger" ;;
@@ -707,6 +730,10 @@ detect_distro () {
 			void*linux) my_distro="Void Linux" ;;
 			zorin*) my_distro="Zorin OS" ;;
 			endeavour*) my_distro="EndeavourOS" ;;
+			*"windows"*)
+				. lib/Windows/ascii.sh
+			;;
+			*"macos"*|*"mac os x"*) : ;;
 			*) my_distro="Unknown" ;;
 		esac
 
@@ -740,6 +767,8 @@ detect_distro () {
 		[[ ${config_distro[os_arch]} =~ 'on' ]] && my_distro="${my_distro} ${kernel_machine}"
 	fi
 
+	[[ -n "${my_distro}" ]] && _infoarray "${config_distro[subtitle]}${config_text[info_separator]} ${my_distro}"
+
 	verboseOut "Finding distribution...found as '${my_distro}'."
 }
 
@@ -763,6 +792,9 @@ detect_userinfo () {
 		if [ -n "${my_userinfo}" ]; then my_userinfo="${my_userinfo}@${my_host}"
 		else my_userinfo="${my_host}"; fi
 	fi
+
+	[[ -n "${my_userinfo}" ]] && _infoarray "${my_userinfo}"
+
 	verboseOut "Finding user info...found as '${my_userinfo}'."
 }
 
@@ -841,6 +873,8 @@ detect_uptime () {
 			fi
 			;;
 	esac
+
+	[[ -n "${my_uptime}" ]] && _infoarray "${config_uptime[subtitle]}${config_text[info_separator]} ${my_uptime}"
 
 	verboseOut "Finding current uptime...found as '${my_uptime}'."
 }
@@ -1018,6 +1052,8 @@ detect_packages () {
 		my_packages=${my_packages/pacman-key/pacman}
 	fi
 
+	[[ -n "${my_packages}" ]] && _infoarray "${config_packages[subtitle]}${config_text[info_separator]} ${my_packages}"
+
 	verboseOut "Finding current package count...found as '${my_packages}'."
 }
 
@@ -1080,6 +1116,8 @@ detect_shell () {
     my_shell=${my_shell/xonsh\//xonsh }
     my_shell=${my_shell/options*}
     my_shell=${my_shell/\(*\)}
+
+	[[ -n "${my_shell}" ]] && _infoarray "${config_shell[subtitle]}${config_text[info_separator]} ${my_shell}"
 
 	verboseOut "Finding current shell...found as '${my_shell}'."
 }
@@ -1215,11 +1253,43 @@ detect_cpu () {
 		fi
 	}
 
+	[[ -n "${my_cpu}" ]] && _infoarray "${config_cpu[subtitle]}${config_text[info_separator]}" "${my_cpu}"
+
 	verboseOut "Finding CPU...found as '${my_cpu}'."
 }
 
 print_ascii () {
-	echo 'nothing here yet :('
+    while IFS=$'\n' read -r line; do
+        line=${line//\\\\/\\}
+        line=${line//█/ }
+        ((++lines,${#line}>ascii_len)) && ascii_len="${#line}"
+    done <<< "${asciiLogo//\$\{??\}}"
+
+    # Colors.
+    asciiLogo="${asciiLogo//\$\{c1\}/$c1}"
+    asciiLogo="${asciiLogo//\$\{c2\}/$c2}"
+    asciiLogo="${asciiLogo//\$\{c3\}/$c3}"
+    asciiLogo="${asciiLogo//\$\{c4\}/$c4}"
+    asciiLogo="${asciiLogo//\$\{c5\}/$c5}"
+    asciiLogo="${asciiLogo//\$\{c6\}/$c6}"
+
+	((text_padding=ascii_len+gap))
+
+	local n=0
+	local i=1
+	while IFS=$'\n' read -r line; do
+		if [ ${n} -lt "${startline}" ]; then
+			printf '%b\n' "${line}${reset}"
+		elif [ ${n} -ge "${startline}" ]; then
+			if [[ -n "${_info[${i}]}" ]]; then
+				printf '%b\n' "${line}${reset} ${_info[${i}]}"
+				((i++))
+			else
+				printf '%b\n' "${line}${reset}"
+			fi
+		fi
+		((n++))
+	done <<< "${asciiLogo}"
 }
 
 usage() {
@@ -1272,5 +1342,6 @@ echo "fetch! You're using ${my_shell}."
 echo "fetch! You're running on ${my_cpu}."
 
 print_ascii
+echo "${_info[0]}"
 
 ((extglob_set)) && shopt -u extglob
