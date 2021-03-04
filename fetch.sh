@@ -379,8 +379,8 @@ detect_distro () {
 							if (type -p guix && type -p herd) >/dev/null 2>&1; then
 								my_distro="Guix System"
 							fi
-						*) : ;;
 						;;
+						*) : ;;
 					esac
 				fi
 
