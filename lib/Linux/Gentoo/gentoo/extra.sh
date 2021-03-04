@@ -1,7 +1,7 @@
 if [[ "$(lsb_release -sd)" =~ Funtoo ]]; then
-    distro="Funtoo"
+    my_distro="Funtoo"
 else
-    distro="Gentoo"
+    my_distro="Gentoo"
 fi
 # detecting release stable/testing/experimental
 # shellcheck disable=SC1091,SC1090

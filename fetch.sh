@@ -222,7 +222,7 @@ detect_distro () {
 						my_distro="Artix"
 						;;
 					"blackPantherOS"|"blackPanther"|"blackpanther"|"blackpantheros")
-						# shellcheck disable=SC2034
+						# shellcheck disable=SC2034,SC1091,SC2153
 						{
 							my_distro=$(source /etc/lsb-release; echo "${DISTRIB_ID}")
 							distro_release=$(source /etc/lsb-release; echo "${DISTRIB_RELEASE}")
@@ -237,7 +237,7 @@ detect_distro () {
 						my_distro="CentOS Stream"
 						;;
 					"BunsenLabs")
-						# shellcheck disable=SC2034
+						# shellcheck disable=SC2034,SC1091,SC2153
 						{
 							my_distro=$(source /etc/lsb-release; echo "${DISTRIB_ID}")
 							distro_release=$(source /etc/lsb-release; echo "${DISTRIB_RELEASE}")
@@ -585,7 +585,7 @@ detect_distro () {
 			my_distro=$(wmic os get Caption)
 			my_distro=${my_distro/Caption}
 			my_distro=$(trim "${my_distro/Microsoft }")
-			[[ ${distro} =~ [[:space:]](.*) ]] && my_distro=${BASH_REMATCH[1]}
+			[[ ${my_distro} =~ [[:space:]](.*) ]] && my_distro=${BASH_REMATCH[1]}
 			my_distro=${my_distro%%+([[:space:]])}
 		elif [[ "${my_os}" =~ [Mm]ac ]]; then
 			case ${osx_version} in
