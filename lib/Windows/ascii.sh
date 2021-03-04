@@ -1,4 +1,4 @@
-case ${distro} in
+case ${my_distro} in
     'Windows Classic')
         if [ "${no_color}" != "1" ]; then
             c1=$(getColor 'light red') # Red
