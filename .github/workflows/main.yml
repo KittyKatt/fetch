@@ -17,4 +17,4 @@ jobs:
     - name: Import Problem Matchers
       uses: lumaxis/shellcheck-problem-matchers@v1
     - name: Run ShellCheck
-      run: shellcheck -a -o all -x -f gcc fetch.sh
+      run: shellcheck -S warning -a -x -f gcc fetch.sh
