@@ -18,7 +18,7 @@ shopt -q extglob; extglob_set=$?
 
 # Let's initialize our info array
 declare -A _info
-_infoarray () {
+info () {
 	if [[ -n "${1}" ]]; then
 		local _tmp="${1}"
 		[[ "${2}" ]] && local _tmp="${1} ${2}"
@@ -187,7 +187,7 @@ detect_kernel () {
 		*) : ;;
 	esac
 
-	[[ -n "${my_kernel}" ]] && _infoarray "${config_kernel[subtitle]}${config_text[info_separator]} ${my_kernel}"
+	[[ -n "${my_kernel}" ]] && info "${config_kernel[subtitle]}${config_text[info_separator]} ${my_kernel}"
 
 	verboseOut "Finding kernel...found as '${my_kernel}'."
 }
@@ -767,7 +767,7 @@ detect_distro () {
 		[[ ${config_distro[os_arch]} =~ 'on' ]] && my_distro="${my_distro} ${kernel_machine}"
 	fi
 
-	[[ -n "${my_distro}" ]] && _infoarray "${config_distro[subtitle]}${config_text[info_separator]} ${my_distro}"
+	[[ -n "${my_distro}" ]] && info "${config_distro[subtitle]}${config_text[info_separator]} ${my_distro}"
 
 	verboseOut "Finding distribution...found as '${my_distro}'."
 }
@@ -793,7 +793,7 @@ detect_userinfo () {
 		else my_userinfo="${my_host}"; fi
 	fi
 
-	[[ -n "${my_userinfo}" ]] && _infoarray "${my_userinfo}"
+	[[ -n "${my_userinfo}" ]] && info "${my_userinfo}"
 
 	verboseOut "Finding user info...found as '${my_userinfo}'."
 }
@@ -874,7 +874,7 @@ detect_uptime () {
 			;;
 	esac
 
-	[[ -n "${my_uptime}" ]] && _infoarray "${config_uptime[subtitle]}${config_text[info_separator]} ${my_uptime}"
+	[[ -n "${my_uptime}" ]] && info "${config_uptime[subtitle]}${config_text[info_separator]} ${my_uptime}"
 
 	verboseOut "Finding current uptime...found as '${my_uptime}'."
 }
@@ -1052,7 +1052,7 @@ detect_packages () {
 		my_packages=${my_packages/pacman-key/pacman}
 	fi
 
-	[[ -n "${my_packages}" ]] && _infoarray "${config_packages[subtitle]}${config_text[info_separator]} ${my_packages}"
+	[[ -n "${my_packages}" ]] && info "${config_packages[subtitle]}${config_text[info_separator]} ${my_packages}"
 
 	verboseOut "Finding current package count...found as '${my_packages}'."
 }
@@ -1117,7 +1117,7 @@ detect_shell () {
     my_shell=${my_shell/options*}
     my_shell=${my_shell/\(*\)}
 
-	[[ -n "${my_shell}" ]] && _infoarray "${config_shell[subtitle]}${config_text[info_separator]} ${my_shell}"
+	[[ -n "${my_shell}" ]] && info "${config_shell[subtitle]}${config_text[info_separator]} ${my_shell}"
 
 	verboseOut "Finding current shell...found as '${my_shell}'."
 }
@@ -1253,7 +1253,7 @@ detect_cpu () {
 		fi
 	}
 
-	[[ -n "${my_cpu}" ]] && _infoarray "${config_cpu[subtitle]}${config_text[info_separator]}" "${my_cpu}"
+	[[ -n "${my_cpu}" ]] && info "${config_cpu[subtitle]}${config_text[info_separator]}" "${my_cpu}"
 
 	verboseOut "Finding CPU...found as '${my_cpu}'."
 }
