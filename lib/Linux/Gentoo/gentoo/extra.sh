@@ -1,4 +1,4 @@
-if [[ "$"(lsb_release -sd)"" =~ Funtoo ]]; then
+if [[ "$(lsb_release -sd)" =~ Funtoo ]]; then
     distro="Funtoo"
 else
     distro="Gentoo"

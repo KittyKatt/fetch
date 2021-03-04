@@ -37,6 +37,6 @@ ubuntu_codenames=(
 
 for each in "${ubuntu_codenames[@]}"; do
     if [[ "${each,,}" =~ ${distro_codename,,} ]]; then
-        distro_codename="$each"
+        distro_codename="${each}"
     fi
 done

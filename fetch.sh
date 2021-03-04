@@ -360,7 +360,7 @@ detect_distro () {
 						distro_more="${distro_release}"
 					fi
 				fi
-				if [ "$(uname -o 2>/dev/null)" ]; then
+				if [ -n "$(uname -o 2>/dev/null)" ]; then
 					os="$(uname -o)"
 					case ${os} in
 						"EndeavourOS") my_distro="EndeavourOS" ;;
@@ -391,7 +391,7 @@ detect_distro () {
 						os_release="/usr/lib/os-release";
 					fi
 					if [ -n "${os_release}" ]; then
-						distrib_id=$(<${os_release});
+						distrib_id="$(<${os_release})";
 						for l in ${distrib_id}; do
 							if [[ ${l} =~ ^ID= ]]; then
 								distrib_id=${l//*=}
@@ -474,6 +474,7 @@ detect_distro () {
 					for di in arch chakra evolveos exherbo fedora \
 								frugalware gentoo kogaion mageia obarun oracle \
 								pardus pclinuxos redhat rosa SuSe; do
+						# shellcheck disable=SC2248
 						if [ -f /etc/${di}-release ]; then
 							my_distro=${di}
 							break
@@ -580,10 +581,10 @@ detect_distro () {
 			my_distro=$(wmic os get Caption)
 			my_distro=${my_distro/Caption}
 			my_distro=$(trim "${my_distro/Microsoft }")
-			[[ $distro =~ [[:space:]](.*) ]] && my_distro=${BASH_REMATCH[1]}
+			[[ ${distro} =~ [[:space:]](.*) ]] && my_distro=${BASH_REMATCH[1]}
 			my_distro=${my_distro%%+([[:space:]])}
 		elif [[ "${my_os}" =~ [Mm]ac ]]; then
-			case $osx_version in
+			case ${osx_version} in
 				10.4*)  my_distro="Mac OS X Tiger" ;;
 				10.5*)  my_distro="Mac OS X Leopard" ;;
 				10.6*)  my_distro="Mac OS X Snow Leopard" ;;
@@ -702,6 +703,7 @@ detect_distro () {
 			void*linux) my_distro="Void Linux" ;;
 			zorin*) my_distro="Zorin OS" ;;
 			endeavour*) my_distro="EndeavourOS" ;;
+			*) my_distro="Unknown" ;;
 		esac
 
 		# shellcheck disable=SC2154
@@ -709,17 +711,18 @@ detect_distro () {
 			on)
 				:
 				;;
-			full)
-				[ -n "${distro_release}" ] && my_distro="${my_distro} ${distro_release}"
-				[ -n "${distro_release}" ] && my_distro="${my_distro} ${distro_codename}"
-				;;
 			version)
 				[ -n "${distro_release}" ] && my_distro="${my_distro} ${distro_release}"
 				;;
 			codename)
 				[ -n "${distro_codename}" ] && my_distro="${my_distro} ${distro_codename}"
 				;;
-			auto)
+
+			full)
+				[ -n "${distro_release}" ] && my_distro="${my_distro} ${distro_release}"
+				[ -n "${distro_release}" ] && my_distro="${my_distro} ${distro_codename}"
+				;;
+			auto|*)
 				# shellcheck disable=SC2154
 				if [[ ${config_global[short]} =~ 'on' ]]; then
 					:
@@ -741,7 +744,7 @@ detect_userinfo () {
 	# shellcheck disable=SC2154
 	if [[ "${config_userinfo[display_user]}" =~ "on" ]]; then
 		my_user=${USER}
-		if [ -z "$USER" ]; then
+		if [ -z "${USER}" ]; then
 			my_user=$(whoami)
 		fi
 		my_userinfo="${my_user}"
@@ -781,6 +784,7 @@ detect_uptime () {
 		Haiku)
 			_seconds=$(($(system_time) / 1000000))
 			;;
+		*) : ;;
 	esac
 
 	# math!
@@ -799,9 +803,9 @@ detect_uptime () {
     ((${_days/ *} == 0)) && unset _days
 
 	# build the uptime line
-    myUptime=${_days:+$_days, }${_hours:+$_hours, }$_mins
+    myUptime=${_days:+${_days}, }${_hours:+${_hours}, }$_mins
     myUptime=${myUptime%', '}
-    myUptime=${myUptime:-$_seconds seconds}
+    myUptime=${myUptime:-${_seconds} seconds}
 
 	# shorthand
 	# shellcheck disable=SC2154
@@ -824,7 +828,7 @@ detect_uptime () {
 		off)
 			:
 			;;
-		auto)
+		auto|*)
 			# shellcheck disable=SC2154
 			if [[ "${config_global[short]}" =~ 'on' ]]; then
 				myUptime=${myUptime/ minutes/ mins}
@@ -859,9 +863,9 @@ detect_packages () {
     }
 
     # Redefine _tot() for Bedrock Linux.
-    [[ -f /bedrock/etc/bedrock-release && $PATH == */bedrock/cross/* ]] && {
+    [[ -f /bedrock/etc/bedrock-release && ${PATH} == */bedrock/cross/* ]] && {
         _tot() {
-            IFS=$'\n' read -d "" -ra pkgs <<< "$(for s in $(brl list); do strat -r "$s" "$@"; done)"
+            IFS=$'\n' read -d "" -ra pkgs <<< "$(for s in $(brl list); do strat -r "${s}" "${@}"; done)"
             ((my_packages+="${#pkgs[@]}"))
 			_pac "$((${#pkgs[@]}-pkgs_h))";
         }
@@ -869,7 +873,7 @@ detect_packages () {
     }
 
 	# get total packages based on OS value
-	case $my_os in
+	case ${my_os} in
 		Linux|BSD|Solaris)
 			# simple commands
 			_has kiss			&& _tot kiss 1
@@ -922,7 +926,7 @@ detect_packages () {
             _has nix-store 		&& {
                 nix-user-pkgs() {
                     nix-store -qR ~/.nix-profile
-                    nix-store -qR /etc/profiles/per-user/"$USER"
+                    nix-store -qR /etc/profiles/per-user/"${USER}"
                 }
                 manager=nix-system	&& _tot nix-store -qR /run/current-system/sw
                 manager=nix-user	&& _tot nix-user-pkgs
@@ -962,7 +966,7 @@ detect_packages () {
             _has nix-store && {
                 nix-user-pkgs() {
                     nix-store -qR ~/.nix-profile
-                    nix-store -qR /etc/profiles/per-user/"$USER"
+                    nix-store -qR /etc/profiles/per-user/"${USER}"
                 }
                 manager=nix-system && _tot nix-store -qR /run/current-system/sw
                 manager=nix-user   && _tot nix-store -qR nix-user-pkgs
@@ -972,6 +976,7 @@ detect_packages () {
             case ${kernel_name} in
                 CYGWIN*) _has cygcheck && _tot cygcheck -cd ;;
                 MSYS*)   _has pacman   && _tot pacman -Qq --color never ;;
+				*)		: ;;
             esac
 
             # Scoop environment throws errors if `tot scoop list` is used
@@ -986,6 +991,7 @@ detect_packages () {
             _has pkgman && _dir /boot/system/package-links/*
             my_packages=${my_packages/pkgman/depot}
 			;;
+		*) : ;;
 	esac
 
 	if ((my_packages == 0)); then
@@ -1000,7 +1006,7 @@ detect_packages () {
 				printf -v my_packages '%s, ' "${managers[@]}"
 				my_packages=${my_packages%,*}
 				;;
-			on)
+			on|*)
 				my_packages+=" (${manager_string%,*})"
 				;;
 		esac
@@ -1016,7 +1022,7 @@ detect_shell () {
 	# shellcheck disable=SC2154
 	case ${config_shell[path]} in
 		on) shell_type="${SHELL}" ;;
-		off) shell_type="${SHELL##*/}" ;;
+		off|*) shell_type="${SHELL##*/}" ;;
 	esac
 
 	# if version_info is off, then return what we have now
@@ -1027,7 +1033,7 @@ detect_shell () {
 	my_shell="${shell_type} "
 	case ${shell_name:=${SHELL##*/}} in
 		bash)
-			[[ ${BASH_VERSION} ]] || BASH_VERSION=$("${SHELL}" -c "printf %s \"\$BASH_VERSION\"")
+			[[ -n ${BASH_VERSION} ]] || BASH_VERSION=$("${SHELL}" -c "printf %s \"\$BASH_VERSION\"")
 			my_shell+="${BASH_VERSION/-*}"
 			;;
 		sh|ash|dash|es) ;;
@@ -1054,7 +1060,7 @@ detect_shell () {
 			my_shell=${my_shell/Copyright*}
 			;;
 		fish)
-			[[ "${FISH_VERSION}" ]] || FISH_VERSION=$("${SHELL}" -c "printf %s \"\$FISH_VERSION\"")
+			[[ -n "${FISH_VERSION}" ]] || FISH_VERSION=$("${SHELL}" -c "printf %s \"\$FISH_VERSION\"")
 			my_shell+="${FISH_VERSION}"
 			;;
 		*)
@@ -1101,11 +1107,11 @@ detect_cpu () {
 			_speed_dir="/sys/devices/system/cpu/cpu0/cpufreq"
 
 			# Select the right temperature file.
-			[[ -d /sys/class/hwmon && "$(ls -A /sys/class/hwmon)" ]] && \
+			[[ -d /sys/class/hwmon && -n "$(ls -A /sys/class/hwmon)" ]] && \
 				for temp_dir in /sys/class/hwmon/*; do
 					if [ -n "${temp_dir}" ]; then
 						[[ "$(< "${temp_dir}/name")" =~ (cpu_thermal|coretemp|fam15h_power|k10temp) ]] && {
-							temp_dirs=("$temp_dir"/temp*_input)
+							temp_dirs=("${temp_dir}"/temp*_input)
 							temp_dir=${temp_dirs[0]}
 							break
 						}
@@ -1130,6 +1136,7 @@ detect_cpu () {
 			# Get CPU cores.
 			_cores="$(grep -c "^processor" "${_file}")"
 			;;
+		*) : ;;
 	esac
 
     # Remove un-needed patterns from cpu output.
@@ -1170,7 +1177,7 @@ detect_cpu () {
 
     # Add CPU cores to the output.
 	# shellcheck disable=SC2154
-    [[ "${config_cpu[cores]}" != "off" && "${_cores}" ]] && \
+    [[ "${config_cpu[cores]}" != "off" && -n "${_cores}" ]] && \
         case ${my_os} in
             "Mac OS X"|"macOS") my_cpu="${my_cpu/@/(${_cores}) @}" ;;
             *)                  my_cpu="${my_cpu} (${_cores})" ;;
@@ -1178,7 +1185,7 @@ detect_cpu () {
 
     # Add CPU speed to the output.
 	# shellcheck disable=SC2154
-    if [[ "${config_cpu[speed]}" != "off" && "${_speed}" ]]; then
+    if [[ "${config_cpu[speed]}" != "off" && -n "${_speed}" ]]; then
         if (( _speed < 1000 )); then
             my_cpu="${my_cpu} @ ${_speed}MHz"
         else
@@ -1190,7 +1197,7 @@ detect_cpu () {
     # Add CPU temp to the output.
 	# shellcheck disable=SC2154
 	{
-		if [[ "${config_cpu[temp]}" != "off" && "${_deg}" ]]; then
+		if [[ "${config_cpu[temp]}" != "off" && -n "${_deg}" ]]; then
 			_deg="${_deg//.}"
 
 			# Convert to Fahrenheit if enabled
@@ -1229,6 +1236,7 @@ case ${1} in
 		fetchConfig "${FETCH_CONFIG}"
 		shift 2
 		;;
+	*) : ;;
 esac
 
 while getopts ":hvVD:" flags; do
@@ -1247,7 +1255,7 @@ detect_kernel
 detect_os
 for i in userinfo distro uptime packages shell cpu; do
 	_arr="config_${i}[display]"
-	if [[ "${!_arr}" =~ "on" ]]; then eval detect_${i}; fi
+	if [[ "${!_arr}" =~ on ]]; then eval "detect_${i}"; fi
 done
 echo "fetch! You are ${my_userinfo}!"
 echo "fetch! You're on ${my_distro}."
