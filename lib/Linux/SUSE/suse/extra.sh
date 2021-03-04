@@ -5,6 +5,6 @@ if [ -f /etc/os-release ]; then
         distro_release=$(awk -F'=' '/^VERSION_ID=/ {print $2}' /etc/os-release | tr -d '"')
     fi
 fi
-if [ ${distro_codename} == "Tumbleweed" ]; then
+if [ "${distro_codename}" == "Tumbleweed" ]; then
     distro_release=
 fi
