@@ -9,23 +9,17 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2.3.4
-    - name: Get recent version
-      uses: ./
     - name: Testing exit code on Ubuntu
       run: ./fetch.sh
   test-macos:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2.3.4
-    - name: Get recent version
-      uses: ./
     - name: Testing exit code on macOS
       run: bash fetch.sh
   test-windows:
     runs-on: windows-2019
     steps:
     - uses: actions/checkout@v2.3.4
-    - name: Get recent version
-      uses: ./
     - name: Testing exit code on Windows
       run: bash fetch.sh
