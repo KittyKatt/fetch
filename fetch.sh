@@ -139,6 +139,7 @@ detect_kernel () {
             case ${sw_vers[i]} in
                 ProductName)			darwin_name=${sw_vers[i+1]} ;;
                 ProductVersion)			osx_version=${sw_vers[i+1]} ;;
+				# shellcheck disable=SC2034
                 ProductBuildVersion)	osx_build=${sw_vers[i+1]}   ;;
 				*)						: ;;
             esac
@@ -803,7 +804,7 @@ detect_uptime () {
     ((${_days/ *} == 0)) && unset _days
 
 	# build the uptime line
-    myUptime=${_days:+${_days}, }${_hours:+${_hours}, }$_mins
+    myUptime=${_days:+${_days}, }${_hours:+${_hours}, }${_mins}
     myUptime=${myUptime%', '}
     myUptime=${myUptime:-${_seconds} seconds}
 
@@ -1043,12 +1044,14 @@ detect_shell () {
 			my_shell=${my_shell/version}
 			;;
 		osh)
-			if [[ ${OIL_VERSION} ]]; then
-				# shellcheck disable=SC2154
-				my_shell+=${OIL_VERSION}
-			else
-				my_shell+=$("${SHELL}" -c "printf %s \"\$OIL_VERSION\"")
-			fi
+			# shellcheck disable=SC2154
+			{
+				if [[ -n ${OIL_VERSION} ]]; then
+					my_shell+=${OIL_VERSION}
+				else
+					my_shell+=$("${SHELL}" -c "printf %s \"\$OIL_VERSION\"")
+				fi
+			}
 			;;
 		tcsh)
 			my_shell+=$("${SHELL}" -c "printf %s \$tcsh")
@@ -1095,7 +1098,7 @@ detect_cpu () {
 					;;	
                 "ia64" | "m32r")
                     my_cpu="$(awk -F':' '/model/ {print $2; exit}' "${_file}")"
-                    [[ -z "$my_cpu" ]] && my_cpu="$(awk -F':' '/family/ {printf $2; exit}' "${_file}")"
+                    [[ -z "${my_cpu}" ]] && my_cpu="$(awk -F':' '/family/ {printf $2; exit}' "${_file}")"
 					;;
                 *)
                     my_cpu="$(awk -F '\\s*: | @' \
