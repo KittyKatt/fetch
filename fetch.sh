@@ -807,27 +807,27 @@ detect_uptime () {
     ((${_days/ *} == 0)) && unset _days
 
 	# build the uptime line
-    myUptime=${_days:+${_days}, }${_hours:+${_hours}, }${_mins}
-    myUptime=${myUptime%', '}
-    myUptime=${myUptime:-${_seconds} seconds}
+    my_uptime=${_days:+${_days}, }${_hours:+${_hours}, }${_mins}
+    my_uptime=${my_uptime%', '}
+    my_uptime=${my_uptime:-${_seconds} seconds}
 
 	# shorthand
 	# shellcheck disable=SC2154
 	case ${config_uptime[short]} in
 		on)
-			myUptime=${myUptime/ minutes/ mins}
-			myUptime=${myUptime/ minute/ min}
-			myUptime=${myUptime/ seconds/ secs}
+			my_uptime=${my_uptime/ minutes/ mins}
+			my_uptime=${my_uptime/ minute/ min}
+			my_uptime=${my_uptime/ seconds/ secs}
 			;;
 		tiny)
-			myUptime=${myUptime/ days/d}
-			myUptime=${myUptime/ day/d}
-			myUptime=${myUptime/ hours/h}
-			myUptime=${myUptime/ hour/h}
-			myUptime=${myUptime/ minutes/m}
-			myUptime=${myUptime/ minute/m}
-			myUptime=${myUptime/ seconds/s}
-			myUptime=${myUptime//,}
+			my_uptime=${my_uptime/ days/d}
+			my_uptime=${my_uptime/ day/d}
+			my_uptime=${my_uptime/ hours/h}
+			my_uptime=${my_uptime/ hour/h}
+			my_uptime=${my_uptime/ minutes/m}
+			my_uptime=${my_uptime/ minute/m}
+			my_uptime=${my_uptime/ seconds/s}
+			my_uptime=${my_uptime//,}
 			;;
 		off)
 			:
@@ -835,14 +835,14 @@ detect_uptime () {
 		auto|*)
 			# shellcheck disable=SC2154
 			if [[ "${config_global[short]}" =~ 'on' ]]; then
-				myUptime=${myUptime/ minutes/ mins}
-				myUptime=${myUptime/ minute/ min}
-				myUptime=${myUptime/ seconds/ secs}
+				my_uptime=${my_uptime/ minutes/ mins}
+				my_uptime=${my_uptime/ minute/ min}
+				my_uptime=${my_uptime/ seconds/ secs}
 			fi
 			;;
 	esac
 
-	verboseOut "Finding current uptime...found as '${myUptime}'."
+	verboseOut "Finding current uptime...found as '${my_uptime}'."
 }
 
 # Package Count - Begin
@@ -1266,7 +1266,7 @@ done
 echo "fetch! You are ${my_userinfo}!"
 echo "fetch! You're on ${my_distro}."
 echo "fetch! You're using ${my_kernel} on ${my_os}."
-echo "fetch! You've been up for ${my_os}."
+echo "fetch! You've been up for ${my_uptime}."
 echo "fetch! Your current package count is: ${my_packages}."
 echo "fetch! You're using ${my_shell}."
 echo "fetch! You're running on ${my_cpu}."
