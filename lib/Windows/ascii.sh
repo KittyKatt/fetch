@@ -28,12 +28,12 @@ ${c4}                 "VEzjt:;;z>*`
 EOF
         ;;
     'Windows'*)
-			if [[ "$no_color" != "1" ]]; then
-				c1=$(getColor 'light blue') # Blue
-			fi
-			startline="1"
-			logowidth="38"
-			read -rd '' asciiLogo <<'EOF'
+		if [ "${no_color}" != "1" ]; then
+			c1=$(getColor 'light blue') # Blue
+		fi
+		startline="1"
+		logowidth="38"
+		read -rd '' asciiLogo <<'EOF'
 ${c1}                                  ..,
 ${c1}                      ....,,:;+ccllll
 ${c1}        ...,,+:;  cllllllllllllllllll
