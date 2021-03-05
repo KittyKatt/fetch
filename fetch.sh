@@ -726,12 +726,13 @@ detect_distro () {
 			ubuntu) 
 				my_distro="Ubuntu"
 				. lib/Linux/Ubuntu/ubuntu/extra.sh
+				. lib/Linux/Ubuntu/ubuntu/ascii.sh
 				;;
 			void*linux) my_distro="Void Linux" ;;
 			zorin*) my_distro="Zorin OS" ;;
 			endeavour*) my_distro="EndeavourOS" ;;
 			*"windows"*)
-				. lib/Windows/ascii.sh
+				ascii.sh. lib/Windows/
 			;;
 			*"macos"*|*"mac os x"*) : ;;
 			*) my_distro="Unknown" ;;
@@ -1275,8 +1276,8 @@ print_ascii () {
 
 	((text_padding=ascii_len+gap))
 
-	local n=0
-	local i=1
+	n=0
+	i=1
 	while IFS=$'\n' read -r line; do
 		if [ ${n} -lt "${startline}" ]; then
 			printf '%b\n' "${line}${reset}"
@@ -1290,6 +1291,9 @@ print_ascii () {
 		fi
 		((n++))
 	done <<< "${asciiLogo}"
+
+	unset n
+	unset i
 }
 
 usage() {
