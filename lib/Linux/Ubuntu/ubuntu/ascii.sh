@@ -5,7 +5,7 @@ if [[ "$no_color" != "1" ]]; then
 	[[ -n "${c1}" ]] && c2=$(getColor 'light red') # Light Red
 	[[ -n "${c1}" ]] && c3=$(getColor 'yellow') # Bold Yellow
 fi
-startline="0"
+startline=0
 logowidth="38"
 asciiLogo=(
 "${c2}                          ./+o+-      %s"
