@@ -1278,7 +1278,8 @@ print_ascii () {
     asciiLogo="${asciiLogo//\$\{c6\}/$c6}"
 
 	n=0
-	i=1
+	i=0
+	read -r -a _display <<< ${config_global[info]}
 	while IFS=$'\n' read -r line; do
 		# Bring in configured gap to local variable
 		local gap=${config_ascii[gap]}
@@ -1298,13 +1299,25 @@ print_ascii () {
 		((text_padding=logo_padding+gap))
 		printf -v _padding "\e[%bC" "${text_padding}"
 
+		#echo "${_info_display}"
+		# _current_info=""
+		#eval echo "_info_display = \${my_${!_display[0]}}"
+		#printf '%s' "${!_display[0]}"
+		#printf '%b' "${_info_display}"
+		#printf '%s\n' "${!_info_display}"
 		# Display logo and info
 		if [ ${n} -lt "${startline}" ]; then
 			printf '%b\n' "${line}${reset}"
 		elif [ ${n} -ge "${startline}" ]; then
-			if [[ -n "${_info[${i}]}" ]]; then
-				printf '%b\n' "${line}${reset}${_padding}${_info[${i}]}"
-				((i++))
+			_info_display="my_${_display[0]}"
+			_info_subtitle="config_${_display[0]}[subtitle]"
+			if ((${#_display}>0)); then
+				if [ -n "${!_info_subtitle}" ]; then
+					printf '%b\n' "${line}${reset}${_padding}${!_info_subtitle}${config_text[info_separator]} ${!_info_display}"
+				else
+					printf '%b\n' "${line}${reset}${_padding}${!_info_display}"
+				fi
+				_display=("${_display[@]:1}")
 			else
 				printf '%b\n' "${line}${reset}"
 			fi
@@ -1343,6 +1356,10 @@ case ${1} in
 	*) : ;;
 esac
 
+#for i in ${config_global[info]}; do
+#	echo "hey! ${i}"
+#done
+
 while getopts ":hvVD:" flags; do
 	case ${flags} in
 		h) usage; exit 0 ;;
@@ -1357,19 +1374,19 @@ done
 
 detect_kernel
 detect_os
-for i in userinfo distro uptime packages shell cpu; do
-	_arr="config_${i}[display]"
-	if [[ "${!_arr}" =~ on ]]; then eval "detect_${i}"; fi
+for i in ${config_global[info]}; do
+	#_arr="config_${i}[display]"
+	#if [[ "${!_arr}" =~ on ]]; then eval "detect_${i}"; fi
+	"detect_${i}"
 done
-echo "fetch! You are ${my_userinfo}!"
-echo "fetch! You're on ${my_distro}."
-echo "fetch! You're using ${my_kernel} on ${my_os}."
-echo "fetch! You've been up for ${my_uptime}."
-echo "fetch! Your current package count is: ${my_packages}."
-echo "fetch! You're using ${my_shell}."
-echo "fetch! You're running on ${my_cpu}."
+#echo "fetch! You are ${my_userinfo}!"
+#echo "fetch! You're on ${my_distro}."
+#echo "fetch! You're using ${my_kernel} on ${my_os}."
+#echo "fetch! You've been up for ${my_uptime}."
+#echo "fetch! Your current package count is: ${my_packages}."
+#echo "fetch! You're using ${my_shell}."
+#echo "fetch! You're running on ${my_cpu}."
 
 print_ascii
-echo "${_info[0]}"
 
 ((extglob_set)) && shopt -u extglob
