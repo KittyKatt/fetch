@@ -3,7 +3,7 @@ case ${my_distro} in
 		# number of colors: 3
 		# logo width: 38
 		if [ "${no_color}" != "1" ]; then
-			c1=$(getColor 'fg') # White
+			c1=$(getColor 'white') # White
 			c2=$(getColor 'light red') # Light Red
 			c3=$(getColor 'yellow') # Bold Yellow
 		fi
