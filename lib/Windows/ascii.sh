@@ -6,8 +6,8 @@ case ${my_distro} in
             c3=$(getColor 'light blue') # Blue
             c4=$(getColor 'yellow') # Yellow
         fi
-        startline="0"
-        logowidth="37"
+        startline=0
+        logowidth=37
         read -rd '' asciiLogo <<'EOF'
 ${c1}        ,.=:!!t3Z3z.,
 ${c1}       :tt:::tt333EE3
@@ -31,8 +31,8 @@ EOF
 		if [ "${no_color}" != "1" ]; then
 			c1=$(getColor 'light blue') # Blue
 		fi
-		startline="1"
-		logowidth="38"
+		startline=1
+		logowidth=38
 		read -rd '' asciiLogo <<'EOF'
 ${c1}                                  ..,
 ${c1}                      ....,,:;+ccllll
