@@ -27,7 +27,7 @@ info () {
 			_n=$((_n + 1))
 			_info[${_n}]="${_tmp}"
 			return
-		elif [[ -z "${_info[@]}" ]]; then
+		elif [ -z "${_info[*]}" ]; then
 			_info[0]="${_tmp}"
 			return
 		fi
@@ -187,7 +187,7 @@ detect_kernel () {
 		*) : ;;
 	esac
 
-	[[ -n "${my_kernel}" ]] && info "${config_kernel[subtitle]}${config_text[info_separator]} ${my_kernel}"
+	[[ -n "${my_kernel}" ]] && info "${config_kernel[subtitle]}${config_text[info_separator]}" "${my_kernel}"
 
 	verboseOut "Finding kernel...found as '${my_kernel}'."
 }
@@ -732,7 +732,7 @@ detect_distro () {
 			zorin*) my_distro="Zorin OS" ;;
 			endeavour*) my_distro="EndeavourOS" ;;
 			*"windows"*)
-				ascii.sh. lib/Windows/
+				. lib/Windows/ascii.sh
 			;;
 			*"macos"*|*"mac os x"*) : ;;
 			*) my_distro="Unknown" ;;
@@ -768,7 +768,7 @@ detect_distro () {
 		[[ ${config_distro[os_arch]} =~ 'on' ]] && my_distro="${my_distro} ${kernel_machine}"
 	fi
 
-	[[ -n "${my_distro}" ]] && info "${config_distro[subtitle]}${config_text[info_separator]} ${my_distro}"
+	[[ -n "${my_distro}" ]] && info "${config_distro[subtitle]}${config_text[info_separator]}" "${my_distro}"
 
 	verboseOut "Finding distribution...found as '${my_distro}'."
 }
@@ -875,7 +875,7 @@ detect_uptime () {
 			;;
 	esac
 
-	[[ -n "${my_uptime}" ]] && info "${config_uptime[subtitle]}${config_text[info_separator]} ${my_uptime}"
+	[[ -n "${my_uptime}" ]] && info "${config_uptime[subtitle]}${config_text[info_separator]}" "${my_uptime}"
 
 	verboseOut "Finding current uptime...found as '${my_uptime}'."
 }
@@ -1053,7 +1053,7 @@ detect_packages () {
 		my_packages=${my_packages/pacman-key/pacman}
 	fi
 
-	[[ -n "${my_packages}" ]] && info "${config_packages[subtitle]}${config_text[info_separator]} ${my_packages}"
+	[[ -n "${my_packages}" ]] && info "${config_packages[subtitle]}${config_text[info_separator]}" "${my_packages}"
 
 	verboseOut "Finding current package count...found as '${my_packages}'."
 }
@@ -1070,8 +1070,11 @@ detect_shell () {
 	# shellcheck disable=SC2154
 	[ "${config_shell[version]}" != "on" ] && my_shell="${shell_type}" && return
 
+	# Possible Windows problem
+	[ "${my_os}" == "Windows" ] && shell_name="${shell_type//\.exe/}"
+
 	# get shell versions
-	my_shell="${shell_type} "
+	my_shell="${shell_name:=${shell_type}} "
 	case ${shell_name:=${SHELL##*/}} in
 		bash)
 			[[ -n ${BASH_VERSION} ]] || BASH_VERSION=$("${SHELL}" -c "printf %s \"\$BASH_VERSION\"")
@@ -1118,7 +1121,7 @@ detect_shell () {
     my_shell=${my_shell/options*}
     my_shell=${my_shell/\(*\)}
 
-	[[ -n "${my_shell}" ]] && info "${config_shell[subtitle]}${config_text[info_separator]} ${my_shell}"
+	[[ -n "${my_shell}" ]] && info "${config_shell[subtitle]}${config_text[info_separator]}" "${my_shell}"
 
 	verboseOut "Finding current shell...found as '${my_shell}'."
 }
