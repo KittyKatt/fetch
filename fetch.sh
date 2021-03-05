@@ -1277,22 +1277,43 @@ print_ascii () {
     asciiLogo="${asciiLogo//\$\{c5\}/$c5}"
     asciiLogo="${asciiLogo//\$\{c6\}/$c6}"
 
-	((text_padding=ascii_len+gap))
-
 	n=0
 	i=1
 	while IFS=$'\n' read -r line; do
+		# Bring in configured gap to local variable
+		local gap=${config_ascii[gap]}
+
+		# Calculate: (max detected logo width - length of current line)
+		_tmp="${line}"
+		_tmp="${_tmp//\$\{??\}}"
+		_tmp=${_tmp//\\\\/\\}
+		_tmp=${_tmp//█/ }
+		if ((${#_tmp}<ascii_len)); then
+			logo_padding=$((ascii_len - ${#_tmp}))
+		else
+			logo_padding=0
+		fi
+
+		# Calculate: (end of logo on current line + defined gap)
+		((text_padding=logo_padding+gap))
+		printf -v _padding "\e[%bC" "${text_padding}"
+
+		# Display logo and info
 		if [ ${n} -lt "${startline}" ]; then
 			printf '%b\n' "${line}${reset}"
 		elif [ ${n} -ge "${startline}" ]; then
 			if [[ -n "${_info[${i}]}" ]]; then
-				printf '%b\n' "${line}${reset} ${_info[${i}]}"
+				printf '%b\n' "${line}${reset}${_padding}${_info[${i}]}"
 				((i++))
 			else
 				printf '%b\n' "${line}${reset}"
 			fi
 		fi
+
+		# Cleanup
 		((n++))
+		unset _tmp
+		unset _padding
 	done <<< "${asciiLogo}"
 
 	unset n
