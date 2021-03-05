@@ -31,7 +31,7 @@ EOF
 			if [[ "$no_color" != "1" ]]; then
 				c1=$(getColor 'light blue') # Blue
 			fi
-			startline="0"
+			startline="1"
 			logowidth="38"
 			read -rd '' asciiLogo <<'EOF'
 ${c1}                                  ..,
