@@ -1,5 +1,5 @@
 case ${my_distro} in
-	'Ubuntu')
+	Ubuntu)
 		# number of colors: 3
 		# logo width: 38
 		if [ "${no_color}" != "1" ]; then
