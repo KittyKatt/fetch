@@ -17,22 +17,20 @@ shopt -q extglob; extglob_set=$?
 ((extglob_set)) && shopt -s extglob
 
 # Let's initialize our info array
-declare -A _info
 info () {
-	if [[ -n "${1}" ]]; then
-		local _tmp="${1}"
-		[[ "${2}" ]] && local _tmp="${1} ${2}"
-		if [[ "${#_info[@]}" -ge "0" ]]; then
-			_n=${#_info[@]}
-			_n=$((_n + 1))
-			_info[${_n}]="${_tmp}"
-			return
-		elif [ -z "${_info[*]}" ]; then
-			_info[0]="${_tmp}"
-			return
+	local _info="${1}"
+	local _info_disp="my_${_info}"
+	
+	if [ -n "${!_info_disp}" ]; then
+		_info_subtitle="config_${_info}[subtitle]"
+		if [ -n "${!_info_subtitle}" ]; then
+			# shellcheck disable=SC2154
+			printf '%b\n' "${!_info_subtitle}${config_text[info_separator]} ${!_info_disp}"
+		else
+			printf '%b\n' "${!_info_disp}"
 		fi
 	else
-		return 1
+		:
 	fi
 }
 
@@ -189,9 +187,6 @@ detect_kernel () {
 			;;
 		*) : ;;
 	esac
-
-	# shellcheck disable=SC2154
-	[[ -n "${my_kernel}" ]] && info "${config_kernel[subtitle]}${config_text[info_separator]}" "${my_kernel}"
 
 	verboseOut "Finding kernel...found as '${my_kernel}'."
 }
@@ -775,9 +770,6 @@ detect_distro () {
 		[[ ${config_distro[os_arch]} =~ 'on' ]] && my_distro="${my_distro} ${kernel_machine}"
 	fi
 
-	# shellcheck disable=SC2154
-	[[ -n "${my_distro}" ]] && info "${config_distro[subtitle]}${config_text[info_separator]}" "${my_distro}"
-
 	verboseOut "Finding distribution...found as '${my_distro}'."
 }
 
@@ -801,9 +793,6 @@ detect_userinfo () {
 		if [ -n "${my_userinfo}" ]; then my_userinfo="${my_userinfo}@${my_host}"
 		else my_userinfo="${my_host}"; fi
 	fi
-
-	# shellcheck disable=SC2154
-	[[ -n "${my_userinfo}" ]] && info "${my_userinfo}"
 
 	verboseOut "Finding user info...found as '${my_userinfo}'."
 }
@@ -883,9 +872,6 @@ detect_uptime () {
 			fi
 			;;
 	esac
-
-	# shellcheck disable=SC2154
-	[[ -n "${my_uptime}" ]] && info "${config_uptime[subtitle]}${config_text[info_separator]}" "${my_uptime}"
 
 	verboseOut "Finding current uptime...found as '${my_uptime}'."
 }
@@ -1063,9 +1049,6 @@ detect_packages () {
 		my_packages=${my_packages/pacman-key/pacman}
 	fi
 
-	# shellcheck disable=SC2154
-	[[ -n "${my_packages}" ]] && info "${config_packages[subtitle]}${config_text[info_separator]}" "${my_packages}"
-
 	verboseOut "Finding current package count...found as '${my_packages}'."
 }
 
@@ -1131,9 +1114,6 @@ detect_shell () {
     my_shell=${my_shell/xonsh\//xonsh }
     my_shell=${my_shell/options*}
     my_shell=${my_shell/\(*\)}
-
-	# shellcheck disable=SC2154
-	[[ -n "${my_shell}" ]] && info "${config_shell[subtitle]}${config_text[info_separator]}" "${my_shell}"
 
 	verboseOut "Finding current shell...found as '${my_shell}'."
 }
@@ -1269,9 +1249,6 @@ detect_cpu () {
 		fi
 	}
 
-	# shellcheck disable=SC2154
-	[[ -n "${my_cpu}" ]] && info "${config_cpu[subtitle]}${config_text[info_separator]}" "${my_cpu}"
-
 	verboseOut "Finding CPU...found as '${my_cpu}'."
 }
 
@@ -1282,8 +1259,6 @@ format_ascii () {
 	_tmp="${_logo//\$\{??\}}"
 	_tmp=${_tmp//\\\\/\\}
 	_tmp=${_tmp//█/ }
-	# \\+([0-9])\[[0-9]\[+([0-9])\[[0-9]\;+([0-9])m(.*)
-	[[ ${_tmp} =~ \\[0-9]+\[[0-9]m\\[0-9]+\[[0-9]\;[0-9]+m(.*) ]] && _tmp=${BASH_REMATCH[1]}
 	if ((${#_tmp}<ascii_len)); then
 		logo_padding=$((ascii_len - ${#_tmp}))
 	else
@@ -1310,7 +1285,6 @@ print_ascii () {
     done <<< "${asciiLogo//\$\{??\}}"
 
 	n=0
-	i=0
 	# shellcheck disable=SC2154
 	read -r -a _display <<< "${config_global[info]}"
 	while IFS=$'\n' read -r line; do
@@ -1324,14 +1298,18 @@ print_ascii () {
 		if [ ${n} -lt "${startline}" ]; then
 			printf '%b\n' "${line}${reset}"
 		elif [ ${n} -ge "${startline}" ]; then
-			_info_display="my_${_display[0]}"
-			_info_subtitle="config_${_display[0]}[subtitle]"
 			if ((${#_display}>0)); then
-				if [ -n "${!_info_subtitle}" ]; then
-					# shellcheck disable=SC2154
-					printf '%b\n' "${line}${reset}${_padding}${!_info_subtitle}${config_text[info_separator]} ${!_info_display}"
+				_info_display="my_${_display[0]}"
+				until [ -n "${!_info_display}" ]; do
+					((${#_display}<=0)) && break
+					_display=("${_display[@]:1}")
+					_info_display="my_${_display[0]}"
+				done
+				_info_display=$(info "${_display[0]}")
+				if [ -n "${_info_display}" ]; then
+					printf '%b\n' "${line}${reset}${_info_display}"
 				else
-					printf '%b\n' "${line}${reset}${_padding}${!_info_display}"
+					continue
 				fi
 				_display=("${_display[@]:1}")
 			else
@@ -1372,10 +1350,6 @@ case ${1} in
 	*) : ;;
 esac
 
-#for i in ${config_global[info]}; do
-#	echo "hey! ${i}"
-#done
-
 while getopts ":hvVD:" flags; do
 	case ${flags} in
 		h) usage; exit 0 ;;
@@ -1391,17 +1365,8 @@ done
 detect_kernel
 detect_os
 for i in ${config_global[info]}; do
-	#_arr="config_${i}[display]"
-	#if [[ "${!_arr}" =~ on ]]; then eval "detect_${i}"; fi
 	"detect_${i}"
 done
-#echo "fetch! You are ${my_userinfo}!"
-#echo "fetch! You're on ${my_distro}."
-#echo "fetch! You're using ${my_kernel} on ${my_os}."
-#echo "fetch! You've been up for ${my_uptime}."
-#echo "fetch! Your current package count is: ${my_packages}."
-#echo "fetch! You're using ${my_shell}."
-#echo "fetch! You're running on ${my_cpu}."
 
 print_ascii
 

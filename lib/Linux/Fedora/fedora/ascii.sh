@@ -1,9 +1,10 @@
+# number of colors: 2
+# logo width: 37
 if [ "${no_color}" != "1" ]; then
     c1=$(getColor 'white') # White
     c2=$(getColor 'light blue') # Light Blue
 fi
 startline=0
-logowidth=37
 read -rd '' asciiLogo <<'EOF'
 ${c2}           /:-------------:\
 ${c2}        :-------------------::
