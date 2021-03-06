@@ -148,7 +148,7 @@ detect_kernel () {
 				ProductName)			echo"darwin_name"; darwin_name=${sw_vers[i+1]} ;;
 				ProductVersion)			echo"osx_version"; osx_version=${sw_vers[i+1]} ;;
 				ProductBuildVersion)	osx_build=${sw_vers[i+1]}   ;;
-				*)						return ;;
+				*)						: ;;
 			esac
         done
     fi
