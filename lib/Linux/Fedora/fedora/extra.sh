@@ -1,4 +1,4 @@
 if [ -f /etc/os-release ]; then
-    source /etc/os-release
-    distro_release="${VERSION%%+([[:space:]])}"
+    _release=$(</etc/os-release)
+    [[ ${_release} =~ VERSION=+\"([^$'\n']*)\" ]] && distro_release="${BASH_REMATCH[1]}"
 fi
