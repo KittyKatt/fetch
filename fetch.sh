@@ -154,6 +154,7 @@ detect_kernel () {
 				esac
 			}
         }
+		echo "hello"
 		echo "darwin_name: ${darwin_name}"
 		echo "osx_version: ${osx_version}"
     fi
