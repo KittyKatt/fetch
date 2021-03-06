@@ -190,6 +190,7 @@ detect_kernel () {
 		*) : ;;
 	esac
 
+	# shellcheck disable=SC2154
 	[[ -n "${my_kernel}" ]] && info "${config_kernel[subtitle]}${config_text[info_separator]}" "${my_kernel}"
 
 	verboseOut "Finding kernel...found as '${my_kernel}'."
@@ -774,6 +775,7 @@ detect_distro () {
 		[[ ${config_distro[os_arch]} =~ 'on' ]] && my_distro="${my_distro} ${kernel_machine}"
 	fi
 
+	# shellcheck disable=SC2154
 	[[ -n "${my_distro}" ]] && info "${config_distro[subtitle]}${config_text[info_separator]}" "${my_distro}"
 
 	verboseOut "Finding distribution...found as '${my_distro}'."
@@ -800,6 +802,7 @@ detect_userinfo () {
 		else my_userinfo="${my_host}"; fi
 	fi
 
+	# shellcheck disable=SC2154
 	[[ -n "${my_userinfo}" ]] && info "${my_userinfo}"
 
 	verboseOut "Finding user info...found as '${my_userinfo}'."
@@ -881,6 +884,7 @@ detect_uptime () {
 			;;
 	esac
 
+	# shellcheck disable=SC2154
 	[[ -n "${my_uptime}" ]] && info "${config_uptime[subtitle]}${config_text[info_separator]}" "${my_uptime}"
 
 	verboseOut "Finding current uptime...found as '${my_uptime}'."
@@ -1059,6 +1063,7 @@ detect_packages () {
 		my_packages=${my_packages/pacman-key/pacman}
 	fi
 
+	# shellcheck disable=SC2154
 	[[ -n "${my_packages}" ]] && info "${config_packages[subtitle]}${config_text[info_separator]}" "${my_packages}"
 
 	verboseOut "Finding current package count...found as '${my_packages}'."
@@ -1127,6 +1132,7 @@ detect_shell () {
     my_shell=${my_shell/options*}
     my_shell=${my_shell/\(*\)}
 
+	# shellcheck disable=SC2154
 	[[ -n "${my_shell}" ]] && info "${config_shell[subtitle]}${config_text[info_separator]}" "${my_shell}"
 
 	verboseOut "Finding current shell...found as '${my_shell}'."
@@ -1263,6 +1269,7 @@ detect_cpu () {
 		fi
 	}
 
+	# shellcheck disable=SC2154
 	[[ -n "${my_cpu}" ]] && info "${config_cpu[subtitle]}${config_text[info_separator]}" "${my_cpu}"
 
 	verboseOut "Finding CPU...found as '${my_cpu}'."
@@ -1304,10 +1311,13 @@ print_ascii () {
 
 	n=0
 	i=0
-	read -r -a _display <<< ${config_global[info]}
+	# shellcheck disable=SC2154
+	read -r -a _display <<< "${config_global[info]}"
 	while IFS=$'\n' read -r line; do
+		# shellcheck disable=SC2154
 		gap=${config_ascii[gap]}
 
+		# call format_ascii to prepare for info display
 		line=$(format_ascii "${line}")
 
 		# Display logo and info
@@ -1318,6 +1328,7 @@ print_ascii () {
 			_info_subtitle="config_${_display[0]}[subtitle]"
 			if ((${#_display}>0)); then
 				if [ -n "${!_info_subtitle}" ]; then
+					# shellcheck disable=SC2154
 					printf '%b\n' "${line}${reset}${_padding}${!_info_subtitle}${config_text[info_separator]} ${!_info_display}"
 				else
 					printf '%b\n' "${line}${reset}${_padding}${!_info_display}"
