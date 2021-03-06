@@ -153,6 +153,7 @@ detect_kernel () {
 					*)						return ;;
 				esac
 			}
+			echo "${darwin_name}"
 			echo "${sw_vers[i+1]}"
         }
 		echo "darwin_name: ${darwin_name}"
