@@ -142,6 +142,7 @@ detect_kernel () {
 
         IFS=$'\n' read -d "" -ra sw_vers <<< "$(awk -F'<|>' '/key|string/ {print $3}' \
                             "/System/Library/CoreServices/SystemVersion.plist")"
+		echo "${sw_vers[@]}"
         for ((i=0;i<${#sw_vers[@]};i+=2)) {
 			# shellcheck disable=SC2034
 			{
