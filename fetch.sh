@@ -1276,7 +1276,7 @@ format_ascii () {
     _logo="${_logo//\$\{c5\}/$c5}"
     _logo="${_logo//\$\{c6\}/$c6}"
 
-	((text_padding=logo_padding+gap))
+	printf -v text_padding "%s" "$((logo_padding+gap))"
 	printf "%b \e[%sC" "${_logo}" "${text_padding}"
 }
 
