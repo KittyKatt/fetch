@@ -140,10 +140,10 @@ detect_kernel () {
         # macOS can report incorrect versions unless this is 0.
         # https://github.com/dylanaraps/neofetch/issues/1607
         export SYSTEM_VERSION_COMPAT=0
+		echo "yes"
 
         IFS=$'\n' read -d "" -ra sw_vers <<< "$(awk -F'<|>' '/key|string/ {print $3}' \
                             "/System/Library/CoreServices/SystemVersion.plist")"
-		echo "${sw_vers[@]}"
         for ((i=0;i<${#sw_vers[@]};i+=2)) {
 			# shellcheck disable=SC2034
 			{
