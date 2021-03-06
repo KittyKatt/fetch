@@ -134,7 +134,6 @@ detect_kernel () {
     kernel_version="${kernel[1]}"
     kernel_machine="${kernel[2]}"
 
-	echo "${kernel_name}"
 	# pulled from neofetch source
     if [ "${kernel_name}" == "Darwin" ]; then
         # macOS can report incorrect versions unless this is 0.
@@ -145,8 +144,8 @@ detect_kernel () {
                             "/System/Library/CoreServices/SystemVersion.plist")"
         for ((i=0;i<${#sw_vers[@]};i+=2)); do
 			case ${sw_vers[i]} in
-				ProductName)			echo"darwin_name"; darwin_name=${sw_vers[i+1]} ;;
-				ProductVersion)			echo"osx_version"; osx_version=${sw_vers[i+1]} ;;
+				ProductName)			darwin_name=${sw_vers[i+1]} ;;
+				ProductVersion)			osx_version=${sw_vers[i+1]} ;;
 				ProductBuildVersion)	osx_build=${sw_vers[i+1]}   ;;
 				*)						: ;;
 			esac
@@ -1377,6 +1376,6 @@ for i in ${config_global[info]}; do
 	eval "detect_${i}"
 done
 
-#print_ascii
+print_ascii
 
 ((extglob_set)) && shopt -u extglob
