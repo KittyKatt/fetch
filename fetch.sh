@@ -721,8 +721,10 @@ detect_distro () {
 			endeavour*) my_distro="EndeavourOS" ;;
 			*"windows"*)
 				. lib/Windows/ascii.sh
-			;;
-			*"macos"*|*"mac os x"*) return ;;
+				;;
+			*"macos"*|*"mac os x"*)
+				. lib/macOS/ascii.sh
+				;;
 			*) my_distro="Unknown" ;;
 		esac
 
@@ -1276,7 +1278,7 @@ format_ascii () {
     _logo="${_logo//\$\{c5\}/$c5}"
     _logo="${_logo//\$\{c6\}/$c6}"
 
-	printf -v text_padding "%s" "$((logo_padding+gap))"
+	((text_padding=logo_padding+gap))
 	printf "%b \e[%sC" "${_logo}" "${text_padding}"
 }
 
