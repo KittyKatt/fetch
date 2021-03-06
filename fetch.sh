@@ -140,7 +140,6 @@ detect_kernel () {
         # macOS can report incorrect versions unless this is 0.
         # https://github.com/dylanaraps/neofetch/issues/1607
         export SYSTEM_VERSION_COMPAT=0
-		echo "yes"
 
         IFS=$'\n' read -d "" -ra sw_vers <<< "$(awk -F'<|>' '/key|string/ {print $3}' \
                             "/System/Library/CoreServices/SystemVersion.plist")"
@@ -154,6 +153,7 @@ detect_kernel () {
 					*)						return ;;
 				esac
 			}
+			echo "${sw_vers[i+1]}"
         }
 		echo "darwin_name: ${darwin_name}"
 		echo "osx_version: ${osx_version}"
