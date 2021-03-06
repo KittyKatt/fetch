@@ -1373,7 +1373,7 @@ done
 detect_kernel
 detect_os
 
-uname -a
+uname -srm
 
 for i in ${config_global[info]}; do
 	eval "detect_${i}"
