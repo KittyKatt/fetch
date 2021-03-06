@@ -1368,7 +1368,7 @@ done
 detect_kernel
 detect_os
 for i in ${config_global[info]}; do
-	"detect_${i}"
+	eval "detect_${i}"
 done
 
 print_ascii
