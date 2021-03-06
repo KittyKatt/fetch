@@ -1350,7 +1350,7 @@ case ${1} in
 		fetchConfig "${FETCH_CONFIG}"
 		shift 2
 		;;
-	*) return ;;
+	*) : ;;
 esac
 
 while getopts ":hvVD:" flags; do
