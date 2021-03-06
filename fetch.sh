@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-FETCH_VERSION="0.5"
+FETCH_VERSION="0.9"
 #FETCH_DATA_DIR="/usr/share/fetch"
 FETCH_DATA_USER_DIR="${XDG_CONFIG_HOME:-${HOME}}/.config/fetch"
 FETCH_CONFIG_FILENAME="config"
@@ -90,6 +90,9 @@ fetchConfig () {
 	fi
 }
 
+# Functions: color
+# Variables: color
+reset='\e[0m'
 colorize () {
 	printf $'\033[0m\033[38;5;%sm' "$1"
 }
@@ -660,7 +663,10 @@ detect_distro () {
 			evolveos) my_distro="Evolve OS" ;;
 			sulin) my_distro="Sulin" ;;
 			exherbo|exherbo*linux) my_distro="Exherbo" ;;
-			fedora) my_distro="Fedora" ;;
+			fedora)
+				my_distro="Fedora"
+				. lib/Linux/Fedora/fedora/ascii.sh
+				;;
 			freebsd) my_distro="FreeBSD" ;;
 			freebsd*old) my_distro="FreeBSD - Old" ;;
 			frugalware) my_distro="Frugalware" ;;
@@ -1262,6 +1268,33 @@ detect_cpu () {
 	verboseOut "Finding CPU...found as '${my_cpu}'."
 }
 
+format_ascii () {
+	local _logo="${1}"
+
+	# Calculate: (max detected logo width - length of current line)
+	_tmp="${_logo//\$\{??\}}"
+	_tmp=${_tmp//\\\\/\\}
+	_tmp=${_tmp//█/ }
+	# \\+([0-9])\[[0-9]\[+([0-9])\[[0-9]\;+([0-9])m(.*)
+	[[ ${_tmp} =~ \\[0-9]+\[[0-9]m\\[0-9]+\[[0-9]\;[0-9]+m(.*) ]] && _tmp=${BASH_REMATCH[1]}
+	if ((${#_tmp}<ascii_len)); then
+		logo_padding=$((ascii_len - ${#_tmp}))
+	else
+		logo_padding=0
+	fi
+
+	# Expand color variables
+	_logo="${_logo//\$\{c1\}/$c1}"
+    _logo="${_logo//\$\{c2\}/$c2}"
+    _logo="${_logo//\$\{c3\}/$c3}"
+    _logo="${_logo//\$\{c4\}/$c4}"
+    _logo="${_logo//\$\{c5\}/$c5}"
+    _logo="${_logo//\$\{c6\}/$c6}"
+
+	((text_padding=logo_padding+gap))
+	printf "%b \e[%sC" "${_logo}" "${text_padding}"
+}
+
 print_ascii () {
     while IFS=$'\n' read -r line; do
         line=${line//\\\\/\\}
@@ -1269,35 +1302,13 @@ print_ascii () {
         ((++lines,${#line}>ascii_len)) && ascii_len="${#line}"
     done <<< "${asciiLogo//\$\{??\}}"
 
-    # Colors.
-    asciiLogo="${asciiLogo//\$\{c1\}/$c1}"
-    asciiLogo="${asciiLogo//\$\{c2\}/$c2}"
-    asciiLogo="${asciiLogo//\$\{c3\}/$c3}"
-    asciiLogo="${asciiLogo//\$\{c4\}/$c4}"
-    asciiLogo="${asciiLogo//\$\{c5\}/$c5}"
-    asciiLogo="${asciiLogo//\$\{c6\}/$c6}"
-
 	n=0
 	i=0
 	read -r -a _display <<< ${config_global[info]}
 	while IFS=$'\n' read -r line; do
-		# Bring in configured gap to local variable
-		local gap=${config_ascii[gap]}
+		gap=${config_ascii[gap]}
 
-		# Calculate: (max detected logo width - length of current line)
-		_tmp="${line}"
-		_tmp="${_tmp//\$\{??\}}"
-		_tmp=${_tmp//\\\\/\\}
-		_tmp=${_tmp//█/ }
-		if ((${#_tmp}<ascii_len)); then
-			logo_padding=$((ascii_len - ${#_tmp}))
-		else
-			logo_padding=0
-		fi
-
-		# Calculate: (end of logo on current line + defined gap)
-		((text_padding=logo_padding+gap))
-		printf -v _padding "\e[%bC" "${text_padding}"
+		line=$(format_ascii "${line}")
 
 		#echo "${_info_display}"
 		# _current_info=""
