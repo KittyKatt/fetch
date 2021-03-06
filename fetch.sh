@@ -1376,6 +1376,6 @@ for i in ${config_global[info]}; do
 	eval "detect_${i}"
 done
 
-print_ascii
+#print_ascii
 
 ((extglob_set)) && shopt -u extglob
