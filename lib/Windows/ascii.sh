@@ -1,13 +1,12 @@
 case ${my_distro} in
+    # logo width: 37
+    # number of colors: 4
     'Windows Classic')
-        if [ "${no_color}" != "1" ]; then
-            c1=$(getColor 'light red') # Red
-            c2=$(getColor 'light green') # Green
-            c3=$(getColor 'light blue') # Blue
-            c4=$(getColor 'yellow') # Yellow
-        fi
+        c1=$(getColor 'light red') # Red
+        c2=$(getColor 'light green') # Green
+        c3=$(getColor 'light blue') # Blue
+        c4=$(getColor 'yellow') # Yellow
         startline=0
-        logowidth=37
         read -rd '' asciiLogo <<'EOF'
 ${c1}        ,.=:!!t3Z3z.,
 ${c1}       :tt:::tt333EE3
@@ -28,11 +27,10 @@ ${c4}                 "VEzjt:;;z>*`
 EOF
         ;;
     'Windows'*)
-		if [ "${no_color}" != "1" ]; then
-			c1=$(getColor 'light blue') # Blue
-		fi
+        # logo width: 38
+        # number of colors: 1
+		c1=$(getColor 'light blue') # Blue
 		startline=1
-		logowidth=38
 		read -rd '' asciiLogo <<'EOF'
 ${c1}                                  ..,
 ${c1}                      ....,,:;+ccllll
