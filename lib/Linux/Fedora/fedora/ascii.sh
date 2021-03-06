@@ -1,4 +1,4 @@
-if [[ "$no_color" != "1" ]]; then
+if [ "${no_color}" != "1" ]; then
     c1=$(getColor 'white') # White
     c2=$(getColor 'light blue') # Light Blue
 fi
