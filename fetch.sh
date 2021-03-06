@@ -154,6 +154,8 @@ detect_kernel () {
 				esac
 			}
         }
+		echo "darwin_name: ${darwin_name}"
+		echo "osx_version: ${osx_version}"
     fi
 
 	# shellcheck disable=SC2154
