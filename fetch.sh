@@ -1209,7 +1209,7 @@ detect_cpu () {
     my_cpu="${my_cpu//, * Compute Cores}"
     my_cpu="${my_cpu//Core / }"
     my_cpu="${my_cpu//(\"AuthenticAMD\"*)}"
-    my_cpu="${my_cpu//with Radeon * Graphics}"
+    my_cpu="${my_cpu//with Radeon * [Graphics|Gfx]}"
     my_cpu="${my_cpu//, altivec supported}"
     my_cpu="${my_cpu//FPU*}"
     my_cpu="${my_cpu//Chip Revision*}"
@@ -1310,12 +1310,6 @@ print_ascii () {
 
 		line=$(format_ascii "${line}")
 
-		#echo "${_info_display}"
-		# _current_info=""
-		#eval echo "_info_display = \${my_${!_display[0]}}"
-		#printf '%s' "${!_display[0]}"
-		#printf '%b' "${_info_display}"
-		#printf '%s\n' "${!_info_display}"
 		# Display logo and info
 		if [ ${n} -lt "${startline}" ]; then
 			printf '%b\n' "${line}${reset}"
