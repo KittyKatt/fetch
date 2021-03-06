@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+# variables: script global
 FETCH_VERSION="0.9"
 #FETCH_DATA_DIR="/usr/share/fetch"
 FETCH_DATA_USER_DIR="${XDG_CONFIG_HOME:-${HOME}}/.config/fetch"
@@ -16,24 +16,7 @@ fi
 shopt -q extglob; extglob_set=$?
 ((extglob_set)) && shopt -s extglob
 
-# Let's initialize our info array
-info () {
-	local _info="${1}"
-	local _info_disp="my_${_info}"
-	
-	if [ -n "${!_info_disp}" ]; then
-		_info_subtitle="config_${_info}[subtitle]"
-		if [ -n "${!_info_subtitle}" ]; then
-			# shellcheck disable=SC2154
-			printf '%b\n' "${!_info_subtitle}${config_text[info_separator]} ${!_info_disp}"
-		else
-			printf '%b\n' "${!_info_disp}"
-		fi
-	else
-		:
-	fi
-}
-
+# functions: script output
 verboseOut () {
 	# shellcheck disable=SC2154
 	if [[ ${config_global[verbose]} =~ "on" ]]; then
@@ -49,7 +32,8 @@ stderrOut () {
 		printf '\033[1;37m[[ \033[1;31m! \033[1;37m]] \033[0m%s\n' "${line}"
 	done
 }
-# Taken from neofetch
+
+# functions: text
 strip_sequences() {
     strip="${1//$'\e['3[0-9]m}"
     strip="${strip//$'\e['[0-9]m}"
@@ -68,6 +52,7 @@ trim() {
     set +f
 }
 
+# functions: configuration
 fetchConfig () {
 	if [ -f "${1}" ]; then
 		while read -r line; do
@@ -88,8 +73,8 @@ fetchConfig () {
 	fi
 }
 
-# Functions: color
-# Variables: color
+# functions: color
+# variables: color
 reset='\e[0m'
 colorize () {
 	printf $'\033[0m\033[38;5;%sm' "$1"
@@ -142,6 +127,7 @@ _randcolor () {
 	echo "${color}"
 }
 
+# functions: system detection
 detect_kernel () {
     IFS=" " read -ra kernel <<< "$(uname -srm)"
     kernel_name="${kernel[0]}"
@@ -163,7 +149,7 @@ detect_kernel () {
 					ProductName)			darwin_name=${sw_vers[i+1]} ;;
 					ProductVersion)			osx_version=${sw_vers[i+1]} ;;
 					ProductBuildVersion)	osx_build=${sw_vers[i+1]}   ;;
-					*)						: ;;
+					*)						return ;;
 				esac
 			}
         }
@@ -185,7 +171,7 @@ detect_kernel () {
 				my_kernel="${kernel_name} ${kernel_version}"
 			fi
 			;;
-		*) : ;;
+		*) return ;;
 	esac
 
 	verboseOut "Finding kernel...found as '${my_kernel}'."
@@ -217,7 +203,6 @@ detect_os () {
 	verboseOut "Finding OS...found as '${my_os}'."
 }
 
-# Distro Detection - Begin
 detect_distro () {
 	if [ -z "${my_distro}" ]; then
 		local distro_detect=
@@ -405,7 +390,7 @@ detect_distro () {
 								my_distro="Guix System"
 							fi
 						;;
-						*) : ;;
+						*) return ;;
 					esac
 				fi
 
@@ -661,6 +646,7 @@ detect_distro () {
 			exherbo|exherbo*linux) my_distro="Exherbo" ;;
 			fedora)
 				my_distro="Fedora"
+				. lib/Linux/Fedora/fedora/extra.sh
 				. lib/Linux/Fedora/fedora/ascii.sh
 				;;
 			freebsd) my_distro="FreeBSD" ;;
@@ -736,7 +722,7 @@ detect_distro () {
 			*"windows"*)
 				. lib/Windows/ascii.sh
 			;;
-			*"macos"*|*"mac os x"*) : ;;
+			*"macos"*|*"mac os x"*) return ;;
 			*) my_distro="Unknown" ;;
 		esac
 
@@ -746,34 +732,33 @@ detect_distro () {
 				:
 				;;
 			version)
-				[ -n "${distro_release}" ] && my_distro="${my_distro} ${distro_release}"
+				[ -n "${distro_release}" ] && my_distro+=" ${distro_release}"
 				;;
 			codename)
-				[ -n "${distro_codename}" ] && my_distro="${my_distro} ${distro_codename}"
+				[ -n "${distro_codename}" ] && my_distro+=" ${distro_codename}"
 				;;
 
 			full)
-				[ -n "${distro_release}" ] && my_distro="${my_distro} ${distro_release}"
-				[ -n "${distro_release}" ] && my_distro="${my_distro} ${distro_codename}"
+				[ -n "${distro_release}" ] && my_distro+=" ${distro_release}"
+				[ -n "${distro_codename}" ] && my_distro+=" ${distro_codename}"
 				;;
 			auto|*)
 				# shellcheck disable=SC2154
 				if [[ ${config_global[short]} =~ 'on' ]]; then
 					:
 				else
-					[ -n "${distro_release}" ] && my_distro="${my_distro} ${distro_release}"
-					[ -n "${distro_release}" ] && my_distro="${my_distro} ${distro_codename}"
+					[ -n "${distro_release}" ] && my_distro+=" ${distro_release}"
+					[ -n "${distro_codename}" ] && my_distro+=" ${distro_codename}"
 				fi
 				;;
 		esac
 
-		[[ ${config_distro[os_arch]} =~ 'on' ]] && my_distro="${my_distro} ${kernel_machine}"
+		[[ ${config_distro[os_arch]} =~ 'on' ]] && my_distro+=" ${kernel_machine}"
 	fi
 
 	verboseOut "Finding distribution...found as '${my_distro}'."
 }
 
-# Host and User detection - Begin
 detect_userinfo () {
 	# shellcheck disable=SC2154
 	if [[ "${config_userinfo[display_user]}" =~ "on" ]]; then
@@ -819,7 +804,7 @@ detect_uptime () {
 		Haiku)
 			_seconds=$(($(system_time) / 1000000))
 			;;
-		*) : ;;
+		*) return ;;
 	esac
 
 	# math!
@@ -876,7 +861,6 @@ detect_uptime () {
 	verboseOut "Finding current uptime...found as '${my_uptime}'."
 }
 
-# Package Count - Begin
 detect_packages () {
 	# most of this is pulled from neofetch with small edits to line up with
 	# previous screenfetch functionality
@@ -1011,7 +995,7 @@ detect_packages () {
             case ${kernel_name} in
                 CYGWIN*) _has cygcheck && _tot cygcheck -cd ;;
                 MSYS*)   _has pacman   && _tot pacman -Qq --color never ;;
-				*)		: ;;
+				*)		return ;;
             esac
 
             # Scoop environment throws errors if `tot scoop list` is used
@@ -1026,7 +1010,7 @@ detect_packages () {
             _has pkgman && _dir /boot/system/package-links/*
             my_packages=${my_packages/pkgman/depot}
 			;;
-		*) : ;;
+		*) return ;;
 	esac
 
 	if ((my_packages == 0)); then
@@ -1176,7 +1160,7 @@ detect_cpu () {
 			# Get CPU cores.
 			_cores="$(grep -c "^processor" "${_file}")"
 			;;
-		*) : ;;
+		*) return ;;
 	esac
 
     # Remove un-needed patterns from cpu output.
@@ -1195,7 +1179,8 @@ detect_cpu () {
     my_cpu="${my_cpu//, * Compute Cores}"
     my_cpu="${my_cpu//Core / }"
     my_cpu="${my_cpu//(\"AuthenticAMD\"*)}"
-    my_cpu="${my_cpu//with Radeon * [Graphics|Gfx]}"
+    my_cpu="${my_cpu//with Radeon * Graphics}"
+	my_cpu="${my_cpu// with Radeon * Gfx}"
     my_cpu="${my_cpu//, altivec supported}"
     my_cpu="${my_cpu//FPU*}"
     my_cpu="${my_cpu//Chip Revision*}"
@@ -1250,6 +1235,24 @@ detect_cpu () {
 	}
 
 	verboseOut "Finding CPU...found as '${my_cpu}'."
+}
+
+# functions: output
+info () {
+	local _info="${1}"
+	local _info_disp="my_${_info}"
+	
+	if [ -n "${!_info_disp}" ]; then
+		_info_subtitle="config_${_info}[subtitle]"
+		if [ -n "${!_info_subtitle}" ]; then
+			# shellcheck disable=SC2154
+			printf '%b\n' "${!_info_subtitle}${config_text[info_separator]} ${!_info_disp}"
+		else
+			printf '%b\n' "${!_info_disp}"
+		fi
+	else
+		:
+	fi
 }
 
 format_ascii () {
@@ -1347,7 +1350,7 @@ case ${1} in
 		fetchConfig "${FETCH_CONFIG}"
 		shift 2
 		;;
-	*) : ;;
+	*) return ;;
 esac
 
 while getopts ":hvVD:" flags; do
