@@ -134,6 +134,7 @@ detect_kernel () {
     kernel_version="${kernel[1]}"
     kernel_machine="${kernel[2]}"
 
+	echo "${kernel_name}"
 	# pulled from neofetch source
     if [ "${kernel_name}" == "Darwin" ]; then
         # macOS can report incorrect versions unless this is 0.
@@ -154,7 +155,6 @@ detect_kernel () {
 				esac
 			}
         }
-		echo "hello"
 		echo "darwin_name: ${darwin_name}"
 		echo "osx_version: ${osx_version}"
     fi
