@@ -8,7 +8,7 @@ case "${my_distro}" in
         c4=$(getColor 'red') # Red
         c5=$(getColor 'purple') # Purple
         c6=$(getColor 'blue') # Blue
-        startline="1"
+        startline=1
 		read -rd '' asciiLogo <<'EOF'
 ${c1}
 ${c1}                 -/+:.
@@ -37,7 +37,7 @@ EOF
         c2=$(getColor 'light blue') # Light blue
         c3=$(getColor 'light grey') # Gray
         c4=$(getColor 'dark grey') # Dark Ggray
-        startline="1"
+        startline=1
 		read -rd '' asciiLogo <<'EOF'
 ${c3}
 ${c3}                        ..

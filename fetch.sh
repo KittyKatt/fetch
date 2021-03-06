@@ -124,7 +124,7 @@ getColor () {
 _randcolor () {
 	local color=
 	color=$((RANDOM % 255))
-	echo "${color}"
+	printf '%s' "${color}"
 }
 
 # functions: system detection
@@ -231,9 +231,9 @@ detect_distro () {
 					"blackPantherOS"|"blackPanther"|"blackpanther"|"blackpantheros")
 						# shellcheck disable=SC2034,SC1091,SC2153
 						{
-							my_distro=$(source /etc/lsb-release; echo "${DISTRIB_ID}")
-							distro_release=$(source /etc/lsb-release; echo "${DISTRIB_RELEASE}")
-							distro_codename=$(source /etc/lsb-release; echo "${DISTRIB_CODENAME}")
+							my_distro=$(source /etc/lsb-release; printf '%s' "${DISTRIB_ID}")
+							distro_release=$(source /etc/lsb-release; printf '%s' "${DISTRIB_RELEASE}")
+							distro_codename=$(source /etc/lsb-release; printf '%s' "${DISTRIB_CODENAME}")
 						}
 						;;
 					"Chakra")
@@ -246,9 +246,9 @@ detect_distro () {
 					"BunsenLabs")
 						# shellcheck disable=SC2034,SC1091,SC2153
 						{
-							my_distro=$(source /etc/lsb-release; echo "${DISTRIB_ID}")
-							distro_release=$(source /etc/lsb-release; echo "${DISTRIB_RELEASE}")
-							distro_codename=$(source /etc/lsb-release; echo "${DISTRIB_CODENAME}")
+							my_distro=$(source /etc/lsb-release; printf '%s' "${DISTRIB_ID}")
+							distro_release=$(source /etc/lsb-release; printf '%s' "${DISTRIB_RELEASE}")
+							distro_codename=$(source /etc/lsb-release; printf '%s' "${DISTRIB_CODENAME}")
 						}
 						;;
 					"Debian")
@@ -412,11 +412,11 @@ detect_distro () {
 						done
 						if [ -n "${distrib_id}" ]; then
 							if [ "${BASH_VERSINFO[0]}" -ge 4 ]; then
-								distrib_id=$(for i in ${distrib_id}; do echo -n "${i^} "; done)
+								distrib_id=$(for i in ${distrib_id}; do printf '%s' "${i^} "; done)
 								my_distro=${distrib_id% }
 								unset distrib_id
 							else
-								distrib_id=$(for i in ${distrib_id}; do FIRST_LETTER=$(echo -n "${i:0:1}" | tr "[:lower:]" "[:upper:]"); echo -n "${FIRST_LETTER}${i:1} "; done)
+								distrib_id=$(for i in ${distrib_id}; do FIRST_LETTER=$(printf '%s' "${i:0:1}" | tr "[:lower:]" "[:upper:]"); printf '%s' "${FIRST_LETTER}${i:1} "; done)
 								my_distro=${distrib_id% }
 								unset distrib_id
 							fi
@@ -460,7 +460,7 @@ detect_distro () {
 
 				if [[ "${my_distro}" == "Unknown" && "${OSTYPE}" =~ "linux" && -f /etc/lsb-release ]]; then
 					LSB_RELEASE=$(</etc/lsb-release)
-					my_distro=$(echo "${LSB_RELEASE}" | awk 'BEGIN {
+					my_distro=$(printf '%s' "${LSB_RELEASE}" | awk 'BEGIN {
 						distro = "Unknown"
 					}
 					{
@@ -613,150 +613,153 @@ detect_distro () {
 				*)      my_distro="macOS" ;;
 			esac
 		fi
-
-		case ${my_distro,,} in
-			aldos) my_distro="ALDOS";;
-			alpine) my_distro="Alpine Linux" ;;
-			amzn|amazon|amazon*linux) my_distro="Amazon Linux" ;;
-			arch*linux*old) my_distro="Arch Linux - Old" ;;
-			arch|arch*linux) my_distro="Arch Linux" ;;
-			arch32) my_distro="Arch Linux 32" ;;
-			arcolinux|arcolinux*) my_distro="ArcoLinux" ;;
-			artix|artix*linux) my_distro="Artix Linux" ;;
-			blackpantheros|black*panther*) my_distro="blackPanther OS" ;;
-			bunsenlabs) my_distro="BunsenLabs" ;;
-			centos) my_distro="CentOS" ;;
-			centos*stream) my_distro="CentOS Stream" ;;
-			chakra) my_distro="Chakra" ;;
-			chrome*|chromium*) my_distro="Chrome OS" ;;
-			crux) my_distro="CRUX" ;;
-			debian) 
-				my_distro="Debian"
-				. lib/Linux/Debian/debian/extra.sh
-				;;
-			devuan) my_distro="Devuan" ;;
-			deepin) my_distro="Deepin" ;;
-			dragonflybsd) my_distro="DragonFlyBSD" ;;
-			dragora) my_distro="Dragora" ;;
-			drauger*) my_distro="DraugerOS" ;;
-			elementary|'elementary os') my_distro="elementary OS";;
-			eurolinux) my_distro="EuroLinux" ;;
-			evolveos) my_distro="Evolve OS" ;;
-			sulin) my_distro="Sulin" ;;
-			exherbo|exherbo*linux) my_distro="Exherbo" ;;
-			fedora)
-				my_distro="Fedora"
-				. lib/Linux/Fedora/fedora/extra.sh
-				. lib/Linux/Fedora/fedora/ascii.sh
-				;;
-			freebsd) my_distro="FreeBSD" ;;
-			freebsd*old) my_distro="FreeBSD - Old" ;;
-			frugalware) my_distro="Frugalware" ;;
-			funtoo) my_distro="Funtoo" ;;
-			gentoo)
-				my_distro="Gentoo"
-				. lib/Linux/Gentoo/gentoo/extra.sh
-				;;
-			gnewsense) my_distro="gNewSense" ;;
-			guix*system) my_distro="Guix System" ;;
-			haiku) my_distro="Haiku" ;;
-			hyperbolagnu|hyperbolagnu/linux-libre|'hyperbola gnu/linux-libre'|hyperbola) my_distro="Hyperbola GNU/Linux-libre" ;;
-			kali*linux) my_distro="Kali Linux" ;;
-			kaos) my_distro="KaOS";;
-			kde*neon|neon)
-				my_distro="KDE neon"
-				. lib/Linux/Ubuntu/kdeneon/extra.sh
-				;;
-			kogaion) my_distro="Kogaion" ;;
-			lmde) my_distro="LMDE" ;;
-			lunar|lunar*linux) my_distro="Lunar Linux";;
-			manjaro) my_distro="Manjaro" ;;
-			mageia) my_distro="Mageia" ;;
-			mer) my_distro="Mer" ;;
-			mint|linux*mint)
-				my_distro="Mint"
-				. lib/Linux/Ubuntu/mint/extra.sh
-				;;
-			netbsd) my_distro="NetBSD" ;;
-			netrunner) my_distro="Netrunner" ;;
-			nix|nix*os) my_distro="NixOS" ;;
-			obarun) my_distro="Obarun" ;;
-			ol|oracle*linux) my_distro="Oracle Linux" ;;
-			openbsd) my_distro="OpenBSD" ;;
-			*suse*) 
-				my_distro="openSUSE"
-				. lib/Linux/SUSE/suse/extra.sh
-				;;
-			os*elbrus) my_distro="OS Elbrus" ;;
-			parabolagnu|parabolagnu/linux-libre|'parabola gnu/linux-libre'|parabola) my_distro="Parabola GNU/Linux-libre" ;;
-			parrot|parrot*security) my_distro="Parrot Security" ;;
-			pclinuxos|pclos) my_distro="PCLinuxOS" ;;
-			peppermint) my_distro="Peppermint" ;;
-			proxmox|proxmox*ve) my_distro="Proxmox VE" ;;
-			pureos) my_distro="PureOS" ;;
-			qubes) my_distro="Qubes OS" ;;
-			raspbian) my_distro="Raspbian" ;;
-			red*hat*|rhel) my_distro="Red Hat Enterprise Linux" ;;
-			rosa) my_distro="ROSA" ;;
-			sabayon) my_distro="Sabayon" ;;
-			sailfish|sailfish*os)
-				my_distro="SailfishOS"
-				. lib/Linux/Independent/sailfish/extra.sh
-				;;
-			scientific*) my_distro="Scientific Linux" ;;
-			siduction) my_distro="Siduction" ;;
-			smgl|source*mage|source*mage*gnu*linux) my_distro="Source Mage GNU/Linux" ;;
-			solus) my_distro="Solus" ;;
-			sparky|sparky*linux) my_distro="SparkyLinux" ;;
-			steam|steam*os) my_distro="SteamOS" ;;
-			tinycore|tinycore*linux) my_distro="TinyCore" ;;
-			trisquel) my_distro="Trisquel";;
-			ubuntu) 
-				my_distro="Ubuntu"
-				. lib/Linux/Ubuntu/ubuntu/extra.sh
-				. lib/Linux/Ubuntu/ubuntu/ascii.sh
-				;;
-			void*linux) my_distro="Void Linux" ;;
-			zorin*) my_distro="Zorin OS" ;;
-			endeavour*) my_distro="EndeavourOS" ;;
-			*"windows"*)
-				. lib/Windows/ascii.sh
-				;;
-			*"macos"*|*"mac os x"*)
-				. lib/macOS/ascii.sh
-				;;
-			*) my_distro="Unknown" ;;
-		esac
-
-		# shellcheck disable=SC2154
-		case ${config_distro[short]} in
-			on)
-				:
-				;;
-			version)
-				[ -n "${distro_release}" ] && my_distro+=" ${distro_release}"
-				;;
-			codename)
-				[ -n "${distro_codename}" ] && my_distro+=" ${distro_codename}"
-				;;
-
-			full)
-				[ -n "${distro_release}" ] && my_distro+=" ${distro_release}"
-				[ -n "${distro_codename}" ] && my_distro+=" ${distro_codename}"
-				;;
-			auto|*)
-				# shellcheck disable=SC2154
-				if [[ ${config_global[short]} =~ 'on' ]]; then
-					:
-				else
-					[ -n "${distro_release}" ] && my_distro+=" ${distro_release}"
-					[ -n "${distro_codename}" ] && my_distro+=" ${distro_codename}"
-				fi
-				;;
-		esac
-
-		[[ ${config_distro[os_arch]} =~ 'on' ]] && my_distro+=" ${kernel_machine}"
 	fi
+
+	case ${my_distro,,} in
+		aldos) my_distro="ALDOS";;
+		alpine) my_distro="Alpine Linux" ;;
+		amzn|amazon|amazon*linux) my_distro="Amazon Linux" ;;
+		arch*linux*old) my_distro="Arch Linux - Old" ;;
+		arch|arch*linux) my_distro="Arch Linux" ;;
+		arch32) my_distro="Arch Linux 32" ;;
+		arcolinux|arcolinux*) my_distro="ArcoLinux" ;;
+		artix|artix*linux) my_distro="Artix Linux" ;;
+		blackpantheros|black*panther*) my_distro="blackPanther OS" ;;
+		bunsenlabs) my_distro="BunsenLabs" ;;
+		centos) my_distro="CentOS" ;;
+		centos*stream) my_distro="CentOS Stream" ;;
+		chakra) my_distro="Chakra" ;;
+		chrome*|chromium*) my_distro="Chrome OS" ;;
+		crux) my_distro="CRUX" ;;
+		debian) 
+			my_distro="Debian"
+			. lib/Linux/Debian/debian/extra.sh
+			;;
+		devuan) my_distro="Devuan" ;;
+		deepin) my_distro="Deepin" ;;
+		dragonflybsd) my_distro="DragonFlyBSD" ;;
+		dragora) my_distro="Dragora" ;;
+		drauger*) my_distro="DraugerOS" ;;
+		elementary|'elementary os') my_distro="elementary OS";;
+		eurolinux) my_distro="EuroLinux" ;;
+		evolveos) my_distro="Evolve OS" ;;
+		sulin) my_distro="Sulin" ;;
+		exherbo|exherbo*linux) my_distro="Exherbo" ;;
+		fedora)
+			my_distro="Fedora"
+			. lib/Linux/Fedora/fedora/extra.sh
+			. lib/Linux/Fedora/fedora/ascii.sh
+			;;
+		freebsd) my_distro="FreeBSD" ;;
+		freebsd*old) my_distro="FreeBSD - Old" ;;
+		frugalware) my_distro="Frugalware" ;;
+		funtoo) my_distro="Funtoo" ;;
+		gentoo)
+			my_distro="Gentoo"
+			. lib/Linux/Gentoo/gentoo/extra.sh
+			;;
+		gnewsense) my_distro="gNewSense" ;;
+		guix*system) my_distro="Guix System" ;;
+		haiku) my_distro="Haiku" ;;
+		hyperbolagnu|hyperbolagnu/linux-libre|'hyperbola gnu/linux-libre'|hyperbola) my_distro="Hyperbola GNU/Linux-libre" ;;
+		kali*linux) my_distro="Kali Linux" ;;
+		kaos) my_distro="KaOS";;
+		kde*neon|neon)
+			my_distro="KDE neon"
+			. lib/Linux/Ubuntu/kdeneon/extra.sh
+			;;
+		kogaion) my_distro="Kogaion" ;;
+		lmde) my_distro="LMDE" ;;
+		lunar|lunar*linux) my_distro="Lunar Linux";;
+		manjaro) my_distro="Manjaro" ;;
+		mageia) my_distro="Mageia" ;;
+		mer) my_distro="Mer" ;;
+		mint|linux*mint)
+			my_distro="Mint"
+			. lib/Linux/Ubuntu/mint/extra.sh
+			;;
+		netbsd) my_distro="NetBSD" ;;
+		netrunner) my_distro="Netrunner" ;;
+		nix|nix*os) my_distro="NixOS" ;;
+		obarun) my_distro="Obarun" ;;
+		ol|oracle*linux) my_distro="Oracle Linux" ;;
+		openbsd) my_distro="OpenBSD" ;;
+		*suse*) 
+			my_distro="openSUSE"
+			. lib/Linux/SUSE/suse/extra.sh
+			;;
+		os*elbrus) my_distro="OS Elbrus" ;;
+		parabolagnu|parabolagnu/linux-libre|'parabola gnu/linux-libre'|parabola) my_distro="Parabola GNU/Linux-libre" ;;
+		parrot|parrot*security) my_distro="Parrot Security" ;;
+		pclinuxos|pclos) my_distro="PCLinuxOS" ;;
+		peppermint) my_distro="Peppermint" ;;
+		proxmox|proxmox*ve) my_distro="Proxmox VE" ;;
+		pureos) my_distro="PureOS" ;;
+		qubes) my_distro="Qubes OS" ;;
+		raspbian) my_distro="Raspbian" ;;
+		red*hat*|rhel) my_distro="Red Hat Enterprise Linux" ;;
+		rosa) my_distro="ROSA" ;;
+		sabayon) my_distro="Sabayon" ;;
+		sailfish|sailfish*os)
+			my_distro="SailfishOS"
+			. lib/Linux/Independent/sailfish/extra.sh
+			;;
+		scientific*) my_distro="Scientific Linux" ;;
+		siduction) my_distro="Siduction" ;;
+		smgl|source*mage|source*mage*gnu*linux) my_distro="Source Mage GNU/Linux" ;;
+		solus) my_distro="Solus" ;;
+		sparky|sparky*linux) my_distro="SparkyLinux" ;;
+		steam|steam*os) my_distro="SteamOS" ;;
+		tinycore|tinycore*linux) my_distro="TinyCore" ;;
+		trisquel) my_distro="Trisquel";;
+		ubuntu) 
+			my_distro="Ubuntu"
+			. lib/Linux/Ubuntu/ubuntu/extra.sh
+			. lib/Linux/Ubuntu/ubuntu/ascii.sh
+			;;
+		void*linux) my_distro="Void Linux" ;;
+		zorin*) my_distro="Zorin OS" ;;
+		endeavour*) my_distro="EndeavourOS" ;;
+		*"windows"*)
+			. lib/Windows/ascii.sh
+			;;
+		*"macos"*)
+			. lib/macOS/ascii.sh
+			;;
+		*"mac os x"*)
+			. lib/macOS/ascii.sh
+			;;
+		*) my_distro="Unknown" ;;
+	esac
+
+	# shellcheck disable=SC2154
+	case ${config_distro[short]} in
+		on)
+			:
+			;;
+		version)
+			[ -n "${distro_release}" ] && my_distro+=" ${distro_release}"
+			;;
+		codename)
+			[ -n "${distro_codename}" ] && my_distro+=" ${distro_codename}"
+			;;
+
+		full)
+			[ -n "${distro_release}" ] && my_distro+=" ${distro_release}"
+			[ -n "${distro_codename}" ] && my_distro+=" ${distro_codename}"
+			;;
+		auto|*)
+			# shellcheck disable=SC2154
+			if [[ ${config_global[short]} =~ 'on' ]]; then
+				:
+			else
+				[ -n "${distro_release}" ] && my_distro+=" ${distro_release}"
+				[ -n "${distro_codename}" ] && my_distro+=" ${distro_codename}"
+			fi
+			;;
+	esac
+
+	[[ ${config_distro[os_arch]} =~ 'on' ]] && my_distro+=" ${kernel_machine}"
 
 	verboseOut "Finding distribution...found as '${my_distro}'."
 }
