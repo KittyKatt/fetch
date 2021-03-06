@@ -1,7 +1,7 @@
 case "${my_distro}" in
     # logo width: 31
     # number of colors: 6
-    *"Mac OS X"*|*"macOS"*s)
+    *"Mac OS X"*|*"macOS"*)
         c1=$(getColor 'green') # Green
         c2=$(getColor 'brown') # Yellow
         c3=$(getColor 'light red') # Orange
