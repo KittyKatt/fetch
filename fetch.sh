@@ -146,7 +146,7 @@ detect_kernel () {
 			case ${sw_vers[i]} in
 				ProductName)			darwin_name=${sw_vers[i+1]} ;;
 				ProductVersion)			osx_version=${sw_vers[i+1]} ;;
-				ProductBuildVersion)	osx_build=${sw_vers[i+1]}   ;;
+				#ProductBuildVersion)	osx_build=${sw_vers[i+1]}   ;;
 				*)						: ;;
 			esac
         done
