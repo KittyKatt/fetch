@@ -142,17 +142,14 @@ detect_kernel () {
 
         IFS=$'\n' read -d "" -ra sw_vers <<< "$(awk -F'<|>' '/key|string/ {print $3}' \
                             "/System/Library/CoreServices/SystemVersion.plist")"
-        for ((i=0;i<${#sw_vers[@]};i+=2)) {
-			# shellcheck disable=SC2034
-			{
-				case ${sw_vers[i]} in
-					ProductName)			darwin_name=${sw_vers[i+1]} ;;
-					ProductVersion)			osx_version=${sw_vers[i+1]} ;;
-					ProductBuildVersion)	osx_build=${sw_vers[i+1]}   ;;
-					*)						return ;;
-				esac
-			}
-        }
+        for ((i=0;i<${#sw_vers[@]};i+=2)); do
+			case ${sw_vers[i]} in
+				ProductName)			darwin_name=${sw_vers[i+1]} ;;
+				ProductVersion)			osx_version=${sw_vers[i+1]} ;;
+				#ProductBuildVersion)	osx_build=${sw_vers[i+1]}   ;;
+				*)						: ;;
+			esac
+        done
     fi
 
 	# shellcheck disable=SC2154
@@ -1372,6 +1369,7 @@ done
 
 detect_kernel
 detect_os
+
 for i in ${config_global[info]}; do
 	eval "detect_${i}"
 done
