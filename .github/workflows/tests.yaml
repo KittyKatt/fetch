@@ -10,9 +10,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2.3.4
     - name: Testing known Ubuntu output
-      run: |
-        bash fetch.sh --config sample.config.conf -v
-        bash tests/ubuntu.sh
+      run: bash tests/ubuntu.sh
   #test-macos:
   #  runs-on: macos-latest
   #  steps:

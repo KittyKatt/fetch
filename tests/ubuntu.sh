@@ -80,6 +80,19 @@ else
     successOut "Shell succeeded."
 fi
 
+if [[ ! ${_output[6]} =~ ^(.*)'Finding current package count...found as '\'[[:digit:]]+' (apt), '[[:digit:]]+' (snap)'\''.' ]]; then
+    errorOut "!! Failed on package count."
+    if [[ $(type -p apt) ]]; then
+        
+        errorOut "\t\$(dpkg-query -W | wc -l): $(dpkg-query -W | wc -l)"
+    else
+        errorOut "\tapt doesn't exist"
+    fi
+    ((f++))
+else
+    successOut "Package count succeeded."
+fi
+
 if ((f == 0)); then
     exit 0
 else
