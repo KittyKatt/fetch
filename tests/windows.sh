@@ -10,8 +10,15 @@ errorOut () {
     printf '%b\n' "${error}${1}${reset}"
 }
 
-tr -d '\r' < fetch.sh > fetch.sh
-tr -d '\r' < lib/Windows/ascii.sh  > lib/Windows/ascii.sh
+if [[ $(type -p dos2unix) ]]; then 
+    $(which dos2unix) fetch.sh
+    $(which dos2unix) lib/Windows/ascii.sh
+else
+    cat fetch.sh | sed 's/\r$//' | od -c > fetch2.sh
+    mv fetch2.sh fetch.sh
+    cat lib/Windows/ascii.sh | sed 's/\r$//' | od -c > lib/Windows/ascii2.sh
+    mv lib/Windows/ascii2.sh lib/Windows/ascii.sh
+fi
 
 if [[ $(bash fetch.sh --config sample.config.conf -v) ]]; then
     successOut 'Fetched current output:'
