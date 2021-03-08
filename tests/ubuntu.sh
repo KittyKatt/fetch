@@ -48,12 +48,20 @@ else
     successOut "User info succeeded."
 fi
 
-if [[ ! ${_output[3]} =~ ^(.*)'Finding distribution...found as '\''Ubuntu '[[:digit:]]+'.'[[:digit:]]+[[:space:]](((LTS)[[:space:]])?)'('([[:alnum:]]|[[:space:]])+') x86_64'\' ]]; then
+if [[ ! ${_output[3]} =~ ^(.*)'Finding distribution...found as '\''Ubuntu '[[:digit:]]+'.'[[:digit:]]+[[:space:]](((LTS)[[:space:]])?)'('([[:alnum:]]|[[:space:]])+') x86_64'\''.' ]]; then
     errorOut "!! Failed on distribution."
-    [[ $(type -p lsb_release) || $(type -p lsb-release) ]] && errorOut "\t\$(lsb_release -sirc): $(lsb_release -sirc)"
+    [[ $(type -p lsb_release) || $(type -p lsb-release) ]] && errorOut "\t\$(lsb_release -sirc): $(lsb_release -sirc | tr '\r\n' ' ')"
     ((f++))
 else
     successOut "Distribution succeeded."
+fi
+
+if [[ ! ${_output[4]} =~ ^(.*)'Finding current uptime...found as '\'([[:digit:]]|,|[[:space:]]|[[:alpha:]])+\''.' ]]; then
+    errorOut "!! Failed on uptime."
+    errorOut "\t\$(uptime): $(uptime)"
+    ((f++))
+else
+    successOut "Uptime succeeded."
 fi
 
 if ((f == 0)); then
@@ -62,7 +70,3 @@ else
     errorOut "failures: ${f}"
     exit 1
 fi
-
-#for (( i = 0; i <= n; i++)); do
-#    printf '%s\n' "${i}"
-#done
