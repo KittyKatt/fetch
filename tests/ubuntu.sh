@@ -49,7 +49,7 @@ else
 fi
 
 # count number of verbosity lines
-numlines=$(awk -F=$'\n' '/^:: Finding/ {print NF}' <<< "${_output[@]}")
+numlines=$(awk -F'\n' '/:: Finding/ {print NF}' <<< "${_output[@]}")
 printf '%s\n' "${numlines}"
 
 #for (( i = 0; i <= n; i++)); do
