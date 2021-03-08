@@ -32,4 +32,6 @@ else
     echo "User info succeeded."
 fi
 
-[[ ${_output[*]} =~ \[FAILED\] ]] && echo "[ TESTS FAILED ]"; exit 1
+for (( i = 0; i <= n; i++)); do
+    echo "${n}"
+done
