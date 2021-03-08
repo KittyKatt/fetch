@@ -1,4 +1,4 @@
-name: "Test Known Environments"
+name: "Output Tests"
 on:
   pull_request:
   push:
