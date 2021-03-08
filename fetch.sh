@@ -480,8 +480,8 @@ detect_distro () {
 
 				if [ "${my_distro}" == "Unknown" ] && [[ "${OSTYPE}" =~ "linux" || "${OSTYPE}" == "gnu" ]]; then
 					for di in arch chakra evolveos exherbo fedora \
-								frugalware gentoo kogaion mageia obarun oracle \
-								pardus pclinuxos redhat rosa SuSe; do
+						frugalware gentoo kogaion mageia obarun oracle pardus \
+						pclinuxos redhat rosa SuSe; do
 						# shellcheck disable=SC2248
 						if [ -f /etc/${di}-release ]; then
 							my_distro=${di}
@@ -995,9 +995,9 @@ detect_packages () {
 			;;
         Windows)
             case ${kernel_name} in
-                CYGWIN*) _has cygcheck && _tot cygcheck -cd ;;
-                MSYS*)   _has pacman   && _tot pacman -Qq --color never ;;
-				*)		return ;;
+                CYGWIN*)	_has cygcheck && _tot cygcheck -cd ;;
+                MSYS*)		_has pacman   && _tot pacman -Qq --color never ;;
+				*)			: ;;
             esac
 
             # Scoop environment throws errors if `tot scoop list` is used
@@ -1370,7 +1370,11 @@ done
 detect_kernel
 detect_os
 
-for i in ${config_global[info]}; do
+# filter {config_global[info]} into a new variable, minus kernel because
+# that is already detected above. keep old variable intact for output purposes.
+GLOBAL_INFO="${config_global[info]//kernel }"
+
+for i in ${GLOBAL_INFO}; do
 	eval "detect_${i}"
 done
 
