@@ -1370,7 +1370,11 @@ done
 detect_kernel
 detect_os
 
-for i in ${config_global[info]}; do
+# filter {config_global[info]} into a new variable, minus kernel because
+# that is already detected above. keep old variable intact for output purposes.
+GLOBAL_INFO="${config_global[info]//kernel }"
+
+for i in ${GLOBAL_INFO}; do
 	eval "detect_${i}"
 done
 
