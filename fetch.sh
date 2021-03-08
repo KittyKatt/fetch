@@ -77,7 +77,7 @@ fetchConfig () {
 # variables: color
 reset='\e[0m'
 colorize () {
-	printf $'\033[0m\033[38;5;%sm' "$1"
+	printf $'\033[0m\033[38;5;%bm' "${1}"
 }
 getColor () {
 	local tmp_color=""
@@ -115,16 +115,16 @@ getColor () {
 			(?([1])?([0-9])[0-9])		color_ret=$(colorize "${tmp_color}");;
 			(?([2])?([0-4])[0-9])		color_ret=$(colorize "${tmp_color}");;
 			(?([2])?([5])[0-6])			color_ret=$(colorize "${tmp_color}");;
+			# random color
+			'rand')
+				_color=$((RANDOM % 255))
+				color_ret="$(colorize ${_color})"
+				;;
 			*)							errorOut "That color will not work"; exit 1;;
 		esac
 
-		[ -n "${color_ret}" ] && printf '%s' "${color_ret}"
+		[ -n "${color_ret}" ] && printf '%b' "${color_ret}"
 	fi
-}
-_randcolor () {
-	local color=
-	color=$((RANDOM % 255))
-	printf '%s' "${color}"
 }
 
 # functions: system detection
@@ -726,7 +726,11 @@ detect_distro () {
 		*"mac os x"*)
 			. lib/macOS/ascii.sh
 			;;
-		*) my_distro="Unknown" ;;
+		*)
+			ascii_distro="Unknown"
+			config_ascii['colors']="random"
+			. lib/unknown.sh
+			;;
 	esac
 
 	# shellcheck disable=SC2154
@@ -1268,6 +1272,16 @@ format_ascii () {
 		logo_padding=$((ascii_len - ${#_tmp}))
 	else
 		logo_padding=0
+	fi
+
+	if [ "${config_ascii['colors']}" == "random" ]; then
+		declare _randc
+		local n=1
+		while [[ ${_logo} =~ \$\{[c][1-6]\} ]]; do
+			_randc="$(getColor 'rand')"
+			_logo="${_logo//\$\{c${n}\}/${_randc}}"
+			((n++))
+		done
 	fi
 
 	# Expand color variables
