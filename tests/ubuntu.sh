@@ -48,9 +48,13 @@ else
     successOut "User info succeeded."
 fi
 
-# count number of verbosity lines
-numlines=$(awk -F'\n' '/:: Finding/ {print NF}' <<< "${_output[@]}")
-printf '%s\n' "${numlines}"
+if [[ ! ${_output[3]} =~ ^(.*)'Finding distribution...found as '\''Ubuntu '[[:digit:]]+'.'[[:digit:]]+[[:space:]](((LTS)[[:space:]])?)'('([[:alnum:]]|[[:space:]])+') x86_64'\' ]]; then
+    errorOut "!! Failed on distribution."
+    [[ $(type -p lsb_release) || $(type -p lsb-release) ]] && errorOut "\t\$(lsb_release -sirc): $(lsb_release -sirc)"
+    ((f++))
+else
+    successOut "Distribution succeeded."
+fi
 
 if ((f == 0)); then
     exit 0
