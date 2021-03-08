@@ -1,7 +1,7 @@
 # fetch
 A BASH system information and distribution logo display tool.
 
-[![Shellcheck](https://github.com/KittyKatt/fetch/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/KittyKatt/fetch/actions/workflows/shellcheck.yml)
+[![Output Tests](https://github.com/KittyKatt/fetch/actions/workflows/tests.yaml/badge.svg)](https://github.com/KittyKatt/fetch/actions/workflows/tests.yaml) [![Shellcheck](https://github.com/KittyKatt/fetch/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/KittyKatt/fetch/actions/workflows/shellcheck.yml)
 
 ## What is fetch?
 fetch is the spiritual successor to [screenFetch](https://github.com/KittyKatt/screenFetch). Where screenFetch was created over the course of 10 years and me learning BASH from nothing, fetch has been created and worked on after all of that.
