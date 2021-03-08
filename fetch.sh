@@ -630,7 +630,7 @@ detect_distro () {
 		crux) my_distro="CRUX" ;;
 		debian) 
 			my_distro="Debian"
-			. lib/Linux/Debian/debian/extra.sh
+			. lib/debian/lib.sh
 			;;
 		devuan) my_distro="Devuan" ;;
 		deepin) my_distro="Deepin" ;;
@@ -638,6 +638,7 @@ detect_distro () {
 		dragora) my_distro="Dragora" ;;
 		drauger*) my_distro="DraugerOS" ;;
 		elementary|'elementary os') my_distro="elementary OS";;
+		endeavour*) my_distro="EndeavourOS" ;;
 		eurolinux) my_distro="EuroLinux" ;;
 		evolveos) my_distro="Evolve OS" ;;
 		sulin) my_distro="Sulin" ;;
@@ -645,8 +646,8 @@ detect_distro () {
 		fedora)
 			[[ -z "${ascii_distro}" ]] && ascii_distro="Fedora"
 			my_distro="Fedora"
-			. lib/Linux/Fedora/fedora/extra.sh
-			. lib/Linux/Fedora/fedora/ascii.sh
+			. lib/fedora/lib.sh
+			. lib/fedora/ascii/${ascii_distro,,}.sh
 			;;
 		freebsd) my_distro="FreeBSD" ;;
 		freebsd*old) my_distro="FreeBSD - Old" ;;
@@ -654,7 +655,7 @@ detect_distro () {
 		funtoo) my_distro="Funtoo" ;;
 		gentoo)
 			my_distro="Gentoo"
-			. lib/Linux/Gentoo/gentoo/extra.sh
+			. lib/gentoo/lib.sh
 			;;
 		gnewsense) my_distro="gNewSense" ;;
 		guix*system) my_distro="Guix System" ;;
@@ -664,17 +665,21 @@ detect_distro () {
 		kaos) my_distro="KaOS";;
 		kde*neon|neon)
 			my_distro="KDE neon"
-			. lib/Linux/Ubuntu/kdeneon/extra.sh
+			. lib/kdeneon/extra.sh
 			;;
 		kogaion) my_distro="Kogaion" ;;
 		lmde) my_distro="LMDE" ;;
 		lunar|lunar*linux) my_distro="Lunar Linux";;
+		*"macos"*|*"mac os x"*)
+			[[ -z "${ascii_distro}" ]] && ascii_distro="macOS"
+			. lib/macos/ascii/${ascii_distro,,}.sh
+			;;
 		manjaro) my_distro="Manjaro" ;;
 		mageia) my_distro="Mageia" ;;
 		mer) my_distro="Mer" ;;
 		mint|linux*mint)
 			my_distro="Mint"
-			. lib/Linux/Ubuntu/mint/extra.sh
+			. lib/mint/lib.sh
 			;;
 		netbsd) my_distro="NetBSD" ;;
 		netrunner) my_distro="Netrunner" ;;
@@ -684,7 +689,7 @@ detect_distro () {
 		openbsd) my_distro="OpenBSD" ;;
 		*suse*) 
 			my_distro="openSUSE"
-			. lib/Linux/SUSE/suse/extra.sh
+			. lib/suse/lib.sh
 			;;
 		os*elbrus) my_distro="OS Elbrus" ;;
 		parabolagnu|parabolagnu/linux-libre|'parabola gnu/linux-libre'|parabola) my_distro="Parabola GNU/Linux-libre" ;;
@@ -701,7 +706,7 @@ detect_distro () {
 		sailfish|sailfish*os)
 			[[ -z "${ascii_distro}" ]] && ascii_distro="SailfishOS"
 			my_distro="SailfishOS"
-			. lib/Linux/Independent/sailfish/extra.sh
+			. lib/sailfish/lib.sh
 			;;
 		scientific*) my_distro="Scientific Linux" ;;
 		siduction) my_distro="Siduction" ;;
@@ -710,23 +715,30 @@ detect_distro () {
 		sparky|sparky*linux) my_distro="SparkyLinux" ;;
 		steam|steam*os) my_distro="SteamOS" ;;
 		tinycore|tinycore*linux) my_distro="TinyCore" ;;
-		trisquel) my_distro="Trisquel";;
-		ubuntu) 
+		trisquel)
+			[[ -z "${ascii_distro}" ]] && ascii_distro="Trisquel"
+			my_distro="Trisquel"
+			. lib/trisquel/ascii/${ascii_distro,,}.sh
+			;;
+		ubuntu)
 			[[ -z "${ascii_distro}" ]] && ascii_distro="Ubuntu"
 			my_distro="Ubuntu"
-			. lib/Linux/Ubuntu/ubuntu/extra.sh
-			. lib/Linux/Ubuntu/ubuntu/ascii.sh
+			. lib/ubuntu/ascii/${ascii_distro,,}.sh
+			. lib/ubuntu/lib.sh
 			;;
-		void*linux) my_distro="Void Linux" ;;
-		zorin*) my_distro="Zorin OS" ;;
-		endeavour*) my_distro="EndeavourOS" ;;
+		void*linux)
+			[[ -z "${ascii_distro}" ]] && ascii_distro="Void"
+			my_distro="Void Linux"
+			. lib/void/ascii/${ascii_distro,,}.sh
+			;;
 		*"windows"*)
 			[[ -z "${ascii_distro}" ]] && ascii_distro="Windows"
-			. lib/Windows/ascii.sh
+			. lib/windows/ascii/${ascii_distro,,}.sh
 			;;
-		*"macos"*|*"mac os x"*)
-			[[ -z "${ascii_distro}" ]] && ascii_distro="macOS"
-			. lib/macOS/ascii.sh
+		zorin*)
+			[[ -z "${ascii_distro}" ]] && ascii_distro="Zorin"
+			my_distro="Zorin OS"
+			. lib/zorin/ascii/${ascii_distro,,}.sh
 			;;
 		*)
 			ascii_distro="Unknown"
