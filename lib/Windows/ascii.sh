@@ -1,4 +1,4 @@
-case ${my_distro} in
+case ${ascii_distro} in
     # logo width: 37
     # number of colors: 4
     'Windows Classic')
