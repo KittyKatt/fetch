@@ -99,7 +99,7 @@ else
     successOut "Package count succeeded."
 fi
 
-if [[ ! ${_output[7]} =~ ^(.*)'Finding CPU...found as '\''Intel '([[:alnum:]|[[:space:]])+' ('[[:digit:]]+') @ '[[:digit:]]'.'[[:digit:]]+'GHz'\''.' ]]; then
+if [[ ! ${_output[7]} =~ ^(.*)'Finding CPU...found as '\''Intel '([[:alnum:]|[[:space:]]|\-)+' ('[[:digit:]]+') @ '[[:digit:]]'.'[[:digit:]]+'GHz'\''.' ]]; then
     errorOut "!! Failed on CPU."
     errorOut "\tfailed line: ${_output[7]}"
     _cpufiletest="$(awk -F '\\s*: | @' \
