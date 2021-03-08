@@ -995,9 +995,9 @@ detect_packages () {
 			;;
         Windows)
             case ${kernel_name} in
-                CYGWIN*) _has cygcheck && _tot cygcheck -cd ;;
-                MSYS*)   _has pacman   && _tot pacman -Qq --color never ;;
-				*)		return ;;
+                CYGWIN*)	_has cygcheck && _tot cygcheck -cd ;;
+                MSYS*)		_has pacman   && _tot pacman -Qq --color never ;;
+				*)			: ;;
             esac
 
             # Scoop environment throws errors if `tot scoop list` is used
