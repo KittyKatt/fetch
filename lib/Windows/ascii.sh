@@ -6,7 +6,7 @@ case ${my_distro} in
         c2=$(getColor 'light green') # Green
         c3=$(getColor 'light blue') # Blue
         c4=$(getColor 'yellow') # Yellow
-        startline=0
+        startline=1
         read -rd '' asciiLogo <<'EOF'
 ${c1}        ,.=:!!t3Z3z.,
 ${c1}       :tt:::tt333EE3
