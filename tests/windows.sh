@@ -14,9 +14,9 @@ if [[ $(type -p dos2unix) ]]; then
     $(which dos2unix) fetch.sh
     $(which dos2unix) lib/Windows/ascii.sh
 else
-    cat fetch.sh | sed 's/\r$//' | od -c > fetch2.sh
+    sed 's/\r$//' < fetch.sh | od -c > fetch2.sh
     mv fetch2.sh fetch.sh
-    cat lib/Windows/ascii.sh | sed 's/\r$//' | od -c > lib/Windows/ascii2.sh
+    sed 's/\r$//' < lib/Windows/ascii.sh | od -c > lib/Windows/ascii2.sh
     mv lib/Windows/ascii2.sh lib/Windows/ascii.sh
 fi
 
