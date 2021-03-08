@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
-# shellcheck disable=SC2034
 f=0
-#trap 'f=$((f+1))' ERR
-
-source ./lib/Linux/Ubuntu/ubuntu/ascii.sh
-
 reset=$'\e[0m'
 successOut () {
     success=$'\033[0m\033[32m'
@@ -14,6 +9,18 @@ errorOut () {
     error=$'\033[0m\033[1;31m'
     printf '%b\n' "${error}${1}${reset}"
 }
+
+
+if [[ $(bash fetch.sh --config sample.config.conf -v) ]]; then
+    successOut 'Fetched current output:'
+    bash fetch.sh --config sample.config.conf -v
+else
+    errorOut 'fetch.sh failed output:'
+    bash fetch.sh --config sample.config.conf -v
+    exit 1
+fi
+
+source ./lib/Linux/Ubuntu/ubuntu/ascii.sh
 
 n=0
 IFS=$'\n'
