@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2034
 f=0
-trap 'f=$((f+1))' ERR
+#trap 'f=$((f+1))' ERR
 
 source ./lib/Linux/Ubuntu/ubuntu/ascii.sh
 
 reset=$'\e[0m'
 successOut () {
     success=$'\033[0m\033[32m'
-    printf '>> %b\n' "${success}${1}${reset}"
+    printf '%b\n' ">> ${success}${1}${reset}"
 }
 errorOut () {
     error=$'\033[0m\033[1;31m'
