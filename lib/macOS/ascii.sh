@@ -1,4 +1,4 @@
-case "${my_distro}" in
+case "${ascii_distro}" in
     # logo width: 31
     # number of colors: 6
     *"Mac OS X"*|*"macOS"*)

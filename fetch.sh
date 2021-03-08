@@ -643,6 +643,7 @@ detect_distro () {
 		sulin) my_distro="Sulin" ;;
 		exherbo|exherbo*linux) my_distro="Exherbo" ;;
 		fedora)
+			[[ -z "${ascii_distro}" ]] && ascii_distro="Fedora"
 			my_distro="Fedora"
 			. lib/Linux/Fedora/fedora/extra.sh
 			. lib/Linux/Fedora/fedora/ascii.sh
@@ -698,6 +699,7 @@ detect_distro () {
 		rosa) my_distro="ROSA" ;;
 		sabayon) my_distro="Sabayon" ;;
 		sailfish|sailfish*os)
+			[[ -z "${ascii_distro}" ]] && ascii_distro="SailfishOS"
 			my_distro="SailfishOS"
 			. lib/Linux/Independent/sailfish/extra.sh
 			;;
@@ -710,6 +712,7 @@ detect_distro () {
 		tinycore|tinycore*linux) my_distro="TinyCore" ;;
 		trisquel) my_distro="Trisquel";;
 		ubuntu) 
+			[[ -z "${ascii_distro}" ]] && ascii_distro="Ubuntu"
 			my_distro="Ubuntu"
 			. lib/Linux/Ubuntu/ubuntu/extra.sh
 			. lib/Linux/Ubuntu/ubuntu/ascii.sh
@@ -718,12 +721,11 @@ detect_distro () {
 		zorin*) my_distro="Zorin OS" ;;
 		endeavour*) my_distro="EndeavourOS" ;;
 		*"windows"*)
+			[[ -z "${ascii_distro}" ]] && ascii_distro="Windows"
 			. lib/Windows/ascii.sh
 			;;
-		*"macos"*)
-			. lib/macOS/ascii.sh
-			;;
-		*"mac os x"*)
+		*"macos"*|*"mac os x"*)
+			[[ -z "${ascii_distro}" ]] && ascii_distro="macOS"
 			. lib/macOS/ascii.sh
 			;;
 		*)

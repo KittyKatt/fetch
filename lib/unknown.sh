@@ -1,5 +1,4 @@
 startline=0
-_rand=1
 read -rd '' asciiLogo <<'EOF'
 ${c1}          -------${c2}--------${c3}-------
 ${c1}         | ${c2}404: ${c3}distro ${c4}not ${c5}found |
