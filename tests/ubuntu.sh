@@ -71,6 +71,15 @@ else
     successOut "Uptime succeeded."
 fi
 
+if [[ ! ${_output[5]} =~ ^(.*)'Finding current shell...found as '\''bash '[[:digit:]]'.'[[:digit:]]+'.'[[:digit:]]+\''.' ]]; then
+    errorOut "!! Failed on shell."
+    errorOut "\t\${SHELL}: ${SHELL}"
+    errorOut "\t\$(ps -e | grep \${PPID}): $(ps --no-headers ${PPID})"
+    ((f++))
+else
+    successOut "Shell succeeded."
+fi
+
 if ((f == 0)); then
     exit 0
 else
