@@ -480,8 +480,8 @@ detect_distro () {
 
 				if [ "${my_distro}" == "Unknown" ] && [[ "${OSTYPE}" =~ "linux" || "${OSTYPE}" == "gnu" ]]; then
 					for di in arch chakra evolveos exherbo fedora \
-								frugalware gentoo kogaion mageia obarun oracle \
-								pardus pclinuxos redhat rosa SuSe; do
+						frugalware gentoo kogaion mageia obarun oracle pardus \
+						pclinuxos redhat rosa SuSe; do
 						# shellcheck disable=SC2248
 						if [ -f /etc/${di}-release ]; then
 							my_distro=${di}
