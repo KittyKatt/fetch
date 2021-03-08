@@ -3,7 +3,7 @@
 f=0
 trap 'f=1' ERR
 
-source ../lib/Linux/Ubuntu/ubuntu/ascii.sh
+source ./lib/Linux/Ubuntu/ubuntu/ascii.sh
 
 reset=$'\e[0m'
 successOut () {
@@ -28,14 +28,14 @@ if [[ ! ${_output[0]} =~ ^(.*)'Finding kernel...found as'(.*)'Linux '[[:digit:]]
     errorOut '\t%s\n' "\t\$(uname -srm): $(uname -srm)"
     f=1
 else
-    succcessOut "Kernel succeeded."
+    successOut "Kernel succeeded."
 fi
 
 if [[ ! ${_output[1]} =~ ^(.*)'Finding OS...found as'(.*)'Linux'(.*)'.' ]]; then
     errorOut "!! Failed on OS."
     f=1
 else
-    succcessOut "OS succeeded."
+    successOut "OS succeeded."
 fi
 
 if [[ ! ${_output[2]} =~ ^(.*)'Finding user info...found as'(.*)'runner@'[^[:space:]]+'.' ]]; then
@@ -45,7 +45,7 @@ if [[ ! ${_output[2]} =~ ^(.*)'Finding user info...found as'(.*)'runner@'[^[:spa
     errorOut "\t\$(hostname): $(hostname)"
     f=1
 else
-    succcessOut "User info succeeded."
+    successOut "User info succeeded."
 fi
 
 # count number of verbosity lines
