@@ -644,10 +644,8 @@ detect_distro () {
 		sulin) my_distro="Sulin" ;;
 		exherbo|exherbo*linux) my_distro="Exherbo" ;;
 		fedora)
-			[[ -z "${ascii_distro}" ]] && ascii_distro="Fedora"
 			my_distro="Fedora"
 			. lib/fedora/lib.sh
-			. lib/fedora/ascii/${ascii_distro,,}.sh
 			;;
 		freebsd) my_distro="FreeBSD" ;;
 		freebsd*old) my_distro="FreeBSD - Old" ;;
@@ -665,14 +663,13 @@ detect_distro () {
 		kaos) my_distro="KaOS";;
 		kde*neon|neon)
 			my_distro="KDE neon"
-			. lib/kdeneon/extra.sh
+			. lib/kdeneon/lib.sh
 			;;
 		kogaion) my_distro="Kogaion" ;;
 		lmde) my_distro="LMDE" ;;
 		lunar|lunar*linux) my_distro="Lunar Linux";;
 		*"macos"*|*"mac os x"*)
-			[[ -z "${ascii_distro}" ]] && ascii_distro="macOS"
-			. lib/macos/ascii/${ascii_distro,,}.sh
+			[ -z "${ascii_distro}" ] && ascii_distro="macOS"
 			;;
 		manjaro) my_distro="Manjaro" ;;
 		mageia) my_distro="Mageia" ;;
@@ -690,6 +687,7 @@ detect_distro () {
 		*suse*) 
 			my_distro="openSUSE"
 			. lib/suse/lib.sh
+			[ -z "${ascii_distro}" ] && ascii_distro="SUSE"
 			;;
 		os*elbrus) my_distro="OS Elbrus" ;;
 		parabolagnu|parabolagnu/linux-libre|'parabola gnu/linux-libre'|parabola) my_distro="Parabola GNU/Linux-libre" ;;
@@ -704,7 +702,6 @@ detect_distro () {
 		rosa) my_distro="ROSA" ;;
 		sabayon) my_distro="Sabayon" ;;
 		sailfish|sailfish*os)
-			[[ -z "${ascii_distro}" ]] && ascii_distro="SailfishOS"
 			my_distro="SailfishOS"
 			. lib/sailfish/lib.sh
 			;;
@@ -715,37 +712,29 @@ detect_distro () {
 		sparky|sparky*linux) my_distro="SparkyLinux" ;;
 		steam|steam*os) my_distro="SteamOS" ;;
 		tinycore|tinycore*linux) my_distro="TinyCore" ;;
-		trisquel)
-			[[ -z "${ascii_distro}" ]] && ascii_distro="Trisquel"
-			my_distro="Trisquel"
-			. lib/trisquel/ascii/${ascii_distro,,}.sh
-			;;
+		trisquel) my_distro="Trisquel" ;;
 		ubuntu)
-			[[ -z "${ascii_distro}" ]] && ascii_distro="Ubuntu"
 			my_distro="Ubuntu"
-			. lib/ubuntu/ascii/${ascii_distro,,}.sh
 			. lib/ubuntu/lib.sh
 			;;
-		void*linux)
-			[[ -z "${ascii_distro}" ]] && ascii_distro="Void"
-			my_distro="Void Linux"
-			. lib/void/ascii/${ascii_distro,,}.sh
-			;;
+		void*linux) my_distro="Void Linux" ;;
 		*"windows"*)
 			[[ -z "${ascii_distro}" ]] && ascii_distro="Windows"
-			. lib/windows/ascii/${ascii_distro,,}.sh
 			;;
-		zorin*)
-			[[ -z "${ascii_distro}" ]] && ascii_distro="Zorin"
-			my_distro="Zorin OS"
-			. lib/zorin/ascii/${ascii_distro,,}.sh
-			;;
+		zorin*) my_distro="Zorin OS" ;;
 		*)
 			ascii_distro="Unknown"
 			config_ascii['colors']="random"
-			. lib/unknown.sh
 			;;
 	esac
+
+	[ -z "${ascii_distro}" ] && ascii_distro="${my_distro}"
+
+	if [ -f "ascii/${ascii_distro,,}.sh" ]; then
+		. ascii/${ascii_distro,,}.sh
+	else
+		. ascii/unknown.sh
+	fi
 
 	# shellcheck disable=SC2154
 	case ${config_distro[short]} in
