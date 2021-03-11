@@ -747,7 +747,7 @@ detect_distro () {
 	[ -z "${ascii_distro}" ] && ascii_distro="${my_distro}"
 
 	if [ -f "ascii/${ascii_distro,,}.sh" ]; then
-		. ascii/${ascii_distro,,}.sh
+		. "ascii/${ascii_distro,,}.sh"
 	else
 		. ascii/unknown.sh
 	fi
