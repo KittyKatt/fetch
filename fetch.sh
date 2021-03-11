@@ -616,15 +616,20 @@ detect_distro () {
 		aldos) my_distro="ALDOS";;
 		alpine) my_distro="Alpine Linux" ;;
 		amzn|amazon|amazon*linux) my_distro="Amazon Linux" ;;
-		arch*linux*old) my_distro="Arch Linux - Old" ;;
 		arch|arch*linux) my_distro="Arch Linux" ;;
-		arch32) my_distro="Arch Linux 32" ;;
+		arch32)
+			my_distro="Arch Linux 32"
+			[[ -z "${ascii_distro}" ]] && ascii_distro="Arch Linux"
+			;;
 		arcolinux|arcolinux*) my_distro="ArcoLinux" ;;
 		artix|artix*linux) my_distro="Artix Linux" ;;
 		blackpantheros|black*panther*) my_distro="blackPanther OS" ;;
 		bunsenlabs) my_distro="BunsenLabs" ;;
 		centos) my_distro="CentOS" ;;
-		centos*stream) my_distro="CentOS Stream" ;;
+		centos*stream)
+			my_distro="CentOS Stream"
+			[[ -z "${ascii_distro}" ]] && ascii_distro="CentOS"
+			;;
 		chakra) my_distro="Chakra" ;;
 		chrome*|chromium*) my_distro="Chrome OS" ;;
 		crux) my_distro="CRUX" ;;
@@ -641,14 +646,12 @@ detect_distro () {
 		endeavour*) my_distro="EndeavourOS" ;;
 		eurolinux) my_distro="EuroLinux" ;;
 		evolveos) my_distro="Evolve OS" ;;
-		sulin) my_distro="Sulin" ;;
 		exherbo|exherbo*linux) my_distro="Exherbo" ;;
 		fedora)
 			my_distro="Fedora"
 			. lib/fedora/lib.sh
 			;;
 		freebsd) my_distro="FreeBSD" ;;
-		freebsd*old) my_distro="FreeBSD - Old" ;;
 		frugalware) my_distro="Frugalware" ;;
 		funtoo) my_distro="Funtoo" ;;
 		gentoo)
@@ -658,7 +661,10 @@ detect_distro () {
 		gnewsense) my_distro="gNewSense" ;;
 		guix*system) my_distro="Guix System" ;;
 		haiku) my_distro="Haiku" ;;
-		hyperbolagnu|hyperbolagnu/linux-libre|'hyperbola gnu/linux-libre'|hyperbola) my_distro="Hyperbola GNU/Linux-libre" ;;
+		hyperbolagnu|hyperbolagnu/linux-libre|'hyperbola gnu/linux-libre'|hyperbola)
+			my_distro="Hyperbola GNU/Linux-libre"
+			[[ -z "${ascii_distro}" ]] && ascii_distro="Hyperbola"
+			;;
 		kali*linux) my_distro="Kali Linux" ;;
 		kaos) my_distro="KaOS";;
 		kde*neon|neon)
@@ -684,13 +690,11 @@ detect_distro () {
 		obarun) my_distro="Obarun" ;;
 		ol|oracle*linux) my_distro="Oracle Linux" ;;
 		openbsd) my_distro="OpenBSD" ;;
-		*suse*) 
-			my_distro="openSUSE"
-			. lib/suse/lib.sh
-			[ -z "${ascii_distro}" ] && ascii_distro="SUSE"
-			;;
 		os*elbrus) my_distro="OS Elbrus" ;;
-		parabolagnu|parabolagnu/linux-libre|'parabola gnu/linux-libre'|parabola) my_distro="Parabola GNU/Linux-libre" ;;
+		parabolagnu|parabolagnu/linux-libre|'parabola gnu/linux-libre'|parabola)
+			my_distro="Parabola GNU/Linux-libre"
+			[[ -z "${ascii_distro}" ]] && ascii_distro="Parabola"
+			;;
 		parrot|parrot*security) my_distro="Parrot Security" ;;
 		pclinuxos|pclos) my_distro="PCLinuxOS" ;;
 		peppermint) my_distro="Peppermint" ;;
@@ -698,7 +702,10 @@ detect_distro () {
 		pureos) my_distro="PureOS" ;;
 		qubes) my_distro="Qubes OS" ;;
 		raspbian) my_distro="Raspbian" ;;
-		red*hat*|rhel) my_distro="Red Hat Enterprise Linux" ;;
+		red*hat*|rhel)
+			my_distro="Red Hat Enterprise Linux"
+			[[ -z "${ascii_distro}" ]] && ascii_distro="RHEL"
+			;;
 		rosa) my_distro="ROSA" ;;
 		sabayon) my_distro="Sabayon" ;;
 		sailfish|sailfish*os)
@@ -707,10 +714,19 @@ detect_distro () {
 			;;
 		scientific*) my_distro="Scientific Linux" ;;
 		siduction) my_distro="Siduction" ;;
-		smgl|source*mage|source*mage*gnu*linux) my_distro="Source Mage GNU/Linux" ;;
+		smgl|source*mage|source*mage*gnu*linux)
+			my_distro="Source Mage GNU/Linux"
+			[[ -z "${ascii_distro}" ]] && ascii_distro="SourceMage"
+			;;
 		solus) my_distro="Solus" ;;
 		sparky|sparky*linux) my_distro="SparkyLinux" ;;
 		steam|steam*os) my_distro="SteamOS" ;;
+		sulin) my_distro="Sulin" ;;
+		*suse*) 
+			my_distro="openSUSE"
+			. lib/suse/lib.sh
+			[ -z "${ascii_distro}" ] && ascii_distro="SUSE"
+			;;
 		tinycore|tinycore*linux) my_distro="TinyCore" ;;
 		trisquel) my_distro="Trisquel" ;;
 		ubuntu)
