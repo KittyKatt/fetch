@@ -52,18 +52,34 @@ jobs:
       - uses: FranzDiebold/github-env-vars-action@v2
       - name: Create JSON nfpm file
         run: bash .github/scripts/create-nfpm.sh "${{ env.APP_NAME }}" "${{ env.MAINTAINER }}" "${{ env.DESC }}" ${CI_REF_NAME}
-      - name: test
-        run: |
-          ls -l
-          pwd
-          cat configuration.yaml
-      - uses: kentik/pkg@v1.0.0-rc7
+      - name: Create DEB package
+        uses: kentik/pkg@v1.0.0-rc7
         with:
           name: ${{ env.APP_NAME }}
-          version: v0.0.1
+          version: ${CI_REF_NAME}
+          arch: x86_64
+          format: deb
+          package: configuration.yaml
+      - name: Create RPM package
+        uses: kentik/pkg@v1.0.0-rc7
+        with:
+          name: ${{ env.APP_NAME }}
+          version: ${CI_REF_NAME}
           arch: x86_64
           format: rpm
           package: configuration.yaml
+      - name: Rename packages to correct arch
+        run: |
+          (
+            for i in *.rpm; do
+              mv ${i} ${i//x86_64/noarch}
+            done
+          )
+          (
+            for i in *.deb; do
+              mv ${i} ${i//x86_64/all}
+            done
+          )
       - uses: actions/upload-artifact@v2
         with:
           name: artifact-deb
