@@ -2,9 +2,9 @@ name: release
 
 on:
   push:
-#    tags:
-#      - 'v*.*.*'
-#      - 'v*.*'
+    tags:
+      - 'v*.*.*'
+      - 'v*.*'
 
 env:
   APP_NAME: 'fetch'
@@ -12,39 +12,6 @@ env:
   DESC: 'fetch is a BASH screenshot, system, and configuration information tool.'
 
 jobs:
-  build-artifact:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os:
-          - ubuntu-20.04
-          - windows-latest
-          - macOS-latest
-    steps:
-      - uses: actions/checkout@v1
-      - name: Create artifact
-        run: |
-          os="${{ runner.os }}"
-          assets="${{ env.APP_NAME }}_$(echo "${{ runner.os }}" | tr '[:upper:]' '[:lower:]')"
-          echo "$assets"
-          mkdir -p "dist/$assets"
-          cp -r fetch.sh sample.config.conf ascii lib LICENSE README.* "dist/$assets/"
-          (
-            cd dist
-            if [[ "${{ runner.os }}" == Windows ]]; then
-              7z a "$assets.zip" "$assets"
-            else
-              tar czf "$assets.tar.gz" "$assets"
-            fi
-            ls -lah *.*
-          )
-        shell: bash
-      #- uses: actions/upload-artifact@v2
-      #  with:
-      #    name: artifact-${{ matrix.os }}
-      #    path: |
-      #      dist/*.tar.gz
-      #      dist/*.zip
   build-linux-packages:
     runs-on: ubuntu-latest
     steps:
