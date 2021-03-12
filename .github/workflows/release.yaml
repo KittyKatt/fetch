@@ -52,8 +52,7 @@ jobs:
       - name: Create JSON nfpm file 
         run: | 
           _version="${{ github.ref }}"
-          [[ ${version} =~ ([a-z])+\/([a-z])+\/v(.*) ]] && _version=${BASH_REMATCH[3]}
-          export _version
+          [[ ${version} =~ refs\/tags\/v(.*) ]] && _version=${BASH_REMATCH[1]}
           bash .github/scripts/create-nfpm.sh "${{ env.APP_NAME }}" "${{ env.MAINTAINER }}" "${{ env.DESC }}" ${_version}
       - name: test
         run: |
@@ -63,7 +62,7 @@ jobs:
       - uses: kentik/pkg@v1.0.0-rc7
         with:
           name: ${{ env.APP_NAME }}
-          version: ${{ env._version }}
+          version: v0.0.1
           arch: x86_64
           format: rpm
           package: configuration.yaml
