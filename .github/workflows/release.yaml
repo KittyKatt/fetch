@@ -54,8 +54,6 @@ jobs:
           _version="${{ github.ref }}"
           [[ ${version} =~ ([a-z])+\/([a-z])+\/v(.*) ]] && _version=${BASH_REMATCH[3]}
           bash .github/scripts/create-nfpm.sh "${{ env.APP_NAME }}" "${{ env.MAINTAINER }}" "${{ env.DESC }}" ${_version}
-          ls -l
-          pwd
       - name: test
         run: |
           ls -l
@@ -65,13 +63,13 @@ jobs:
         id: deb-package
         with:
           packager: "deb"
-          config: nfpm.yaml
+          config: "configuration.yaml"
       - name: Create rpm package
         uses: skynet-core/nfpm@v1.5
         id: rpm-package
         with:
           packager: "rpm"
-          config: nfpm.yaml
+          config: "configuration.yaml"
       - uses: actions/upload-artifact@v2
         with:
           name: artifact-deb
