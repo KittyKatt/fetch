@@ -49,11 +49,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - name: Create JSON nfpm file 
-        run: | 
-          _version="${{ github.ref }}"
-          [[ ${version} =~ refs\/tags\/v(.*) ]] && _version=${BASH_REMATCH[1]}
-          bash .github/scripts/create-nfpm.sh "${{ env.APP_NAME }}" "${{ env.MAINTAINER }}" "${{ env.DESC }}" ${_version}
+      - uses: FranzDiebold/github-env-vars-action@v2
+      - name: Create JSON nfpm file
+        run: bash .github/scripts/create-nfpm.sh "${{ env.APP_NAME }}" "${{ env.MAINTAINER }}" "${{ env.DESC }}" ${CI_REF_NAME}
       - name: test
         run: |
           ls -l
