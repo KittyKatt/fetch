@@ -59,11 +59,13 @@ jobs:
         id: deb-package
         with:
           packager: "deb"
+          config: /home/runner/work/fetch/fetch/nfpm.yaml
       - name: Create rpm package
         uses: skynet-core/nfpm@v1.5
         id: rpm-package
         with:
           packager: "rpm"
+          config: /home/runner/work/fetch/fetch/nfpm.yaml
       - uses: actions/upload-artifact@v2
         with:
           name: artifact-deb
