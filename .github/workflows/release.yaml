@@ -51,18 +51,18 @@ jobs:
       - uses: actions/checkout@v1
       - name: Create JSON nfpm file 
         run: | 
-        bash .github/scripts/create-nfpm.sh "${{ env.APP_NAME }}" "${{ env.MAINTAINER }}" "${{ env.DESC }}" "${{ github.ref }}"
+          bash .github/scripts/create-nfpm.sh "${{ env.APP_NAME }}" "${{ env.MAINTAINER }}" "${{ env.DESC }}" ${{ github.ref }}
       - name: Create deb package
         uses: skynet-core/nfpm@v1.5
         id: deb-package
         with:
-          config: "custom.yaml"
+          config: "package.yaml"
           packager: "deb"
       - name: Create rpm package
         uses: skynet-core/nfpm@v1.5
         id: rpm-package
         with:
-          config: "custom.yaml"
+          config: "package.yaml"
           packager: "rpm"
       - uses: actions/upload-artifact@v2
         with:
