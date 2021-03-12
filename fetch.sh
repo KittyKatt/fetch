@@ -669,7 +669,7 @@ detect_distro () {
 		kaos) my_distro="KaOS";;
 		kde*neon|neon)
 			my_distro="KDE neon"
-			. "lib/kde neon/lib.sh"
+			. lib/kde-neon/lib.sh
 			;;
 		kogaion) my_distro="Kogaion" ;;
 		lmde) my_distro="LMDE" ;;

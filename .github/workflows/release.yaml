@@ -10,6 +10,7 @@ env:
   APP_NAME: 'fetch'
   MAINTAINER: 'Brett Bohnenkamper'
   DESC: 'fetch is a BASH screenshot, system, and configuration information tool.'
+  DEPENDS: 'bash (>=4.0), awk'
 
 jobs:
   build-artifact:
