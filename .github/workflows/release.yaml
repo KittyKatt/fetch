@@ -59,7 +59,7 @@ jobs:
           ls -l
           pwd
           cat configuration.yaml
-      - uses: kentik/pkg@v1
+      - uses: kentik/pkg@v1.0.0-rc7
         with:
           name: ${{ env.APP_NAME }}
           version: ${{ github.ref }}
