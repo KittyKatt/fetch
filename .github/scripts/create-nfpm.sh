@@ -18,12 +18,14 @@ files:
     file: fetch.sh
     mode: "0755"
     user: "root"
-  "/usr/share/fetch/ascii":
-    directory: ascii
-  "/usr/share/fetch/lib":
-    directory: lib
   "/usr/share/fetch/config.yaml":
     file: sample.config.yaml
+
+directories:
+  "/usr/share/fetch/ascii":
+    dir: ascii
+  "/usr/share/fetch/lib":
+    dir: lib
 EOF
 
 printf '%s\n' "${yaml}" > configuration.yaml
