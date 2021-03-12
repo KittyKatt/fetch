@@ -39,12 +39,12 @@ jobs:
             ls -lah *.*
           )
         shell: bash
-      - uses: actions/upload-artifact@v2
-        with:
-          name: artifact-${{ matrix.os }}
-          path: |
-            dist/*.tar.gz
-            dist/*.zip
+      #- uses: actions/upload-artifact@v2
+      #  with:
+      #    name: artifact-${{ matrix.os }}
+      #    path: |
+      #      dist/*.tar.gz
+      #      dist/*.zip
   build-linux-packages:
     runs-on: ubuntu-latest
     steps:
@@ -58,6 +58,7 @@ jobs:
         run: |
           ls -l
           pwd
+          cat configuration.yaml
       - name: Create deb package
         uses: skynet-core/nfpm@v1.5
         id: deb-package
