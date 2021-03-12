@@ -19,9 +19,9 @@ files:
     mode: "0755"
     user: "root"
   "/usr/share/fetch/ascii":
-    file: ascii
+    directory: ascii
   "/usr/share/fetch/lib":
-    file: lib
+    directory: lib
   "/usr/share/fetch/config.yaml":
     file: sample.config.yaml
 EOF
