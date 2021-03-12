@@ -669,7 +669,7 @@ detect_distro () {
 		kaos) my_distro="KaOS";;
 		kde*neon|neon)
 			my_distro="KDE neon"
-			. lib/kdeneon/lib.sh
+			. "lib/kde neon/lib.sh"
 			;;
 		kogaion) my_distro="Kogaion" ;;
 		lmde) my_distro="LMDE" ;;
@@ -747,6 +747,7 @@ detect_distro () {
 	[ -z "${ascii_distro}" ] && ascii_distro="${my_distro}"
 
 	if [ -f "ascii/${ascii_distro,,}.sh" ]; then
+		# shellcheck source=/dev/null
 		. "ascii/${ascii_distro,,}.sh"
 	else
 		. ascii/unknown.sh
