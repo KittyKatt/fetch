@@ -19,7 +19,7 @@ files:
     mode: "0755"
     user: "root"
   "/usr/share/fetch/config.yaml":
-    file: sample.config.yaml
+    file: sample.config.conf
 
 directories:
   "/usr/share/fetch/ascii":
