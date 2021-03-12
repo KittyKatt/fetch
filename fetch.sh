@@ -746,6 +746,8 @@ detect_distro () {
 
 	[ -z "${ascii_distro}" ] && ascii_distro="${my_distro}"
 
+	[ -n "${ascii_distro}" ] && ascii_distro="${ascii_distro// /-}"
+
 	if [ -f "ascii/${ascii_distro,,}.sh" ]; then
 		# shellcheck source=/dev/null
 		. "ascii/${ascii_distro,,}.sh"
@@ -1389,12 +1391,13 @@ case ${1} in
 	*) : ;;
 esac
 
-while getopts ":hvVD:" flags; do
+while getopts ":hvVD:A:" flags; do
 	case ${flags} in
 		h) usage; exit 0 ;;
 		V) versioninfo; exit 0 ;;
 		v) declare config_global[verbose]="on" ;;
 		D) my_distro="${OPTARG}" ;;
+		A) ascii_distro="${OPTARG}" ;;
 		:) errorOut "Error: You're missing an argument somewhere. Exiting."; exit 1 ;;
 		?) errorOut "Error: Invalid flag somewhere. Exiting."; exit 1 ;;
 		*) errorOut "Error"; exit 1 ;;
