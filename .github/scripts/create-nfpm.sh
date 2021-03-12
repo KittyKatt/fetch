@@ -43,5 +43,3 @@ overrides:
 EOF
 
 printf '%s\n' "${yaml}" > nfpm.yaml
-ls -l
-pwd

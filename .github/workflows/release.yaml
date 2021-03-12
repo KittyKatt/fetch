@@ -2,9 +2,9 @@ name: release
 
 on:
   push:
-    tags:
-      - 'v*.*.*'
-      - 'v*.*'
+#    tags:
+#      - 'v*.*.*'
+#      - 'v*.*'
 
 env:
   APP_NAME: 'fetch'
@@ -54,18 +54,24 @@ jobs:
           _version="${{ github.ref }}"
           [[ ${version} =~ ([a-z])+\/([a-z])+\/v(.*) ]] && _version=${BASH_REMATCH[3]}
           bash .github/scripts/create-nfpm.sh "${{ env.APP_NAME }}" "${{ env.MAINTAINER }}" "${{ env.DESC }}" ${_version}
+          ls -l
+          pwd
+      - name: test
+        run: |
+          ls -l
+          pwd
       - name: Create deb package
         uses: skynet-core/nfpm@v1.5
         id: deb-package
         with:
           packager: "deb"
-          config: /home/runner/work/fetch/fetch/nfpm.yaml
+          config: nfpm.yaml
       - name: Create rpm package
         uses: skynet-core/nfpm@v1.5
         id: rpm-package
         with:
           packager: "rpm"
-          config: /home/runner/work/fetch/fetch/nfpm.yaml
+          config: nfpm.yaml
       - uses: actions/upload-artifact@v2
         with:
           name: artifact-deb
