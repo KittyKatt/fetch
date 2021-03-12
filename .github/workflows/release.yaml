@@ -63,7 +63,8 @@ jobs:
           cp -pr lib .rpmpkg/usr/share/fetch/
           cp -pr ascii .debpkg/usr/share/fetch/
           cp -pr ascii .rpmpkg/usr/share/fetch/
-          chmod +x /usr/local/bin/fetch
+          chmod +x .rpmpkg/usr/local/bin/fetch
+          chmod +x .debpkg/usr/local/bin/fetch
       - uses: jiro4989/build-deb-action@v2
         with:
           package: ${{ env.APP_NAME }}
