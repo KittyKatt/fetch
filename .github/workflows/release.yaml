@@ -56,13 +56,11 @@ jobs:
         uses: skynet-core/nfpm@v1.5
         id: deb-package
         with:
-          config: "package.yaml"
           packager: "deb"
       - name: Create rpm package
         uses: skynet-core/nfpm@v1.5
         id: rpm-package
         with:
-          config: "package.yaml"
           packager: "rpm"
       - uses: actions/upload-artifact@v2
         with:

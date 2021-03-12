@@ -42,4 +42,4 @@ overrides:
       - awk
 EOF
 
-printf '%s\n' "${yaml}" > package.yaml
+printf '%s\n' "${yaml}" > nfpm.yaml
