@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - 'v*.*.*'
+      - 'v*.*'
 
 env:
   APP_NAME: 'fetch'
