@@ -10,7 +10,6 @@ env:
   APP_NAME: 'fetch'
   MAINTAINER: 'Brett Bohnenkamper'
   DESC: 'fetch is a BASH screenshot, system, and configuration information tool.'
-  DEPENDS: 'bash (>=4.0), awk'
 
 jobs:
   build-artifact:
@@ -52,17 +51,18 @@ jobs:
       - uses: actions/checkout@v1
       - name: Create JSON nfpm file 
         run: | 
-        bash .github/scripts/create-nfpm.sh "${{ env.APP_NAME }}" "${{ env.MAINTAINER }}" "${{ env.DESC }}" "${{ github.ref - name: Create deb package
-      - uses: skynet-core/nfpm@v1.5
+        bash .github/scripts/create-nfpm.sh "${{ env.APP_NAME }}" "${{ env.MAINTAINER }}" "${{ env.DESC }}" "${{ github.ref }}"
+      - name: Create deb package
+        uses: skynet-core/nfpm@v1.5
         id: deb-package
         with:
-          config: "package.yaml"
+          config: "custom.yaml"
           packager: "deb"
       - name: Create rpm package
         uses: skynet-core/nfpm@v1.5
         id: rpm-package
         with:
-          config: "package.yaml"
+          config: "custom.yaml"
           packager: "rpm"
       - uses: actions/upload-artifact@v2
         with:
@@ -86,7 +86,7 @@ jobs:
           wget https://github.com/git-chglog/git-chglog/releases/download/0.9.1/git-chglog_linux_amd64
           chmod +x git-chglog_linux_amd64
           mv git-chglog_linux_amd64 git-chglog
-          ./git-chglog --output ./changelog.yaml $(git describe --tags $(git rev-list --tags --max-count=1))
+          ./git-chglog --output ./changelog $(git describe --tags $(git rev-list --tags --max-count=1))
       - name: Create Release
         id: create-release
         uses: actions/create-release@v1
@@ -95,7 +95,7 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: ${{ github.ref }}
-          body_path: ./changelog.yaml
+          body_path: ./changelog
           draft: false
           prerelease: false
 
