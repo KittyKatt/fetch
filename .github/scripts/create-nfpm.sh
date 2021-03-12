@@ -7,12 +7,10 @@ _version="${4}"
 read -rd '' yaml <<EOF
 name: ${_name}
 arch: all
-platform: linux
 version: ${_version}
-priority: extra
 maintainer: ${_maintainer}
 description: ${_desc}
-license: GPLv3
+
 contents:
   - src: lib
     dst: /usr/share/fetch/lib
@@ -29,6 +27,7 @@ contents:
     type: config
   - src: LICENSE
     dst: /usr/share/fetch/LICENSE
+
 overrides:
   deb:
     depends:
