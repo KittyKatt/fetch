@@ -4,7 +4,7 @@ _maintainer="${2}"
 _desc="${3}"
 _version="${4}"
 
-read -rd "" yaml <<'EOF'
+read -rd '' yaml <<"EOF"
 name: ${_name}
 arch: all
 platform: linux
