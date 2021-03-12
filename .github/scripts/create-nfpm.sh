@@ -4,9 +4,9 @@ _maintainer="${2}"
 _desc="${3}"
 _version="${4}"
 
-read -rd '' yaml <<'EOF'
+read -rd "" yaml <<'EOF'
 name: ${_name}
-arch: amd64
+arch: all
 platform: linux
 version: ${_version}
 priority: extra
@@ -31,12 +31,10 @@ contents:
     dst: /usr/share/fetch/LICENSE
 overrides:
   deb:
-    arch: all
     depends:
       - bash (>= 4.0)
       - awk
   rpm:
-    arch: noarch
     depends:
       - bash (>= 4.0)
       - awk
