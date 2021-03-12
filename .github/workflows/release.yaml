@@ -59,18 +59,13 @@ jobs:
           ls -l
           pwd
           cat configuration.yaml
-      - name: Create deb package
-        uses: skynet-core/nfpm@v1.5
-        id: deb-package
+      - uses: kentik/pkg@v1
         with:
-          packager: "deb"
-          config: "configuration.yaml"
-      - name: Create rpm package
-        uses: skynet-core/nfpm@v1.5
-        id: rpm-package
-        with:
-          packager: "rpm"
-          config: "configuration.yaml"
+          name: ${{ env.APP_NAME }}
+          version: ${{ github.ref }}
+          arch: noarch
+          format: rpm
+          package: configuration.yaml
       - uses: actions/upload-artifact@v2
         with:
           name: artifact-deb
