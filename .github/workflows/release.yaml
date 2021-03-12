@@ -53,6 +53,7 @@ jobs:
         run: | 
           _version="${{ github.ref }}"
           [[ ${version} =~ ([a-z])+\/([a-z])+\/v(.*) ]] && _version=${BASH_REMATCH[3]}
+          export _version
           bash .github/scripts/create-nfpm.sh "${{ env.APP_NAME }}" "${{ env.MAINTAINER }}" "${{ env.DESC }}" ${_version}
       - name: test
         run: |
@@ -62,7 +63,7 @@ jobs:
       - uses: kentik/pkg@v1.0.0-rc7
         with:
           name: ${{ env.APP_NAME }}
-          #version: ${{ github.ref }}
+          version: ${{ env._version }}
           arch: x86_64
           format: rpm
           package: configuration.yaml
