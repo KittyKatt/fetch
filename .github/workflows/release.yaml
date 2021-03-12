@@ -51,20 +51,27 @@ jobs:
       - uses: actions/checkout@v1
       - name: create structure
         run: |
-          mkdir -p {.rpmpkg,.debpkg}/usr/local/bin
-          mkdir -p {.rpmpkg,.debpkg}/usr/share/fetch
-          cp -p fetch.sh {.rpmpkg,.debpkg}/usr/local/bin/fetch
-          cp -p sample.config.conf {.rpmpkg,.debpkg}/usr/share/fetch/
-          cp -pr {lib,ascii} {.rpmpkg,.debpkg}/usr/share/fetch/
+          mkdir -p .debpkg/usr/local/bin
+          mkdir -p .rpmpkg/usr/local/bin
+          mkdir -p .debpkg/usr/share/fetch
+          mkdir -p .rpmpkg/usr/share/fetch
+          cp -p fetch.sh .debpkg/usr/local/bin/fetch
+          cp -p fetch.sh .rpmpkg/usr/local/bin/fetch
+          cp -p sample.config.conf .debpkg/usr/share/fetch/
+          cp -p sample.config.conf .rpmpkg/usr/share/fetch/
+          cp -pr lib .debpkg/usr/share/fetch/
+          cp -pr lib .rpmpkg/usr/share/fetch/
+          cp -pr ascii .debpkg/usr/share/fetch/
+          cp -pr ascii .rpmpkg/usr/share/fetch/
+          chmod +x /usr/bin/fetch
       - uses: jiro4989/build-deb-action@v2
         with:
           package: ${{ env.APP_NAME }}
           package_root: .debpkg
           maintainer: ${{ env.MAINTAINER }}
           version: ${{ github.ref }}
-          arch: 'any'
+          arch: 'all'
           desc: '${{ env.DESC }}'
-
       - uses: jiro4989/build-rpm-action@v2
         with:
           summary: '${{ env.DESC }}'
@@ -72,8 +79,9 @@ jobs:
           package_root: .rpmpkg
           maintainer: ${{ env.MAINTAINER }}
           version: ${{ github.ref }}
-          arch: 'any'
+          arch: 'noarch'
           desc: '${{ env.DESC }}'
+          license: 'GPLv3'
 
       - uses: actions/upload-artifact@v2
         with:
