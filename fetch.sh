@@ -1326,19 +1326,6 @@ detect_memory () {
 
     [ "${config_memory[percent]}" == "on" ] && ((mem_perc=mem_used * 100 / mem_total))
 
-    case ${memory_unit} in
-        gib)
-            mem_used=$(awk '{printf "%.2f", $1 / $2}' <<< "$mem_used 1024")
-            mem_total=$(awk '{printf "%.2f", $1 / $2}' <<< "$mem_total 1024")
-            mem_label=GiB
-        ;;
-        kib)
-            mem_used=$((mem_used * 1024))
-            mem_total=$((mem_total * 1024))
-            mem_label=KiB
-        ;;
-    esac
-
     my_memory="${mem_used}${mem_label:-MiB} / ${mem_total}${mem_label:-MiB} ${mem_perc:+(${mem_perc}%)}"
 
 	verboseOut "Finding memory usage...found as '${my_memory}'."
