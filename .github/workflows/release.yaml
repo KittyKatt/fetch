@@ -49,40 +49,37 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - name: create structure
+      - uses: FranzDiebold/github-env-vars-action@v2
+      - name: Create JSON nfpm file
+        run: bash .github/scripts/create-nfpm.sh "${{ env.APP_NAME }}" "${{ env.MAINTAINER }}" "${{ env.DESC }}" ${CI_REF_NAME}
+      - name: Create DEB package
+        uses: kentik/pkg@v1.0.0-rc7
+        with:
+          name: ${{ env.APP_NAME }}
+          version: ${{ env.CI_REF_NAME }}
+          arch: x86_64
+          format: deb
+          package: configuration.yaml
+      - name: Create RPM package
+        uses: kentik/pkg@v1.0.0-rc7
+        with:
+          name: ${{ env.APP_NAME }}
+          version: ${{ env.CI_REF_NAME }}
+          arch: x86_64
+          format: rpm
+          package: configuration.yaml
+      - name: Rename packages to correct arch
         run: |
-          mkdir -p .debpkg/usr/local/bin
-          mkdir -p .rpmpkg/usr/local/bin
-          mkdir -p .debpkg/usr/share/fetch
-          mkdir -p .rpmpkg/usr/share/fetch
-          cp -p fetch.sh .debpkg/usr/local/bin/fetch
-          cp -p fetch.sh .rpmpkg/usr/local/bin/fetch
-          cp -p sample.config.conf .debpkg/usr/share/fetch/
-          cp -p sample.config.conf .rpmpkg/usr/share/fetch/
-          cp -pr lib .debpkg/usr/share/fetch/
-          cp -pr lib .rpmpkg/usr/share/fetch/
-          cp -pr ascii .debpkg/usr/share/fetch/
-          cp -pr ascii .rpmpkg/usr/share/fetch/
-          chmod +x /usr/local/bin/fetch
-      - uses: jiro4989/build-deb-action@v2
-        with:
-          package: ${{ env.APP_NAME }}
-          package_root: .debpkg
-          maintainer: ${{ env.MAINTAINER }}
-          version: ${{ github.ref }}
-          arch: 'all'
-          desc: '${{ env.DESC }}'
-      - uses: jiro4989/build-rpm-action@v2
-        with:
-          summary: '${{ env.DESC }}'
-          package: ${{ env.APP_NAME }}
-          package_root: .rpmpkg
-          maintainer: ${{ env.MAINTAINER }}
-          version: ${{ github.ref }}
-          arch: 'noarch'
-          desc: '${{ env.DESC }}'
-          license: 'GPLv3'
-
+          (
+            for i in *.rpm; do
+              mv ${i} ${i//x86_64/noarch}
+            done
+          )
+          (
+            for i in *.deb; do
+              mv ${i} ${i//amd64/all}
+            done
+          )
       - uses: actions/upload-artifact@v2
         with:
           name: artifact-deb

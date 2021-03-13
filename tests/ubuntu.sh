@@ -20,7 +20,7 @@ else
     exit 1
 fi
 
-source ./lib/Linux/Ubuntu/ubuntu/ascii.sh
+source ./ascii/ubuntu.sh
 
 n=0
 IFS=$'\n'
