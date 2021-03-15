@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v1
       - uses: FranzDiebold/github-env-vars-action@v2
       - name: Read package.yaml
-        runs: | 
+        run: |
           ls -l .github
           cat .github/package.yaml
       - name: Create deb package
