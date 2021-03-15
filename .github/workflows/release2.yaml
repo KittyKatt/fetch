@@ -14,13 +14,27 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - uses: FranzDiebold/github-env-vars-action@v2
+      - name: Move fetch.sh to fetch
+        run: mv fetch.sh fetch
       - name: Create Debian control file
-        run: bash .github/scripts/dpkg-control.sh ${{ env.CI_REF_NAME }}
-      - name: Build Debian package (.deb)
-        uses: singingwolfboy/build-dpkg-buster@v1
-        id: build
+        id: deb_control
+        uses: Nightwind-Developments/debian-control-file-builder@latest
         with:
-          args: --unsigned-source --unsigned-changes
+          config-file: '.github/extras/control.json'
+          deps-file: '.github/extras/dependencies'
+          output-path: "${{ github.workspace }}"
+      - name: Spit out contents of generated control file
+        run: cat "${{ steps.deb_control.outputs.control_file_path }}"
+      - name: Build Debian package (.deb)
+        uses: Nightwind-Developments/debian-packer@latest
+        id: deb_build
+        with:
+          input_dir: "${{ github.workspace }}"
+          output_dir: "${{ github.workspace }}"
+          layout_map_file: ".github/file-layout.json"
+          package_name: "fetch"
+          package_version: "v0.7.1"
+          package_arch: "all"
       - name: Check output files
         run: |
           ls -la
