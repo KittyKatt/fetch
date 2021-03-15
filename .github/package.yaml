@@ -9,7 +9,7 @@ description: fetch is a BASH screenshot, system, and configuration information t
 homepage: https://github.com/KittyKatt/fetch
 license: GPLv3
 depends:
-  - bash (>=4.0)
+  - bash
   - awk
 contents:
   - src: fetch.sh
