@@ -9,7 +9,7 @@ env:
   DESC: 'fetch is a BASH screenshot, system, and configuration information tool.'
 
 jobs:
-  build-linux-packages:
+  build-debian-package:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
