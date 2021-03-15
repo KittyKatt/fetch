@@ -14,16 +14,11 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - uses: FranzDiebold/github-env-vars-action@v2
-      - name: Read package.yaml
-        run: |
-          ls -l .github
-          cat .github/package.yaml
-      - name: Create deb package
-        uses: skynet-core/nfpm@v1.5
-        id: deb-package
+      - name: Build Debian package (.deb)
+        uses: singingwolfboy/build-dpkg-buster@v1
+        id: build
         with:
-          config: ".github/package.yaml"
-          packager: "deb"
+          args: --unsigned-source --unsigned-changes
       - name: Check output files
         run: |
           ls -la
