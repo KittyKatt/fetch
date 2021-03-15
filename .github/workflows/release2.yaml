@@ -14,6 +14,8 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - uses: FranzDiebold/github-env-vars-action@v2
+      - name: Create Debian control file
+        run: bash .github/scripts/dpkg-control.sh ${{ env.CI_REF_NAME }}
       - name: Build Debian package (.deb)
         uses: singingwolfboy/build-dpkg-buster@v1
         id: build
