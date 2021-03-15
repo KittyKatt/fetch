@@ -1,0 +1,27 @@
+name: Release Tests
+
+on:
+  push:
+
+env:
+  APP_NAME: 'fetch'
+  MAINTAINER: 'Brett Bohnenkamper'
+  DESC: 'fetch is a BASH screenshot, system, and configuration information tool.'
+
+jobs:
+  build-linux-packages:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: FranzDiebold/github-env-vars-action@v2
+      - name: Create deb package
+        uses: skynet-core/nfpm@v1.5
+        id: deb-package
+        with:
+          config: ".github/package.yaml"
+          packager: "deb"
+      - name: Check output files
+        run: |
+          ls -la
+          dpkg -c *.deb
+          dpkg -I *.deb

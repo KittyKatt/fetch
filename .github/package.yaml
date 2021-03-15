@@ -1,0 +1,25 @@
+name: fetch
+arch: all
+platform: linux
+version: v0.8.1-beta1
+section: default
+priority: extra
+maintainer: Brett Bohnenkamper <kittykatt@kittykatt.co>
+description: fetch is a BASH screenshot, system, and configuration information tool
+homepage: https://github.com/KittyKatt/fetch
+license: GPLv3
+depends:
+  - bash (>=4.0)
+  - awk
+contents:
+  - src: fetch.sh
+    dst: /usr/local/bin/fetch
+    file_info:
+      mode: 0755
+  - src: sample.config.conf
+    dst: /usr/share/fetch/config.yaml
+    type: config
+  - src: ascii/*.sh
+    dst: /usr/share/fetch/ascii/
+  - src: lib
+    dst: /usr/share/fetch/

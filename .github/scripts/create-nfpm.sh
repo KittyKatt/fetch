@@ -20,8 +20,12 @@ files:
     user: "root"
   "/usr/share/fetch/config.yaml":
     file: sample.config.conf
+  "/usr/share/fetch/ascii/":
+    file: ascii/*
+  "/usr/share/fetch/lib/":
+    file: lib/*/*
 
-directories:
+dirs:
   "/usr/share/fetch/ascii":
     dir: ascii
   "/usr/share/fetch/lib":
