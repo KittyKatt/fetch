@@ -114,7 +114,7 @@ jobs:
         with:
           body_path: ./changelog
           tag_name: ${{ github.ref }}
-          name: ${{ github.ref }}
+          name: ${{ env.CI_REF_NAME }}
           draft: false
           prerelease: false
           files: |
