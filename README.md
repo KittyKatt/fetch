@@ -12,6 +12,6 @@ Some core complaints about screenFetch have been:
   - No persistent configuration / have to run every single time with tons of flags if you wanna do off the wall stuff. screenFetch had a couple of nice, interesting flags to alter the output of the script. However, if you wanted to do several modifications to the output, you had to either 1) alias the one-liner to something shorter or 2) remember all those flags and values every time you wanted to run it. fetch solves that by implementing a configuration file that is well commented and easy to follow. As fetch grows and I work in most of the screenFetch functionality, that configuration will grow to include many more configurable things. You should not have to do any major, huge editing to the configuration logic to include new functions and configuration sections, either.
 
 ## License
-Components pulled from [screenFetch](https://github.com/KittyKatt/screenFetch) that were pulled in by external contributors are licensed under the GPLv3+ license. You can find this license at LICENSE.gpl.
+Components pulled from [screenFetch](https://github.com/KittyKatt/screenFetch) that were pulled in by external contributors are licensed under the GPLv3+ license. You can find this license at [LICENSE.gpl](LICENSE.gpl).
 
 Everything else here is licensed under the MIT license.
