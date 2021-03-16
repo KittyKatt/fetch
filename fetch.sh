@@ -1387,12 +1387,12 @@ format_ascii () {
 	fi
 
 	# Expand color variables
-	_logo="${_logo//\$\{c1\}/${c1}}"
-    _logo="${_logo//\$\{c2\}/${c2}}"
-    _logo="${_logo//\$\{c3\}/${c3}}"
-    _logo="${_logo//\$\{c4\}/${c4}}"
-    _logo="${_logo//\$\{c5\}/${c5}}"
-    _logo="${_logo//\$\{c6\}/${c6}}"
+	_logo="${_logo//\$\{c1\}/$c1}"
+    _logo="${_logo//\$\{c2\}/$c2}"
+    _logo="${_logo//\$\{c3\}/$c3}"
+    _logo="${_logo//\$\{c4\}/$c4}"
+    _logo="${_logo//\$\{c5\}/$c5}"
+    _logo="${_logo//\$\{c6\}/$c6}"
 
 	((text_padding=logo_padding+gap))
 	printf "%b \e[%sC" "${_logo}" "${text_padding}"
