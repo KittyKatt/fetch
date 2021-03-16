@@ -14,12 +14,14 @@ options:
         - dist
         - misc
   commit_groups:
+    group_by: Type
+    sort_by: Title
     title_maps:
       feat: Features
       fix: Bug Fixes
       perf: Performance Improvements
       refactor: Code Refactoring
-      dist: New Distribution(s)
+      dist: New Distribution
       misc: Miscellanious Commits
   header:
     pattern: "^(\\w*)(?:\\(([\\w\\$\\.\\-\\*\\s]*)\\))?\\:\\s(.*)$"
