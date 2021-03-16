@@ -17,7 +17,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - uses: FranzDiebold/github-env-vars-action@v2
       - name: Create package structure
         run: |
           mkdir -p deb_pkg/usr/share/fetch
@@ -54,7 +53,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - uses: FranzDiebold/github-env-vars-action@v2
       - name: Install RPM tools
         run: |
           sudo apt update
@@ -109,12 +107,16 @@ jobs:
           ./git-chglog --output ./changelog $(git describe --tags $(git rev-list --tags --max-count=1))
       - uses: actions/download-artifact@v2
         name: Download package artifacts
+      - name: Prepare release name
+        run: |
+          RELEASE=${{ github.ref }}
+          echo "RELEASE=${RELEASE//refs\/tags\/v}" >> ${GITHUB_ENV}
       - name: Create release
         uses: softprops/action-gh-release@v1
         with:
           body_path: ./changelog
-          tag_name: ${{ env.CI_REF_NAME }}
-          name: ${{ env.CI_REF_NAME }}
+          tag_name: ${{ env.RELEASE }}
+          name: ${{ env.RELEASE }}
           draft: false
           prerelease: false
           files: |
