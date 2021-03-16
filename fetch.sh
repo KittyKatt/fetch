@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # variables: script global
-FETCH_VERSION="0.7"
+FETCH_VERSION="0.7.2"
 #FETCH_DATA_DIR="/usr/share/fetch"
 FETCH_DATA_USER_DIR="${XDG_CONFIG_HOME:-${HOME}}/.config/fetch"
 FETCH_CONFIG_FILENAME="config"
