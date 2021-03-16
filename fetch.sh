@@ -1313,6 +1313,15 @@ detect_memory () {
                 "OpenBSD"*) ;;
                 *) mem_free="$(($(vmstat | awk 'END {printf $5}') / 1024))" ;;
             esac
+
+            case ${kernel_name} in
+                "OpenBSD"*)
+                    mem_used="$(vmstat | awk 'END {printf $3}')"
+                    mem_used="${mem_used/M}"
+                ;;
+
+                *) mem_used="$((mem_total - mem_free))" ;;
+            esac
 			;;
         "Mac OS X"|"macOS")
             mem_total="$(($(sysctl -n hw.memsize) / 1024 / 1024))"
@@ -1321,6 +1330,11 @@ detect_memory () {
             mem_compressed="$(vm_stat | awk '/ occupied/ { printf $5 }')"
             mem_compressed="${mem_compressed:-0}"
             mem_used="$(((${mem_wired//.} + ${mem_active//.} + ${mem_compressed//.}) * 4 / 1024))"
+        ;;
+        "Haiku")
+            mem_total="$(($(sysinfo -mem | awk -F '\\/ |)' '{print $2; exit}') / 1024 / 1024))"
+            mem_used="$(sysinfo -mem | awk -F '\\/|)' '{print $2; exit}')"
+            mem_used="$((${mem_used/max} / 1024 / 1024))"
         ;;
 	esac
 
