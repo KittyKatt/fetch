@@ -1399,11 +1399,14 @@ format_ascii () {
 }
 
 print_ascii () {
-    while IFS=$'\n' read -r line; do
-        line=${line//\\\\/\\}
-        line=${line//█/ }
-        ((++lines,${#line}>ascii_len)) && ascii_len="${#line}"
-    done <<< "${asciiLogo//\$\{??\}}"
+	# shellcheck disable=SC2154
+	(
+		while IFS=$'\n' read -r line; do
+			line=${line//\\\\/\\}
+			line=${line//█/ }
+			((++lines,${#line}>ascii_len)) && ascii_len="${#line}"
+		done <<< "${asciiLogo//\$\{??\}}"
+	)
 
 	n=0
 	# shellcheck disable=SC2154
@@ -1416,6 +1419,7 @@ print_ascii () {
 		line=$(format_ascii "${line}")
 
 		# Display logo and info
+		# shellcheck disable=SC2154
 		if [ ${n} -lt "${startline}" ]; then
 			printf '%b\n' "${line}${reset}"
 		elif [ ${n} -ge "${startline}" ]; then
