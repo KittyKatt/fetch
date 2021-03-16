@@ -46,10 +46,6 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - uses: FranzDiebold/github-env-vars-action@v2
-      - name: Install RPM tools
-        run: |
-          sudo apt update
-          sudo apt install -y rpm
       - name: Create package structure
         run: |
           mkdir -p rpm_pkg/usr/share/fetch
