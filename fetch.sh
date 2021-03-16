@@ -1172,7 +1172,6 @@ detect_cpu () {
 
 			# Get CPU speed.
 			if [ -d "${_speed_dir}" ]; then
-				# Fallback to bios_limit if $speed_type fails.
 				_speed="$(< "${_speed_dir}/bios_limit")" ||\
 				_speed="$(< "${_speed_dir}/scaling_max_freq")" ||\
 				_speed="$(< "${_speed_dir}/cpuinfo_max_freq")"
@@ -1271,7 +1270,7 @@ detect_memory () {
             # MemUsed = Memtotal + Shmem - MemFree - Buffers - Cached - SReclaimable
             # Source: https://github.com/KittyKatt/screenFetch/issues/386#issuecomment-249312716
             while IFS=":" read -r a b; do
-                case $a in
+                case ${a} in
                     "MemTotal") ((mem_used+=${b/kB})); mem_total="${b/kB}" ;;
                     "Shmem") ((mem_used+=${b/kB}))  ;;
                     "MemFree" | "Buffers" | "Cached" | "SReclaimable")
@@ -1388,12 +1387,12 @@ format_ascii () {
 	fi
 
 	# Expand color variables
-	_logo="${_logo//\$\{c1\}/$c1}"
-    _logo="${_logo//\$\{c2\}/$c2}"
-    _logo="${_logo//\$\{c3\}/$c3}"
-    _logo="${_logo//\$\{c4\}/$c4}"
-    _logo="${_logo//\$\{c5\}/$c5}"
-    _logo="${_logo//\$\{c6\}/$c6}"
+	_logo="${_logo//\$\{c1\}/${c1}}"
+    _logo="${_logo//\$\{c2\}/${c2}}"
+    _logo="${_logo//\$\{c3\}/${c3}}"
+    _logo="${_logo//\$\{c4\}/${c4}}"
+    _logo="${_logo//\$\{c5\}/${c5}}"
+    _logo="${_logo//\$\{c6\}/${c6}}"
 
 	((text_padding=logo_padding+gap))
 	printf "%b \e[%sC" "${_logo}" "${text_padding}"
