@@ -1,3 +1,5 @@
+# shellcheck shell=bash
+# shellcheck disable=SC2034,SC2154
 c1=$(getColor 'light grey') # light grey
 startline="0"
 read -rd '' asciiLogo <<'EOF'

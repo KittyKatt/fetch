@@ -1,3 +1,5 @@
+# shellcheck shell=bash
+# shellcheck disable=SC2034,SC2154
 # logo widht: 52			
 c1=$(getColor 'white') # White
 c2=$(getColor 'light purple') # Light Purple

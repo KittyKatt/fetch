@@ -1,3 +1,5 @@
+# shellcheck shell=bash
+# shellcheck disable=SC2034,SC2154
 case ${ascii_distro} in
 	Ubuntu)
 		# number of colors: 3
