@@ -113,7 +113,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           body_path: ./changelog
-          tag_name: ${{ github.ref }}
+          tag_name: ${{ env.CI_REF_NAME }}
           name: ${{ env.CI_REF_NAME }}
           draft: false
           prerelease: false
