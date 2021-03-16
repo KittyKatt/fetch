@@ -116,7 +116,7 @@ jobs:
         with:
           body_path: ./changelog
           tag_name: ${{ env.RELEASE }}
-          name: ${{ env.RELEASE }}
+          name: Version ${{ env.RELEASE }}
           draft: false
           prerelease: false
           files: |
