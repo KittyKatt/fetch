@@ -1324,6 +1324,7 @@ detect_memory () {
         ;;
 	esac
 
+	# shellcheck disable=SC2154
     [ "${config_memory[percent]}" == "on" ] && ((mem_perc=mem_used * 100 / mem_total))
 
     my_memory="${mem_used}${mem_label:-MiB} / ${mem_total}${mem_label:-MiB} ${mem_perc:+(${mem_perc}%)}"
