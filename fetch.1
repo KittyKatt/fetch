@@ -1,0 +1,84 @@
+.TH FETCH "1" "March 2021" "0.7.2" "User Commands"
+
+.SH NAME
+fetch \- A BASH system information and distribution logo display tool.
+
+.SH SYNOPSIS
+.B fetch \fR[OPTIONAL FLAGS]
+
+.SH DESCRIPTION
+fetch is a script written in Bash 4.0+ and is used to generate
+a block of system and setup info, with an optional included ASCII
+logo of your detected distribution (or the logo of your choice).
+It will detect your current running OS, distribution, shell, 
+themes, and a multitude of hardware information to display in a 
+nicely formatted and readable block of text. Easily extendable and
+configurable, fetch aims to be as user friendly as possible.
+.PP
+Supported GNU/Linux Distributions:
+.IP
+.\" @supported_distros_start@
+ALDOS, Alpine Linux, Amazon Linux, Arch Linux, Artix Linux, 
+blackPanther OS, BunsenLabs, CentOS, Chakra, Chrome/Chromium OS, CRUX, 
+Debian, Deepin, Devuan, DraugerOS, elementary OS, Exherbo, Fedora, 
+Frugalware, Funtoo, Gentoo, Guix System, Hyperbola GNU/Linux-libre, 
+Kali Linux, KaOS, KDE neon, Kogaion, Linux Mint, LMDE, Mageia,Manjaro, 
+Netrunner, NixOS, openSUSE, OS Elbrus, Parabola GNU/Linux-libre, Pardus, 
+Parrot Security, PCLinuxOS, PeppermintOS, Proxmox VE, PureOS, Qubes OS, 
+Raspbian, Red Hat Enterprise Linux, ROSA, Sabayon, SailfishOS, Scientific Linux, 
+Siduction, Solus, Source Mage GNU/Linux, SparkyLinux, SteamOS, 
+SUSE Linux Enterprise, TinyCore, Trisquel, Ubuntu, Void and Zorin OS.
+.\" @supported_distros_end@
+.PP
+Other Supported Systems:
+.IP
+.\" @supported_other_start@
+ Dragonfly/Free/Open/Net BSD, Haiku, Mac OS X, Windows, and GNU/Hurd.
+.\" @supported_other_end@
+.PP
+In additiont to the above, the following extra ASCII art is included:
+.IP
+.\" @additiona_ascii_start@
+Manjaro (tree), Arch Linux (older Trek-like logo), Windows classic logo, 
+FreeBSD (older logo), Linux generic Tux, UNIX generic (ASCII "UNIX"), 
+Mac classic logo, and a custom Unknown distro cat art.
+.\" @additiona_ascii_end@
+
+.SH OPTIONS
+.TP
+.B \-v
+Verbose output.
+.TP
+.B \-N
+Strip all color from output.
+.TP
+.B \-D 'DISTRO'
+Here you can specify your distribution for the script
+to use. Surrounding quotes are required.
+.TP
+.B \-A 'DISTRO ART'
+Here you can specify the distribution art that you want
+displayed. This is for when you want your distro
+detected but want to display a different logo.
+.TP
+.B \-V, \-\-version
+Display current script version.
+.TP
+.B \-h, \-\-help
+Display this help.
+
+.SH "SEE ALSO"
+http://github.com/KittyKatt/fetch
+
+.SH AUTHOR
+Created and licensed by Brett Bohnenkamper <kittykatt@kittykatt.co>
+under the MIT license. Portions of this code that were pulled from
+screenFetch contributions are licensed under GPLv3. You should have
+received a copy of both of these licenses with this source.
+
+.SH REPORTING BUGS
+Report bugs to <https://github.com/KittyKatt/fetch/issues>
+
+.SH COPYRIGHT
+This is free software; you can redistribute it and/or modify it under
+the terms of the MIT license.
