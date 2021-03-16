@@ -3,9 +3,9 @@
 # logo width: 44
 # number of olcors: 3
 if [ "${config_text[color]}" == "off" ]; then
-c1=$(getColor 'yellow')
-c3=$(getColor 'purple')
-c5=$(getColor 'cyan')
+	c1=$(getColor 'yellow')
+	c3=$(getColor 'purple')
+	c5=$(getColor 'cyan')
 fi
 startline="1"
 read -rd '' asciiLogo <<'EOF'

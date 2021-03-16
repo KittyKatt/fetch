@@ -1,7 +1,7 @@
 # shellcheck shell=bash
 # shellcheck disable=SC2034,SC2154
 if [ "${config_text[color]}" == "off" ]; then
-c1=$(getColor 'red') # red
+	c1=$(getColor 'red') # red
 fi
 startline="0"
 read -rd '' asciiLogo <<'EOF'

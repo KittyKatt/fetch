@@ -3,12 +3,12 @@
 # logo width: 31
 # number of colors: 6
 if [ "${config_text[color]}" == "off" ]; then
-c1=$(getColor 'green') # Green
-c2=$(getColor 'brown') # Yellow
-c3=$(getColor 'light red') # Orange
-c4=$(getColor 'red') # Red
-c5=$(getColor 'purple') # Purple
-c6=$(getColor 'blue') # Blue
+	c1=$(getColor 'green') # Green
+	c2=$(getColor 'brown') # Yellow
+	c3=$(getColor 'light red') # Orange
+	c4=$(getColor 'red') # Red
+	c5=$(getColor 'purple') # Purple
+	c6=$(getColor 'blue') # Blue
 fi
 startline=1
 read -rd '' asciiLogo <<'EOF'
