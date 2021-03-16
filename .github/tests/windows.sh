@@ -11,20 +11,20 @@ errorOut () {
 }
 
 if [[ $(type -p dos2unix) ]]; then 
-    $(which dos2unix) fetch.sh
+    $(which dos2unix) fetch
     $(which dos2unix) lib/Windows/ascii.sh
 else
-    sed 's/\r$//' < fetch.sh | od -c > fetch2.sh
-    mv fetch2.sh fetch.sh
+    sed 's/\r$//' < fetch | od -c > fetch2.sh
+    mv fetch2.sh fetch
     sed 's/\r$//' < lib/Windows/ascii.sh | od -c > lib/Windows/ascii2.sh
     mv lib/Windows/ascii2.sh lib/Windows/ascii.sh
 fi
 
-if [[ $(bash fetch.sh --config sample.config.conf -v) ]]; then
+if [[ $(bash fetch --config sample.config.conf -v) ]]; then
     successOut 'Fetched current output:'
-    bash fetch.sh --config sample.config.conf -v
+    bash fetch --config sample.config.conf -v
 else
-    errorOut 'fetch.sh failed output:'
-    bash fetch.sh --config sample.config.conf -v
+    errorOut 'fetch failed output:'
+    bash fetch --config sample.config.conf -v
     exit 1
 fi

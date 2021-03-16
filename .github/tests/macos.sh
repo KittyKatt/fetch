@@ -12,11 +12,11 @@ errorOut () {
 
 bash_exe="/usr/local/bin/bash"
 
-if [[ $(bash fetch.sh --config sample.config.conf -v) ]]; then
+if [[ $(bash fetch --config sample.config.conf -v) ]]; then
     successOut 'Fetched current output:'
-    ${bash_exe} fetch.sh --config sample.config.conf -v
+    ${bash_exe} fetch --config sample.config.conf -v
 else
-    errorOut 'fetch.sh failed output:'
-    ${bash_exe} fetch.sh --config sample.config.conf -v
+    errorOut 'fetch failed output:'
+    ${bash_exe} fetch --config sample.config.conf -v
     exit 1
 fi

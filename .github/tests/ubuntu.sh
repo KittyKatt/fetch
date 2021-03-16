@@ -12,12 +12,12 @@ errorOut () {
 }
 
 
-if [[ $(bash fetch.sh --config sample.config.conf -v) ]]; then
+if [[ $(bash fetch --config sample.config.conf -v) ]]; then
     successOut 'Fetched current output:'
-    bash fetch.sh --config sample.config.conf -v
+    bash fetch --config sample.config.conf -v
 else
-    errorOut 'fetch.sh failed output:'
-    bash fetch.sh --config sample.config.conf -v
+    errorOut 'fetch failed output:'
+    bash fetch --config sample.config.conf -v
     exit 1
 fi
 
@@ -28,7 +28,7 @@ IFS=$'\n'
 while read -r line; do
     _output[${n}]="${line}"
     ((n++))
-done <<< "$(bash fetch.sh --config sample.config.conf -v)"
+done <<< "$(bash fetch --config sample.config.conf -v)"
 
 if [[ ! ${_output[0]} =~ ^(.*)'Finding kernel...found as'(.*)'Linux '[[:digit:]]+'.'[[:digit:]]+'.'[[:digit:]]+'-'[[:digit:]]+'-azure' ]]; then
     errorOut "!! Failed on kernel."

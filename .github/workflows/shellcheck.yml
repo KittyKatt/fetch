@@ -4,7 +4,7 @@ name: Shellcheck
 on:
   push:
     paths:
-      - fetch.sh
+      - fetch
       - sample.config.conf
       - lib/*/*.sh
       - ascii/*.sh
@@ -21,4 +21,4 @@ jobs:
     - name: Import Problem Matchers
       uses: lumaxis/shellcheck-problem-matchers@v1
     - name: Run ShellCheck
-      run: shellcheck -S warning -a -x -f gcc fetch.sh
+      run: shellcheck -S warning -a -x -f gcc fetch
