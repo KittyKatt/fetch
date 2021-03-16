@@ -59,13 +59,13 @@ jobs:
         run: |
           PVERSION="v0.7.1"
           echo "PVERSION=${PVERSION//v/}" >> ${GITHUB_ENV}
-          echo PDEPENDS="-d 'bash (>4)' -d 'awk' -d 'pciutils'" >> $GITHUB_ENV
+          echo PDEPENDS="-d 'bash >=4.0' -d 'awk' -d 'pciutils' -d 'bind-utils' -d 'grep' -d 'coreutils'" >> $GITHUB_ENV
       - name: Run NPM to create Red Hat package
         uses: bpicode/github-action-fpm@master
         id: rpm_build
         with:
           fpm_args: './'
-          fpm_opts: "--log warn -t rpm -a noarch -n ${{ env.APP_NAME }} -v ${{ env.PVERSION }} -m \"${{ env.MAINTAINER }}\" --description \"${{ env.DESC }}\" --url \"${{ env.HOMEPAGE }}\" --license GPLv3 ${{ env.PDEPENDS }} -C rpm_pkg -s dir"
+          fpm_opts: "--log warn -t rpm -a noarch -n ${{ env.APP_NAME }} -v ${{ env.PVERSION }} -m \"${{ env.MAINTAINER }}\" --description \"${{ env.DESC }}\" --url \"${{ env.HOMEPAGE }}\" --license GPLv3 ${{ env.PDEPENDS }} --category 'Productivity/Text/Utilities' -C rpm_pkg -s dir"
       - name: Check output files
         run: |
           ls -l *.rpm
