@@ -752,6 +752,7 @@ detect_distro () {
 		# shellcheck source=/dev/null
 		. "ascii/${ascii_distro,,}.sh"
 	else
+		# shellcheck disable=SC1094
 		. ascii/unknown.sh
 	fi
 
@@ -1400,13 +1401,11 @@ format_ascii () {
 
 print_ascii () {
 	# shellcheck disable=SC2154
-	(
-		while IFS=$'\n' read -r line; do
-			line=${line//\\\\/\\}
-			line=${line//█/ }
-			((++lines,${#line}>ascii_len)) && ascii_len="${#line}"
-		done <<< "${asciiLogo//\$\{??\}}"
-	)
+	while IFS=$'\n' read -r line; do
+		line=${line//\\\\/\\}
+		line=${line//█/ }
+		((++lines,${#line}>ascii_len)) && ascii_len="${#line}"
+	done <<< "${asciiLogo//\$\{??\}}"
 
 	n=0
 	# shellcheck disable=SC2154
