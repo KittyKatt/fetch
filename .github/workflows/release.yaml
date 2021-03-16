@@ -99,13 +99,6 @@ jobs:
     needs:
       - build-debian-package
       - build-rpm-package
-    strategy:
-      matrix:
-        include:
-          - pkg: deb
-            asset_content_type: application/vnd.debian.binary-package
-          - pkg: rpm
-            asset_content_type: application/x-rpm
     steps:
       - uses: actions/checkout@v1
       - name: Generate changelog
@@ -116,19 +109,5 @@ jobs:
           ./git-chglog --output ./changelog $(git describe --tags $(git rev-list --tags --max-count=1))
       - uses: actions/download-artifact@v2
         name: Download package artifacts
-        with:
-          name: artifact-${{ matrix.pkg }}
-      - name: Create release
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          body_path: ./changelog
-          tag_name: ${{ github.ref }}
-          name: ${{ github.ref }}
-          draft: false
-          prerelease: false
-          files: |
-            *.deb
-            *.rpm
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check output
+        run: ls -R
