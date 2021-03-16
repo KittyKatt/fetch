@@ -23,7 +23,6 @@ jobs:
           cp LICENSE README.md deb_pkg/usr/share/fetch/
           cp sample.config.conf deb_pkg/usr/share/fetch/
           cp fetch.sh deb_pkg/usr/local/bin/
-          ls -l deb_pkg
       - name: Build some variables to use
         run: |
           PVERSION="v0.7.1"
@@ -37,15 +36,20 @@ jobs:
           fpm_opts: "--log warn -t deb -a all -n ${{ env.APP_NAME }} -v ${{ env.PVERSION }} -m \"${{ env.MAINTAINER }}\" --description \"${{ env.DESC }}\" --url \"${{ env.HOMEPAGE }}\" --license GPLv3 --category 'Utils' --deb-priority 'extra' ${{ env.PDEPENDS }} -C deb_pkg -s dir"
       - name: Check output files
         run: |
-          echo "Package contents:"
-          dpkg -c *.deb
+          ls -l *.deb
           echo "Package information:"
           dpkg -I *.deb
+          echo "Package contents:"
+          dpkg -c *.deb
   build-rpm-package:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
       - uses: FranzDiebold/github-env-vars-action@v2
+      - name: Install RPM tools
+        run: |
+          sudo apt update
+          sudo apt install -y rpm
       - name: Create package structure
         run: |
           mkdir -p rpm_pkg/usr/share/fetch
@@ -54,18 +58,23 @@ jobs:
           cp LICENSE README.md rpm_pkg/usr/share/fetch/
           cp sample.config.conf rpm_pkg/usr/share/fetch/
           cp fetch.sh rpm_pkg/usr/local/bin/
-          ls -l rpm_pkg
       - name: Build some variables to use
         run: |
           PVERSION="v0.7.1"
           echo "PVERSION=${PVERSION//v/}" >> ${GITHUB_ENV}
-          echo PDEPENDS="-d 'bash >=4.0' -d 'awk' -d 'pciutils' -d 'bind-utils' -d 'grep' -d 'coreutils'" >> $GITHUB_ENV
+          echo PDEPENDS="-d 'bash>=4.0' -d 'awk' -d 'pciutils' -d 'coreutils' -d 'grep'" >> $GITHUB_ENV
       - name: Run NPM to create Red Hat package
         uses: bpicode/github-action-fpm@master
         id: rpm_build
         with:
           fpm_args: './'
-          fpm_opts: "--log warn -t rpm -a noarch -n ${{ env.APP_NAME }} -v ${{ env.PVERSION }} -m \"${{ env.MAINTAINER }}\" --description \"${{ env.DESC }}\" --url \"${{ env.HOMEPAGE }}\" --license GPLv3 ${{ env.PDEPENDS }} --category 'Productivity/Text/Utilities' -C rpm_pkg -s dir"
+          fpm_opts: "--log warn -t rpm -a noarch -n ${{ env.APP_NAME }} -v ${{ env.PVERSION }} -m \"${{ env.MAINTAINER }}\" --description \"${{ env.DESC }}\" --url \"${{ env.HOMEPAGE }}\" --license GPLv3 --category 'Productivity/Text/Utilities' ${{ env.PDEPENDS }} -C rpm_pkg -s dir"
       - name: Check output files
         run: |
           ls -l *.rpm
+          echo "Packing Information:"
+          rpm -qip *.rpm
+          echo "Packge Dependencies:"
+          rpm -qRp *.rpm
+          echo "Package Contents:"
+          rpm -qlp *.rpm
