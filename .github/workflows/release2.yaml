@@ -5,8 +5,9 @@ on:
 
 env:
   APP_NAME: 'fetch'
-  MAINTAINER: 'Brett Bohnenkamper'
-  DESC: 'fetch is a BASH screenshot, system, and configuration information tool.'
+  MAINTAINER: 'Brett Bohnenkamper <kittykatt@kittykatt.co>'
+  DESC: 'fetch is a BASH screenshot, system information, and distribution ASCII logo display tool.'
+  HOMEPAGE: 'https://github.com/KittyKatt/fetch'
 
 jobs:
   build-debian-package:
@@ -14,29 +15,61 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - uses: FranzDiebold/github-env-vars-action@v2
-      - name: Move fetch.sh to fetch
-        run: mv fetch.sh fetch
-      - name: Create Debian control file
-        id: deb_control
-        uses: Nightwind-Developments/debian-control-file-builder@latest
-        with:
-          config-file: '.github/extras/control.json'
-          deps-file: '.github/extras/dependencies'
-          output-path: "./"
-      - name: Spit out contents of generated control file
-        run: cat "${{ steps.deb_control.outputs.control_file_path }}"
-      - name: Build Debian package (.deb)
-        uses: Nightwind-Developments/debian-packer@latest
+      - name: Create package structure
+        run: |
+          mkdir -p deb_pkg/usr/share/fetch
+          mkdir -p deb_pkg/usr/local/bin
+          cp -r ascii lib deb_pkg/usr/share/fetch/
+          cp LICENSE README.md deb_pkg/usr/share/fetch/
+          cp sample.config.conf deb_pkg/usr/share/fetch/
+          cp fetch.sh deb_pkg/usr/local/bin/
+          ls -l deb_pkg
+      - name: Build some variables to use
+        run: |
+          PVERSION="v0.7.1"
+          echo "PVERSION=${PVERSION//v/}" >> ${GITHUB_ENV}
+          echo PDEPENDS="-d 'bash (>4)' -d 'awk' -d 'pciutils' -d 'procps'" >> $GITHUB_ENV
+      - name: Run NPM to create Debian package
+        uses: bpicode/github-action-fpm@master
         id: deb_build
         with:
-          input_dir: "./"
-          output_dir: "./"
-          layout_map_file: ".github/file-layout.json"
-          package_name: "fetch"
-          package_version: "v0.7.1"
-          package_arch: "all"
+          fpm_args: './'
+          fpm_opts: "--log warn -t deb -a all -n ${{ env.APP_NAME }} -v ${{ env.PVERSION }} -m \"${{ env.MAINTAINER }}\" --description \"${{ env.DESC }}\" --url \"${{ env.HOMEPAGE }}\" --license GPLv3 --category 'Utils' --deb-priority 'extra' ${{ env.PDEPENDS }} -C deb_pkg -s dir"
       - name: Check output files
         run: |
-          ls -la
+          echo "Package contents:"
           dpkg -c *.deb
+          echo "Package information:"
           dpkg -I *.deb
+  build-rpm-package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: FranzDiebold/github-env-vars-action@v2
+      - name: Install RPM tools
+        run: |
+          sudo apt update
+          sudo apt install -y rpm
+      - name: Create package structure
+        run: |
+          mkdir -p rpm_pkg/usr/share/fetch
+          mkdir -p rpm_pkg/usr/local/bin
+          cp -r ascii lib rpm_pkg/usr/share/fetch/
+          cp LICENSE README.md rpm_pkg/usr/share/fetch/
+          cp sample.config.conf rpm_pkg/usr/share/fetch/
+          cp fetch.sh rpm_pkg/usr/local/bin/
+          ls -l rpm_pkg
+      - name: Build some variables to use
+        run: |
+          PVERSION="v0.7.1"
+          echo "PVERSION=${PVERSION//v/}" >> ${GITHUB_ENV}
+          echo PDEPENDS="-d 'bash (>4)' -d 'awk' -d 'pciutils'" >> $GITHUB_ENV
+      - name: Run NPM to create Red Hat package
+        uses: bpicode/github-action-fpm@master
+        id: rpm_build
+        with:
+          fpm_args: './'
+          fpm_opts: "--log warn -t rpm -a noarch -n ${{ env.APP_NAME }} -v ${{ env.PVERSION }} -m \"${{ env.MAINTAINER }}\" --description \"${{ env.DESC }}\" --url \"${{ env.HOMEPAGE }}\" --license GPLv3 ${{ env.PDEPENDS }} -C rpm_pkg -s dir"
+      - name: Check output files
+        run: |
+          ls -l *.rpm
