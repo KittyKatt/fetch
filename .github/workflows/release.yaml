@@ -44,8 +44,7 @@ jobs:
           dpkg -I *.deb
           echo "Package contents:"
           dpkg -c *.deb
-      - name: Upload *.deb package as artifact
-        id: deb_upload
+      - name: Upload DPKG artifact
         uses: actions/upload-artifact@v2
         with:
           name: artifact-deb
@@ -88,9 +87,9 @@ jobs:
           rpm -qRp *.rpm
           echo "Package Contents:"
           rpm -qlp *.rpm
-      - name: Upload *.rpm package as artifact
-        id: rpm_upload
+      - name: Upload RPM artifact
         uses: actions/upload-artifact@v2
+        with:
           name: artifact-rpm
           path: |
             ./*.rpm
