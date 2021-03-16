@@ -752,6 +752,7 @@ detect_distro () {
 		# shellcheck source=/dev/null
 		. "ascii/${ascii_distro,,}.sh"
 	else
+		# shellcheck disable=SC1094
 		. ascii/unknown.sh
 	fi
 
@@ -1387,23 +1388,24 @@ format_ascii () {
 	fi
 
 	# Expand color variables
-	_logo="${_logo//\$\{c1\}/${c1}}"
-    _logo="${_logo//\$\{c2\}/${c2}}"
-    _logo="${_logo//\$\{c3\}/${c3}}"
-    _logo="${_logo//\$\{c4\}/${c4}}"
-    _logo="${_logo//\$\{c5\}/${c5}}"
-    _logo="${_logo//\$\{c6\}/${c6}}"
+	_logo="${_logo//\$\{c1\}/$c1}"
+    _logo="${_logo//\$\{c2\}/$c2}"
+    _logo="${_logo//\$\{c3\}/$c3}"
+    _logo="${_logo//\$\{c4\}/$c4}"
+    _logo="${_logo//\$\{c5\}/$c5}"
+    _logo="${_logo//\$\{c6\}/$c6}"
 
 	((text_padding=logo_padding+gap))
 	printf "%b \e[%sC" "${_logo}" "${text_padding}"
 }
 
 print_ascii () {
-    while IFS=$'\n' read -r line; do
-        line=${line//\\\\/\\}
-        line=${line//█/ }
-        ((++lines,${#line}>ascii_len)) && ascii_len="${#line}"
-    done <<< "${asciiLogo//\$\{??\}}"
+	# shellcheck disable=SC2154
+	while IFS=$'\n' read -r line; do
+		line=${line//\\\\/\\}
+		line=${line//█/ }
+		((++lines,${#line}>ascii_len)) && ascii_len="${#line}"
+	done <<< "${asciiLogo//\$\{??\}}"
 
 	n=0
 	# shellcheck disable=SC2154
@@ -1416,6 +1418,7 @@ print_ascii () {
 		line=$(format_ascii "${line}")
 
 		# Display logo and info
+		# shellcheck disable=SC2154
 		if [ ${n} -lt "${startline}" ]; then
 			printf '%b\n' "${line}${reset}"
 		elif [ ${n} -ge "${startline}" ]; then
@@ -1471,13 +1474,15 @@ case ${1} in
 	*) : ;;
 esac
 
-while getopts ":hvVD:A:" flags; do
+while getopts ":hvVND:A:" flags; do
+	# shellcheck disable=SC2154
 	case ${flags} in
 		h) usage; exit 0 ;;
 		V) versioninfo; exit 0 ;;
 		v) declare config_global[verbose]="on" ;;
 		D) my_distro="${OPTARG}" ;;
 		A) ascii_distro="${OPTARG}" ;;
+		N) declare config_text[color]="off" ;;
 		:) errorOut "Error: You're missing an argument somewhere. Exiting."; exit 1 ;;
 		?) errorOut "Error: Invalid flag somewhere. Exiting."; exit 1 ;;
 		*) errorOut "Error"; exit 1 ;;

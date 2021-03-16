@@ -1,6 +1,10 @@
+# shellcheck shell=bash
+# shellcheck disable=SC2034,SC2154
 # logo width: 60
-c1=$(getColor 'orange') # Orange
-c2=$(getColor 'white') # White
+if [ ! "${config_text[color]}" == "off" ]; then
+	c1=$(getColor 'orange') # Orange
+	c2=$(getColor 'white') # White
+fi
 startline="0"
 read -rd '' asciiLogo <<'EOF'
 ${c1}                                  __,gnnnOCCCCCOObaau,_

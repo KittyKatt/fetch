@@ -1,5 +1,9 @@
+# shellcheck shell=bash
+# shellcheck disable=SC2034,SC2154
 # logo width: 41
-c1=$(getColor 'rosa_blue') # special blue color from ROSA
+if [ ! "${config_text[color]}" == "off" ]; then
+	c1=$(getColor 'rosa_blue') # special blue color from ROSA
+fi
 startline="3"
 read -rd '' asciiLogo <<'EOF'
 ${c1}            ROSAROSAROSAROSAR

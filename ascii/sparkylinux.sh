@@ -1,5 +1,9 @@
+# shellcheck shell=bash
+# shellcheck disable=SC2034,SC2154
 # logo width: 48
-c1=$(getColor 'light gray') # Gray
+if [ ! "${config_text[color]}" == "off" ]; then
+	c1=$(getColor 'light gray') # Gray
+fi
 startline="0"
 read -rd '' asciiLogo <<'EOF'
 ${c1}             .            `-:-`

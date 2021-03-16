@@ -1,8 +1,12 @@
+# shellcheck shell=bash
+# shellcheck disable=SC2034,SC2154
 # logo width: 44
 # number of olcors: 3
-c1=$(getColor 'yellow')
-c3=$(getColor 'purple')
-c5=$(getColor 'cyan')
+if [ ! "${config_text[color]}" == "off" ]; then
+	c1=$(getColor 'yellow')
+	c3=$(getColor 'purple')
+	c5=$(getColor 'cyan')
+fi
 startline="1"
 read -rd '' asciiLogo <<'EOF'
 ${c1}
