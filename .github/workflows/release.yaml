@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
+      - uses: FranzDiebold/github-env-vars-action@v2
       - name: Create package structure
         run: |
           mkdir -p deb_pkg/usr/share/fetch
@@ -53,6 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
+      - uses: FranzDiebold/github-env-vars-action@v2
       - name: Install RPM tools
         run: |
           sudo apt update
