@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# TODO: test ASCII output
 f=0
 reset=$'\e[0m'
 successOut () {
@@ -109,6 +110,14 @@ if [[ ! ${_output[7]} =~ ^(.*)'Finding CPU...found as '\''Intel '([[:alnum:]|[[:
     ((f++))
 else
     successOut "CPU succeeded."
+fi
+
+if [[ ! ${_output[8]} =~ ^(.*)'Finding memory usage...found as '\'([[:digit:]])+(MiB|KiB)' / '([[:digit:]])+(MiB|KiB)' ('([[:digit:]])+'%)'\''.' ]]; then
+    errorOut "!! Failed on memory."
+    errorOut "\tfailed line: ${_output[8]}"
+    ((f++))
+else
+    successOut "Memory succeeded."
 fi
 
 if ((f == 0)); then

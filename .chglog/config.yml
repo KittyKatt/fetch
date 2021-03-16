@@ -8,6 +8,7 @@ options:
     filters:
       Type:
         - feat
+        - flag
         - fix
         - perf
         - refactor
@@ -18,6 +19,7 @@ options:
     sort_by: Title
     title_maps:
       feat: Features
+      flag: Flags
       fix: Bug Fixes
       perf: Performance Improvements
       refactor: Code Refactoring

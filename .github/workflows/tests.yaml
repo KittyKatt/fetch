@@ -2,7 +2,12 @@ name: "Output Tests"
 on:
   pull_request:
   push:
-    branches: [ master ]
+    paths:
+      - fetch.sh
+      - sample.config.conf
+      - lib/*/*.sh
+      - ascii/*.sh
+  workflow_dispatch:
 
 jobs:
   test-ubuntu:
