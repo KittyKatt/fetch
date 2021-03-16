@@ -109,5 +109,16 @@ jobs:
           ./git-chglog --output ./changelog $(git describe --tags $(git rev-list --tags --max-count=1))
       - uses: actions/download-artifact@v2
         name: Download package artifacts
-      - name: Check output
-        run: ls -R
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: ./changelog
+          tag_name: ${{ github.ref }}
+          name: ${{ github.ref }}
+          draft: false
+          prerelease: false
+          files: |
+            artifact-rpm/*.rpm
+            artifact-deb/*.deb
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
