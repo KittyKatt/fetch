@@ -1474,13 +1474,15 @@ case ${1} in
 	*) : ;;
 esac
 
-while getopts ":hvVD:A:" flags; do
+while getopts ":hvVND:A:" flags; do
+	# shellcheck disable=SC2154
 	case ${flags} in
 		h) usage; exit 0 ;;
 		V) versioninfo; exit 0 ;;
 		v) declare config_global[verbose]="on" ;;
 		D) my_distro="${OPTARG}" ;;
 		A) ascii_distro="${OPTARG}" ;;
+		N) declare config_text[color]="off" ;;
 		:) errorOut "Error: You're missing an argument somewhere. Exiting."; exit 1 ;;
 		?) errorOut "Error: Invalid flag somewhere. Exiting."; exit 1 ;;
 		*) errorOut "Error"; exit 1 ;;
