@@ -101,6 +101,7 @@ jobs:
       - build-rpm-package
     steps:
       - uses: actions/checkout@v1
+      - uses: FranzDiebold/github-env-vars-action@v2
       - name: Generate changelog
         run: |
           wget https://github.com/git-chglog/git-chglog/releases/download/0.9.1/git-chglog_linux_amd64
@@ -117,7 +118,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           body_path: ./changelog
-          tag_name: ${{ github.ref }}
+          tag_name: ${{ env.CI_REF_NAME }}
           name: Version ${{ env.RELEASE }}
           draft: false
           prerelease: false
