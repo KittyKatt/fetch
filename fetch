@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # variables: script global
 FETCH_VERSION="0.7.2"
-#FETCH_DATA_DIR="/usr/share/fetch"
+FETCH_DATA_DIR="/usr/share/fetch"
 FETCH_DATA_USER_DIR="${XDG_CONFIG_HOME:-${HOME}}/.config/fetch"
 FETCH_CONFIG_FILENAME="config"
 LC_ALL=C
@@ -612,6 +612,8 @@ detect_distro () {
 		fi
 	fi
 
+	# shellcheck disable=SC1090
+	{
 	case ${my_distro,,} in
 		aldos) my_distro="ALDOS";;
 		alpine) my_distro="Alpine Linux" ;;
@@ -635,7 +637,7 @@ detect_distro () {
 		crux) my_distro="CRUX" ;;
 		debian) 
 			my_distro="Debian"
-			. lib/debian/lib.sh
+			. ${FETCH_DATA_DIR}/lib/debian/lib.sh
 			;;
 		devuan) my_distro="Devuan" ;;
 		deepin) my_distro="Deepin" ;;
@@ -649,14 +651,14 @@ detect_distro () {
 		exherbo|exherbo*linux) my_distro="Exherbo" ;;
 		fedora)
 			my_distro="Fedora"
-			. lib/fedora/lib.sh
+			. ${FETCH_DATA_DIR}/lib/fedora/lib.sh
 			;;
 		freebsd) my_distro="FreeBSD" ;;
 		frugalware) my_distro="Frugalware" ;;
 		funtoo) my_distro="Funtoo" ;;
 		gentoo)
 			my_distro="Gentoo"
-			. lib/gentoo/lib.sh
+			. ${FETCH_DATA_DIR}/lib/gentoo/lib.sh
 			;;
 		gnewsense) my_distro="gNewSense" ;;
 		guix*system) my_distro="Guix System" ;;
@@ -669,7 +671,7 @@ detect_distro () {
 		kaos) my_distro="KaOS";;
 		kde*neon|neon)
 			my_distro="KDE neon"
-			. lib/kde-neon/lib.sh
+			. ${FETCH_DATA_DIR}/lib/kde-neon/lib.sh
 			;;
 		kogaion) my_distro="Kogaion" ;;
 		lmde) my_distro="LMDE" ;;
@@ -682,7 +684,7 @@ detect_distro () {
 		mer) my_distro="Mer" ;;
 		mint|linux*mint)
 			my_distro="Mint"
-			. lib/mint/lib.sh
+			. ${FETCH_DATA_DIR}/lib/mint/lib.sh
 			;;
 		netbsd) my_distro="NetBSD" ;;
 		netrunner) my_distro="Netrunner" ;;
@@ -710,7 +712,7 @@ detect_distro () {
 		sabayon) my_distro="Sabayon" ;;
 		sailfish|sailfish*os)
 			my_distro="SailfishOS"
-			. lib/sailfish/lib.sh
+			. ${FETCH_DATA_DIR}/lib/sailfish/lib.sh
 			;;
 		scientific*) my_distro="Scientific Linux" ;;
 		siduction) my_distro="Siduction" ;;
@@ -724,14 +726,14 @@ detect_distro () {
 		sulin) my_distro="Sulin" ;;
 		*suse*) 
 			my_distro="openSUSE"
-			. lib/suse/lib.sh
+			. ${FETCH_DATA_DIR}/lib/suse/lib.sh
 			[ -z "${ascii_distro}" ] && ascii_distro="SUSE"
 			;;
 		tinycore|tinycore*linux) my_distro="TinyCore" ;;
 		trisquel) my_distro="Trisquel" ;;
 		ubuntu)
 			my_distro="Ubuntu"
-			. lib/ubuntu/lib.sh
+			. ${FETCH_DATA_DIR}/lib/ubuntu/lib.sh
 			;;
 		void*linux) my_distro="Void Linux" ;;
 		*"windows"*)
@@ -743,17 +745,18 @@ detect_distro () {
 			config_ascii['colors']="random"
 			;;
 	esac
+	}
 
 	[ -z "${ascii_distro}" ] && ascii_distro="${my_distro}"
 
 	[ -n "${ascii_distro}" ] && ascii_distro="${ascii_distro// /-}"
 
-	if [ -f "ascii/${ascii_distro,,}.sh" ]; then
+	if [ -f "${FETCH_DATA_DIR}/ascii/${ascii_distro,,}.sh" ]; then
 		# shellcheck source=/dev/null
-		. "ascii/${ascii_distro,,}.sh"
+		. "${FETCH_DATA_DIR}/ascii/${ascii_distro,,}.sh"
 	else
-		# shellcheck disable=SC1094
-		. ascii/unknown.sh
+		# shellcheck disable=SC1094,SC1090
+		. ${FETCH_DATA_DIR}/ascii/unknown.sh
 	fi
 
 	# shellcheck disable=SC2154
@@ -1474,7 +1477,7 @@ case ${1} in
 	*) : ;;
 esac
 
-while getopts ":hvVND:A:" flags; do
+while getopts ":hvVND:A:L:" flags; do
 	# shellcheck disable=SC2154
 	case ${flags} in
 		h) usage; exit 0 ;;
@@ -1483,6 +1486,7 @@ while getopts ":hvVND:A:" flags; do
 		D) my_distro="${OPTARG}" ;;
 		A) ascii_distro="${OPTARG}" ;;
 		N) declare config_text[color]="off" ;;
+		L) FETCH_DATA_DIR="${OPTARG}" ;;
 		:) errorOut "Error: You're missing an argument somewhere. Exiting."; exit 1 ;;
 		?) errorOut "Error: Invalid flag somewhere. Exiting."; exit 1 ;;
 		*) errorOut "Error"; exit 1 ;;
