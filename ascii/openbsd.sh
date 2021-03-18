@@ -1,15 +1,15 @@
 # shellcheck shell=bash
 # shellcheck disable=SC2034,SC2154
 # logo width: 44
+# number of colors: 5
 if [ ! "${config_text[color]}" == "off" ]; then
-	c1=$(getColor 'yellow') # Light Yellow
-	c2=$(getColor 'brown') # Bold Yellow
+	c1=$(getColor 'yellow')     # Yellow
+	c2=$(getColor 'brown')      # Brown
 	c3=$(getColor 'light cyan') # Light Cyan
-	c4=$(getColor 'light red') # Light Red
-	c5=$(getColor 'dark grey')
+	c4=$(getColor 'light red')  # Light Red
+	c5=$(getColor 'dark grey')  # Dark Grey
 fi
 startline="3"
-logowidth="44"
 read -rd '' asciiLogo <<'EOF'
 ${c3}
 ${c3}                                       (_)

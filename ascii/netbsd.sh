@@ -3,7 +3,7 @@
 # logo width: 60
 # number of colors: 2
 if [ ! "${config_text[color]}" == "off" ]; then
-	c1=$(getColor '202') # Orange
+	c1=$(getColor '202')    # Orange
 	c2=$(getColor 'white')  # White
 fi
 startline="0"
