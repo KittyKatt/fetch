@@ -1,9 +1,10 @@
 # shellcheck shell=bash
 # shellcheck disable=SC2034,SC2154
 # logo width: 36
+# number of colors: 3
 if [ ! "${config_text[color]}" == "off" ]; then
 	c1=$(getColor 'white') # White
-	c2=$(getColor 'blue') # Blue
+	c2=$(getColor 'blue')  # Blue
 	c3=$(getColor 'black') # Black
 fi
 startline="0"

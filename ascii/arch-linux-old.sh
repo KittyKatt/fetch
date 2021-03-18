@@ -3,7 +3,7 @@
 # logo width: 37
 # number of colors: 2
 if [ ! "${config_text[color]}" == "off" ]; then
-	c1=$(getColor 'white') # White
+	c1=$(getColor 'white')      # White
 	c2=$(getColor 'light blue') # Light Blue
 fi
 startline="0"

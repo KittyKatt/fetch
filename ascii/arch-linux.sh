@@ -4,7 +4,7 @@
 # number of colors: 2
 if [ ! "${config_text[color]}" == "off" ]; then
 	c1=$(getColor 'light cyan') # Light
-	c2=$(getColor 'cyan') # Dark
+	c2=$(getColor 'cyan')       # Dark
 fi
 startline="1"
 read -rd '' asciiLogo <<'EOF'
