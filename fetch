@@ -127,7 +127,8 @@ getColor () {
 	fi
 }
 
-# functions: system detection
+#########################################
+# functions: detection
 detect_kernel () {
     IFS=" " read -ra kernel <<< "$(uname -srm)"
     kernel_name="${kernel[0]}"
@@ -1349,6 +1350,7 @@ detect_memory () {
 	verboseOut "Finding memory usage...found as '${my_memory}'."
 }
 
+###############################
 # functions: output
 info () {
 	local _info="${1}"
@@ -1450,10 +1452,12 @@ print_ascii () {
 		unset _padding
 	done <<< "${asciiLogo}"
 
+	# Cleanup
 	unset n
-	unset i
 }
 
+#############################
+# functions: information
 usage() {
 	printf "Help!\n"
 }
