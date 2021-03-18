@@ -1,5 +1,7 @@
 # shellcheck shell=bash
 # shellcheck disable=SC2034,SC2154
+# logo width: 25
+# number of colors: 1
 if [ ! "${config_text[color]}" == "off" ]; then
 	c1=$(getColor 'light grey') # light grey
 fi

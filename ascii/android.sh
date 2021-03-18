@@ -5,7 +5,7 @@
 if [ ! "${config_text[color]}" == "off" ]; then
 	c1=$(getColor 'light green') # Bold Green
 fi
-startline="2"
+startline="1"
 read -rd '' asciiLogo <<'EOF'
 ${c1}       ╲ ▁▂▂▂▁ ╱
 ${c1}       ▄███████▄
