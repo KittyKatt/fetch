@@ -638,7 +638,7 @@ detect_distro () {
 		crux) my_distro="CRUX" ;;
 		debian) 
 			my_distro="Debian"
-			. ${FETCH_DATA_DIR}/lib/debian/lib.sh
+			. ${FETCH_DATA_DIR}/lib/distro/debian/lib.sh
 			;;
 		devuan) my_distro="Devuan" ;;
 		deepin) my_distro="Deepin" ;;
@@ -652,14 +652,14 @@ detect_distro () {
 		exherbo|exherbo*linux) my_distro="Exherbo" ;;
 		fedora)
 			my_distro="Fedora"
-			. ${FETCH_DATA_DIR}/lib/fedora/lib.sh
+			. ${FETCH_DATA_DIR}/lib/distro/fedora/lib.sh
 			;;
 		freebsd) my_distro="FreeBSD" ;;
 		frugalware) my_distro="Frugalware" ;;
 		funtoo) my_distro="Funtoo" ;;
 		gentoo)
 			my_distro="Gentoo"
-			. ${FETCH_DATA_DIR}/lib/gentoo/lib.sh
+			. ${FETCH_DATA_DIR}/lib/distro/gentoo/lib.sh
 			;;
 		gnewsense) my_distro="gNewSense" ;;
 		guix*system) my_distro="Guix System" ;;
@@ -672,7 +672,7 @@ detect_distro () {
 		kaos) my_distro="KaOS";;
 		kde*neon|neon)
 			my_distro="KDE neon"
-			. ${FETCH_DATA_DIR}/lib/kde-neon/lib.sh
+			. ${FETCH_DATA_DIR}/lib/distro/kde-neon/lib.sh
 			;;
 		kogaion) my_distro="Kogaion" ;;
 		lmde) my_distro="LMDE" ;;
@@ -685,7 +685,7 @@ detect_distro () {
 		mer) my_distro="Mer" ;;
 		mint|linux*mint)
 			my_distro="Mint"
-			. ${FETCH_DATA_DIR}/lib/mint/lib.sh
+			. ${FETCH_DATA_DIR}/lib/distro/mint/lib.sh
 			;;
 		netbsd) my_distro="NetBSD" ;;
 		netrunner) my_distro="Netrunner" ;;
@@ -713,7 +713,7 @@ detect_distro () {
 		sabayon) my_distro="Sabayon" ;;
 		sailfish|sailfish*os)
 			my_distro="SailfishOS"
-			. ${FETCH_DATA_DIR}/lib/sailfish/lib.sh
+			. ${FETCH_DATA_DIR}/lib/distro/sailfish/lib.sh
 			;;
 		scientific*) my_distro="Scientific Linux" ;;
 		siduction) my_distro="Siduction" ;;
@@ -727,14 +727,14 @@ detect_distro () {
 		sulin) my_distro="Sulin" ;;
 		*suse*) 
 			my_distro="openSUSE"
-			. ${FETCH_DATA_DIR}/lib/suse/lib.sh
+			. ${FETCH_DATA_DIR}/lib/distro/suse/lib.sh
 			[ -z "${ascii_distro}" ] && ascii_distro="SUSE"
 			;;
 		tinycore|tinycore*linux) my_distro="TinyCore" ;;
 		trisquel) my_distro="Trisquel" ;;
 		ubuntu)
 			my_distro="Ubuntu"
-			. ${FETCH_DATA_DIR}/lib/ubuntu/lib.sh
+			. ${FETCH_DATA_DIR}/lib/distro/ubuntu/lib.sh
 			;;
 		void*linux) my_distro="Void Linux" ;;
 		*"windows"*)
