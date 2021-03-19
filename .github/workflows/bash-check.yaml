@@ -1,0 +1,19 @@
+name: BASH Static Application Checking
+
+on:
+  push:
+
+jobs:
+  sh-checker:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v1
+      - name: Run the sh-checker
+        uses: luizm/action-sh-checker@v0.1.12
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SHELLCHECK_OPTS: -x
+          SHFMT_OPTS: -i 4 -ln bash -ci -sr -kp -s -d
+        with:
+          sh_checker_comment: true
+          sh_checker_exclude: ".github"
