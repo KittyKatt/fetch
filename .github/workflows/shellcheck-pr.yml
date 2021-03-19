@@ -3,6 +3,11 @@ on:
   pull_request:
     branches:
       - master
+    paths:
+      - fetch
+      - sample.config.conf
+      - lib/*/*.sh
+      - ascii/*.sh
 jobs:
   shellcheck:
     name: ShellCheck
