@@ -651,7 +651,7 @@ detect_distro() {
             arch | arch*linux) my_distro="Arch Linux" ;;
             arch32)
                 my_distro="Arch Linux 32"
-                [[ -z "${ascii_distro}" ]] && ascii_distro="Arch Linux"
+                [ -z "${ascii_distro}" ] && ascii_distro="Arch Linux"
                 ;;
             arcolinux | arcolinux*) my_distro="ArcoLinux" ;;
             artix | artix*linux) my_distro="Artix Linux" ;;
@@ -660,12 +660,12 @@ detect_distro() {
             centos) my_distro="CentOS" ;;
             centos*stream)
                 my_distro="CentOS Stream"
-                [[ -z "${ascii_distro}" ]] && ascii_distro="CentOS"
+                [ -z "${ascii_distro}" ] && ascii_distro="CentOS"
                 ;;
             chakra) my_distro="Chakra" ;;
             chrome* | chromium*) my_distro="Chrome OS" ;;
             crux) my_distro="CRUX" ;;
-            debian) 
+            debian)
                 my_distro="Debian"
                 . ${FETCH_DATA_DIR}/lib/distro/debian/lib.sh
                 ;;
@@ -695,7 +695,7 @@ detect_distro() {
             haiku) my_distro="Haiku" ;;
             hyperbolagnu | hyperbolagnu/linux-libre | 'hyperbola gnu/linux-libre' | hyperbola)
                 my_distro="Hyperbola GNU/Linux-libre"
-                [[ -z "${ascii_distro}" ]] && ascii_distro="Hyperbola"
+                [ -z "${ascii_distro}" ] && ascii_distro="Hyperbola"
                 ;;
             kali*linux) my_distro="Kali Linux" ;;
             kaos) my_distro="KaOS" ;;
@@ -706,7 +706,7 @@ detect_distro() {
             kogaion) my_distro="Kogaion" ;;
             lmde) my_distro="LMDE" ;;
             lunar | lunar*linux) my_distro="Lunar Linux" ;;
-            *"macos"*|*"mac os x"*)
+            *"macos"* | *"mac os x"*)
                 [ -z "${ascii_distro}" ] && ascii_distro="macOS"
                 ;;
             manjaro) my_distro="Manjaro" ;;
@@ -725,7 +725,7 @@ detect_distro() {
             os*elbrus) my_distro="OS Elbrus" ;;
             parabolagnu | parabolagnu/linux-libre | 'parabola gnu/linux-libre' | parabola)
                 my_distro="Parabola GNU/Linux-libre"
-                [[ -z "${ascii_distro}" ]] && ascii_distro="Parabola"
+                [ -z "${ascii_distro}" ] && ascii_distro="Parabola"
                 ;;
             parrot | parrot*security) my_distro="Parrot Security" ;;
             pclinuxos | pclos) my_distro="PCLinuxOS" ;;
@@ -736,7 +736,7 @@ detect_distro() {
             raspbian) my_distro="Raspbian" ;;
             red*hat* | rhel)
                 my_distro="Red Hat Enterprise Linux"
-                [[ -z "${ascii_distro}" ]] && ascii_distro="RHEL"
+                [ -z "${ascii_distro}" ] && ascii_distro="RHEL"
                 ;;
             rosa) my_distro="ROSA" ;;
             sabayon) my_distro="Sabayon" ;;
@@ -748,13 +748,13 @@ detect_distro() {
             siduction) my_distro="Siduction" ;;
             smgl | source*mage | source*mage*gnu*linux)
                 my_distro="Source Mage GNU/Linux"
-                [[ -z "${ascii_distro}" ]] && ascii_distro="SourceMage"
+                [ -z "${ascii_distro}" ] && ascii_distro="SourceMage"
                 ;;
             solus) my_distro="Solus" ;;
             sparky | sparky*linux) my_distro="SparkyLinux" ;;
             steam | steam*os) my_distro="SteamOS" ;;
             sulin) my_distro="Sulin" ;;
-            *suse*) 
+            *suse*)
                 my_distro="openSUSE"
                 . ${FETCH_DATA_DIR}/lib/distro/suse/lib.sh
                 [ -z "${ascii_distro}" ] && ascii_distro="SUSE"
@@ -767,7 +767,7 @@ detect_distro() {
                 ;;
             void*linux) my_distro="Void Linux" ;;
             *"windows"*)
-                [[ -z "${ascii_distro}" ]] && ascii_distro="Windows"
+                [ -z "${ascii_distro}" ] && ascii_distro="Windows"
                 ;;
             zorin*) my_distro="Zorin OS" ;;
             *)
@@ -939,11 +939,11 @@ detect_packages() {
     # _tot: Count lines in command output.
     _has() { type -p "${1}" > /dev/null && manager=${1}; }
     _dir() {
-        ((my_packages+=$#))
-        _pac "$(($#-pkgs_h))"
+        ((my_packages += $#))
+        _pac "$(($# - pkgs_h))"
     }
     _pac() {
-        ((${1} > 0)) && { 
+        ((${1} > 0)) && {
             managers+=("${1} (${manager})")
             manager_string+="${manager}, "
         }
