@@ -15,5 +15,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SHFMT_OPTS: -i 4 -ln bash -ci -sr -kp -s -d
         with:
+          sh_checker_shellcheck_disable: true
           sh_checker_comment: true
           sh_checker_exclude: ".github"

@@ -1130,24 +1130,27 @@ detect_shell() {
 
     # get shell versions
     my_shell="${shell_name:=${shell_type}} "
+    
     case ${shell_name:=${SHELL##*/}} in
         bash)
-            [[ -n ${BASH_VERSION} ]] || BASH_VERSION=$("${SHELL}" -c "printf %s \"\$BASH_VERSION\"")
-            my_shell+="${BASH_VERSION/-*}"
+            # shellcheck disable=SC2016
+            [ -n "${BASH_VERSION}" ] || BASH_VERSION=$("${SHELL}" -c 'printf %s "$BASH_VERSION"')
+            my_shell+="${BASH_VERSION/-*/}"
             ;;
-        sh|ash|dash|es) ;;
+        sh | ash | dash | es) ;;
         *ksh)
-            my_shell+=$("${SHELL}" -c "printf %s \"\$KSH_VERSION\"")
-            my_shell=${my_shell/ * KSH}
-            my_shell=${my_shell/version}
+            # shellcheck disable=SC2154,SC2016
+            my_shell+=$("${SHELL}" -c 'printf %s "$KSH_VERSION"')
+            my_shell=${my_shell/ * KSH/}
+            my_shell=${my_shell/version/}
             ;;
         osh)
-            # shellcheck disable=SC2154
+            # shellcheck disable=SC2016
             {
                 if [[ -n ${OIL_VERSION} ]]; then
                     my_shell+=${OIL_VERSION}
                 else
-                    my_shell+=$("${SHELL}" -c "printf %s \"\$OIL_VERSION\"")
+                    my_shell+=$("${SHELL}" -c 'printf %s "$OIL_VERSION"')
                 fi
             }
             ;;
@@ -1156,17 +1159,18 @@ detect_shell() {
             ;;
         yash)
             my_shell+=$("${SHELL}" --version 2>&1)
-            my_shell=${my_shell/ ${shell_name}}
-            my_shell=${my_shell/ Yet another shell}
-            my_shell=${my_shell/Copyright*}
+            my_shell=${my_shell/ ${shell_name}/}
+            my_shell=${my_shell/ Yet another shell/}
+            my_shell=${my_shell/Copyright*/}
             ;;
         fish)
-            [[ -n "${FISH_VERSION}" ]] || FISH_VERSION=$("${SHELL}" -c "printf %s \"\$FISH_VERSION\"")
+            # shellcheck disable=SC2016
+            [ -n "${FISH_VERSION}" ] || FISH_VERSION=$("${SHELL}" -c 'printf %s "$FISH_VERSION"')
             my_shell+="${FISH_VERSION}"
             ;;
         *)
             my_shell+=$("${SHELL}" --version 2>&1)
-            my_shell=${my_shell/ ${shell_name}}
+            my_shell=${my_shell/ ${shell_name}/}
             ;;
     esac
 
@@ -1221,8 +1225,8 @@ detect_cpu() {
 
             # Get CPU speed.
             if [ -d "${_speed_dir}" ]; then
-                _speed="$(< "${_speed_dir}/bios_limit")" ||\
-                    _speed="$(< "${_speed_dir}/scaling_max_freq")" ||\
+                _speed="$(< "${_speed_dir}/bios_limit")" ||
+                    _speed="$(< "${_speed_dir}/scaling_max_freq")" ||
                     _speed="$(< "${_speed_dir}/cpuinfo_max_freq")"
                 _speed="$((_speed / 1000))"
             else
@@ -1238,7 +1242,6 @@ detect_cpu() {
             ;;
         *) return ;;
     esac
-
 
     # Remove un-needed patterns from cpu output.
     my_cpu="${my_cpu//(TM)/}"
@@ -1271,15 +1274,15 @@ detect_cpu() {
     # Remove CPU brand from the output.
     # shellcheck disable=SC2154
     if [ "${config_cpu[brand]}" == "off" ]; then
-        my_cpu="${my_cpu/AMD }"
-        my_cpu="${my_cpu/Intel }"
-        my_cpu="${my_cpu/Core? Duo }"
-        my_cpu="${my_cpu/Qualcomm }"
+        my_cpu="${my_cpu/AMD /}"
+        my_cpu="${my_cpu/Intel /}"
+        my_cpu="${my_cpu/Core? Duo /}"
+        my_cpu="${my_cpu/Qualcomm /}"
     fi
 
     # Add CPU cores to the output.
     # shellcheck disable=SC2154
-    [[ ${config_cpu[cores]} != "off" && -n "${_cores}" ]] &&
+    [[ ${config_cpu[cores]} != "off" && -n ${_cores} ]] &&
         case ${my_os} in
             "Mac OS X" | "macOS")   my_cpu="${my_cpu/@/(${_cores}) @}" ;;
             *)                      my_cpu="${my_cpu} (${_cores})" ;;
@@ -1287,7 +1290,7 @@ detect_cpu() {
 
     # Add CPU speed to the output.
     # shellcheck disable=SC2154
-    if [[ ${config_cpu[speed]} != "off" && -n "${_speed}" ]]; then
+    if [[ ${config_cpu[speed]} != "off" && -n ${_speed} ]]; then
         if ((_speed < 1000)); then
             my_cpu="${my_cpu} @ ${_speed}MHz"
         else
@@ -1299,7 +1302,7 @@ detect_cpu() {
     # Add CPU temp to the output.
     # shellcheck disable=SC2154
     {
-        if [[ ${config_cpu[temp]} != "off" && -n "${_deg}" ]]; then
+        if [[ ${config_cpu[temp]} != "off" && -n ${_deg} ]]; then
             _deg="${_deg//./}"
             # Convert to Fahrenheit if enabled
             [ "${config_cpu[temp]}" == "F" ] && _deg="$((_deg * 90 / 50 + 320))"
@@ -1319,7 +1322,7 @@ detect_memory() {
             # Source: https://github.com/KittyKatt/screenFetch/issues/386#issuecomment-249312716
             while IFS=":" read -r a b; do
                 case ${a} in
-                    "MemTotal") 
+                    "MemTotal")
                         ((mem_used += ${b/kB/}))
                         mem_total="${b/kB/}"
                         ;;
@@ -1547,15 +1550,15 @@ while getopts ":hvVNRD:A:L:" flags; do
         N) declare config_text[color]="off" ;;
         L) FETCH_DATA_DIR="${OPTARG}" ;;
         R) config_ascii['colors']="random" ;;
-        :) 
+        :)
             errorOut "Error: You're missing an argument somewhere. Exiting."
             exit 1
             ;;
-        ?) 
+        ?)
             errorOut "Error: Invalid flag somewhere. Exiting."
             exit 1
             ;;
-        *) 
+        *)
             errorOut "Error"
             exit 1
             ;;
