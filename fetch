@@ -1465,7 +1465,7 @@ print_ascii() {
         # call format_ascii to prepare for info display
         line=$(format_ascii "${line}")
 
-        # Display logo and info
+        # Display ASCII art and detected info
         # shellcheck disable=SC2154
         if [ ${n} -lt "${startline}" ]; then
             printf '%b\n' "${line}${reset}"
