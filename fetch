@@ -96,25 +96,25 @@ getColor() {
         fi
 
         case "${tmp_color}" in
-            'black')                        color_ret='\033[0m\033[30m';;
-            'red')                          color_ret='\033[0m\033[31m';;
-            'green')                        color_ret='\033[0m\033[32m';;
-            'brown')                        color_ret='\033[0m\033[33m';;
-            'blue')                         color_ret='\033[0m\033[34m';;
-            'purple')                       color_ret='\033[0m\033[35m';;
-            'cyan')                         color_ret='\033[0m\033[36m';;
-            'yellow')                       color_ret='\033[0m\033[1;33m';;
-            'white')                        color_ret='\033[0m\033[1;37m';;
-            'dark grey')                    color_ret='\033[0m\033[1;30m';;
-            'light red')                    color_ret='\033[0m\033[1;31m';;
-            'light green')                  color_ret='\033[0m\033[1;32m';;
-            'light blue')                   color_ret='\033[0m\033[1;34m';;
-            'light purple')                 color_ret='\033[0m\033[1;35m';;
-            'light cyan')                   color_ret='\033[0m\033[1;36m';;
-            'light grey'|'bold white')      color_ret='\033[0m\033[37m';;
-            (?([1])?([0-9])[0-9]?(,bold))   color_ret=$(colorize "${tmp_color}");;
-            (?([2])?([0-4])[0-9]?(,bold))   color_ret=$(colorize "${tmp_color}");;
-            (?([2])?([5])[0-6]?(,bold))     color_ret=$(colorize "${tmp_color}");;
+            'black')                        color_ret='\033[0m\033[30m' ;;
+            'red')                          color_ret='\033[0m\033[31m' ;;
+            'green')                        color_ret='\033[0m\033[32m' ;;
+            'brown')                        color_ret='\033[0m\033[33m' ;;
+            'blue')                         color_ret='\033[0m\033[34m' ;;
+            'purple')                       color_ret='\033[0m\033[35m' ;;
+            'cyan')                         color_ret='\033[0m\033[36m' ;;
+            'yellow')                       color_ret='\033[0m\033[1;33m' ;;
+            'white')                        color_ret='\033[0m\033[1;37m' ;;
+            'dark grey')                    color_ret='\033[0m\033[1;30m' ;;
+            'light red')                    color_ret='\033[0m\033[1;31m' ;;
+            'light green')                  color_ret='\033[0m\033[1;32m' ;;
+            'light blue')                   color_ret='\033[0m\033[1;34m' ;;
+            'light purple')                 color_ret='\033[0m\033[1;35m' ;;
+            'light cyan')                   color_ret='\033[0m\033[1;36m' ;;
+            'light grey'|'bold white')      color_ret='\033[0m\033[37m' ;;
+            (?([1])?([0-9])[0-9]?(,bold))   color_ret=$(colorize "${tmp_color}") ;;
+            (?([2])?([0-4])[0-9]?(,bold))   color_ret=$(colorize "${tmp_color}") ;;
+            (?([2])?([5])[0-6]?(,bold))     color_ret=$(colorize "${tmp_color}") ;;
             'rand')
                 _color=$((RANDOM % 255))
                 color_ret="$(colorize ${_color})"
