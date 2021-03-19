@@ -111,10 +111,10 @@ getColor() {
             'light blue')                   color_ret='\033[0m\033[1;34m' ;;
             'light purple')                 color_ret='\033[0m\033[1;35m' ;;
             'light cyan')                   color_ret='\033[0m\033[1;36m' ;;
-            'light grey'|'bold white')      color_ret='\033[0m\033[37m' ;;
-            (?([1])?([0-9])[0-9]?(,bold))   color_ret=$(colorize "${tmp_color}") ;;
-            (?([2])?([0-4])[0-9]?(,bold))   color_ret=$(colorize "${tmp_color}") ;;
-            (?([2])?([5])[0-6]?(,bold))     color_ret=$(colorize "${tmp_color}") ;;
+            'light grey' | 'bold white')    color_ret='\033[0m\033[37m' ;;
+            ?([1])?([0-9])[0-9]?(,bold))   color_ret=$(colorize "${tmp_color}") ;;
+            ?([2])?([0-4])[0-9]?(,bold))   color_ret=$(colorize "${tmp_color}") ;;
+            ?([2])?([5])[0-6]?(,bold))     color_ret=$(colorize "${tmp_color}") ;;
             'rand')
                 _color=$((RANDOM % 255))
                 color_ret="$(colorize ${_color})"
