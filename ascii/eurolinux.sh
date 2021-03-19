@@ -4,10 +4,10 @@
 # number of colors: 1
 # TODO: this logo is vertically huge. Condense, perhaps?
 if [ ! "${config_text[color]}" == "off" ]; then
-	c1=$(getColor 'light blue') # Light Blue
+    c1=$(getColor 'light blue') # Light Blue
 fi
 startline="3"
-read -rd '' asciiLogo <<'EOF'
+read -rd '' asciiLogo << 'EOF'
 ${c1}
 ${c1}           DZZZZZZZZZZZZZ 
 ${c1}         ZZZZZZZZZZZZZZZZZZZ
