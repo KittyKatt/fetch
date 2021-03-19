@@ -431,14 +431,14 @@ detect_distro() {
                         done
                         if [ -n "${distrib_id}" ]; then
                             if [ "${BASH_VERSINFO[0]}" -ge 4 ]; then
-                                distrib_id=$(for i in ${distrib_id}; do printf '%s' "${i^} "; done)
+                                distrib_id=$(for d in ${distrib_id}; do printf '%s' "${d^} "; done)
                                 my_distro=${distrib_id% }
                                 unset distrib_id
                             else
                                 distrib_id=$(
-                                    for i in ${distrib_id}; do
-                                        FIRST_LETTER=$(printf '%s' "${i:0:1}" | tr "[:lower:]" "[:upper:]")
-                                        printf '%s' "${FIRST_LETTER}${i:1} "
+                                    for d in ${distrib_id}; do
+                                        FIRST_LETTER=$(printf '%s' "${d:0:1}" | tr "[:lower:]" "[:upper:]")
+                                        printf '%s' "${FIRST_LETTER}${d:1} "
                                     done
                                 )
                                 my_distro=${distrib_id% }
@@ -1395,118 +1395,143 @@ detect_memory() {
 
 ###############################
 # functions: output
-info() {
-    local _info="${1}"
-    local _info_disp="my_${_info}"
+print_info() {
+    local _info="my_${1}"
+    local _infodisplay="my_${1}"
+    until [ -n "${!_info}" ]; do
+        ((${#_display} < 1)) && break
+        _display=("${_display[@]:1}")
+        _info="my_${1}}"
+    done
 
-    if [ -n "${!_info_disp}" ]; then
-        _info_subtitle="config_${_info}[subtitle]"
+    if [ -n "${!_info}" ]; then
+        _info_subtitle="config_${1}[subtitle]"
         if [ -n "${!_info_subtitle}" ]; then
             # shellcheck disable=SC2154
-            printf '%b\n' "${!_info_subtitle}${config_text[info_separator]} ${!_info_disp}"
+            printf '%b\n' "${!_info_subtitle}${config_text[info_separator]} ${!_info}"
         else
-            printf '%b\n' "${!_info_disp}"
+            printf '%b\n' "${!_info}"
         fi
     else
         :
     fi
+
+    _display=("${_display[@]:1}")
 }
-
-format_ascii() {
-    local _logo="${1}"
-
+print_ascii() {
+    local logo="${1}"
+    # shellcheck disable=SC2154
+    gap=${config_ascii[gap]}
     # Calculate: (max detected logo width - length of current line)
-    _tmp="${_logo//\$\{??\}/}"
+    _tmp="${logo//\$\{??\}/}"
     _tmp=${_tmp//\\\\/\\}
     _tmp=${_tmp//█/ }
+    # shellcheck disable=SC2154
     if ((${#_tmp} < ascii_len)); then
         logo_padding=$((ascii_len - ${#_tmp}))
     else
         logo_padding=0
     fi
 
+    # Random coloring support
     if [ "${config_ascii['colors']}" == "random" ]; then
         declare _randc
         local n=1
-        while [[ ${_logo} =~ \$\{[c][1-6]\} ]]; do
+        while [[ ${logo} =~ \$\{[c][1-6]\} ]]; do
             _randc="$(getColor 'rand')"
-            _logo="${_logo//\$\{c${n}\}/${_randc}}"
+            logo="${logo//\$\{c${n}\}/${_randc}}"
             ((n++))
         done
     fi
 
     # Expand color variables
-    _logo="${_logo//\$\{c1\}/$c1}"
-    _logo="${_logo//\$\{c2\}/$c2}"
-    _logo="${_logo//\$\{c3\}/$c3}"
-    _logo="${_logo//\$\{c4\}/$c4}"
-    _logo="${_logo//\$\{c5\}/$c5}"
-    _logo="${_logo//\$\{c6\}/$c6}"
+    logo="${logo//\$\{c1\}/$c1}"
+    logo="${logo//\$\{c2\}/$c2}"
+    logo="${logo//\$\{c3\}/$c3}"
+    logo="${logo//\$\{c4\}/$c4}"
+    logo="${logo//\$\{c5\}/$c5}"
+    logo="${logo//\$\{c6\}/$c6}"
 
-    ((text_padding = logo_padding + gap))
-    printf "%b \e[%sC" "${_logo}" "${text_padding}"
-}
-
-print_ascii() {
-    # shellcheck disable=SC2154
-    while IFS=$'\n' read -r line; do
-        line=${line//\\\\/\\}
-        line=${line//█/ }
-        ((++lines, ${#line} > ascii_len)) && ascii_len="${#line}"
-    done <<< "${asciiLogo//\$\{??\}/}"
-
-    n=0
-    # shellcheck disable=SC2154
-    read -r -a _display <<< "${config_global[info]}"
-    while IFS=$'\n' read -r line; do
-        # shellcheck disable=SC2154
-        gap=${config_ascii[gap]}
-
-        # call format_ascii to prepare for info display
-        line=$(format_ascii "${line}")
+    # Let's output!
+    if [ "${config_text[display]}" == "on" ]; then
+        # Format line with gap after ASCII for info display
+        ((text_padding = logo_padding + gap))
+        logo="$(printf "%b \e[%sC" "${logo}" "${text_padding}")"
 
         # Display ASCII art and detected info
         # shellcheck disable=SC2154
-        if [ ${n} -lt "${startline}" ]; then
-            printf '%b\n' "${line}${reset}"
-        elif [ ${n} -ge "${startline}" ]; then
+        if [ "${i}" -lt "${startline}" ]; then
+            printf '%b\n' "${logo}${reset}"
+        elif [ "${i}" -ge "${startline}" ]; then
             if ((${#_display} > 0)); then
-                _info_display="my_${_display[0]}"
-                until [ -n "${!_info_display}" ]; do
-                    ((${#_display} <= 0)) && break
-                    _display=("${_display[@]:1}")
-                    _info_display="my_${_display[0]}"
-                done
-                _info_display=$(info "${_display[0]}")
-                if [ -n "${_info_display}" ]; then
-                    printf '%b\n' "${line}${reset}${_info_display}"
-                else
-                    continue
-                fi
+                _infodisplay="$(print_info "${_display[0]}")"
+                printf '%b\n' "${logo}${reset}${_infodisplay}"
                 _display=("${_display[@]:1}")
             else
-                printf '%b\n' "${line}${reset}"
+                printf '%b\n' "${logo}${reset}"
             fi
         fi
 
         # Cleanup
-        ((n++))
+        # shellcheck disable=SC2031
         unset _tmp
-        unset _padding
-    done <<< "${asciiLogo}"
+        unset text_padding
+    else
+        printf '%b\n' "${logo}${reset}"
+    fi
 
     # Cleanup
     unset n
 }
 
 #############################
-# functions: information
+# function: Usage
 usage() {
     printf "Help!\n"
 }
 
+##############################
+# function: Version
 versioninfo() {
     printf 'fetch %s\n' "${FETCH_VERSION}"
+}
+
+main() {
+    detect_kernel
+    detect_os
+
+    # filter {config_global[info]} into a new variable, minus kernel because
+    # that is already detected above. keep old variable intact for output purposes.
+    GLOBAL_INFO="${config_global[info]//kernel /}"
+
+    for g in ${GLOBAL_INFO}; do
+        eval "detect_${g}"
+    done
+
+    # shellcheck disable=SC2154
+    read -r -a _display <<< "${config_global[info]}"
+
+    if [ "${config_ascii[display]}" == "on" ]; then
+        i=0
+        # Get logo max width
+        # shellcheck disable=SC2154
+        while IFS=$'\n' read -r line; do
+            line=${line//\\\\/\\}
+            line=${line//█/ }
+            ((++lines, ${#line} > ascii_len)) && ascii_len="${#line}"
+        done <<< "${asciiLogo//\$\{??\}/}"
+        # Loop over logo and output
+        # shellcheck disable=SC2154
+        while IFS=$'\n' read -r line; do
+            print_ascii "${line}"
+            ((i++))
+        done <<< "${asciiLogo}"
+        unset i
+    else
+        while ((${#_display} > 0)); do
+            print_info "${_display[0]}"
+        done
+    fi
 }
 
 # Catch configuration flag
@@ -1530,7 +1555,7 @@ case ${1} in
     *) : ;;
 esac
 
-while getopts ":hvVNRD:A:L:" flags; do
+while getopts ":hvVNRTLD:A:C:" flags; do
     # shellcheck disable=SC2154
     case ${flags} in
         h)
@@ -1541,11 +1566,13 @@ while getopts ":hvVNRD:A:L:" flags; do
             versioninfo
             exit 0
             ;;
-        v) declare config_global[verbose]="on" ;;
+        v) config_global[verbose]="on" ;;
         D) my_distro="${OPTARG}" ;;
         A) ascii_distro="${OPTARG}" ;;
-        N) declare config_text[color]="off" ;;
-        L) FETCH_DATA_DIR="${OPTARG}" ;;
+        N) config_text[color]="off" ;;
+        C) FETCH_DATA_DIR="${OPTARG}" ;;
+        T) config_ascii[display]="off" ;;
+        L) config_text[display]="off" ;;
         R) config_ascii['colors']="random" ;;
         :)
             errorOut "Error: You're missing an argument somewhere. Exiting."
@@ -1562,17 +1589,6 @@ while getopts ":hvVNRD:A:L:" flags; do
     esac
 done
 
-detect_kernel
-detect_os
-
-# filter {config_global[info]} into a new variable, minus kernel because
-# that is already detected above. keep old variable intact for output purposes.
-GLOBAL_INFO="${config_global[info]//kernel /}"
-
-for i in ${GLOBAL_INFO}; do
-    eval "detect_${i}"
-done
-
-print_ascii
+main
 
 ((extglob_set)) && shopt -u extglob
