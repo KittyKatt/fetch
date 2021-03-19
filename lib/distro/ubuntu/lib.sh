@@ -1,3 +1,5 @@
+# shellcheck shell=bash
+# shellcheck disable=SC2034,SC2154
 ubuntu_codenames=(
 		'(Warty Warthog)'		#  4.10
 		'(Hoary Hedgehog)'		#  5.04

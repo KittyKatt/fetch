@@ -1,3 +1,5 @@
+# shellcheck shell=bash
+# shellcheck disable=SC2034,SC2154
 if [ -f /etc/siduction-version ]; then
     my_distro="Siduction"
     distro_release="(Debian Sid)"

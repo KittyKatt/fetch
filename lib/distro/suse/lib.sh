@@ -1,3 +1,5 @@
+# shellcheck shell=bash
+# shellcheck disable=SC2034,SC2154
 if [ -f /etc/os-release ]; then
     if grep -q -i 'SUSE Linux Enterprise' /etc/os-release ; then
         my_distro="SUSE Linux"

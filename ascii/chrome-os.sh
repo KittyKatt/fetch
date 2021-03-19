@@ -10,7 +10,7 @@ if [ ! "${config_text[color]}" == "off" ]; then
     c5=$(getColor 'white')       # White
 fi
 startline="0"
-read -rd '' asciiLogo << 'EOF'            
+read -rd '' asciiLogo << 'EOF'
 ${c2}             .,:loool:,.
 ${c2}         .,coooooooooooooc,.
 ${c2}      .,lllllllllllllllllllll,.

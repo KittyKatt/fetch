@@ -3,10 +3,10 @@
 # logo width: 41
 # number of colors: 1
 if [ ! "${config_text[color]}" == "off" ]; then
-	c1=$(getColor '25') # Blue (25/#005faf)
+    c1=$(getColor '25') # Blue (25/#005faf)
 fi
 startline="3"
-read -rd '' asciiLogo <<'EOF'
+read -rd '' asciiLogo << 'EOF'
 ${c1}            ROSAROSAROSAROSAR
 ${c1}         ROSA               AROS
 ${c1}       ROS   SAROSAROSAROSAR   AROS
