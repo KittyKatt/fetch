@@ -3,14 +3,16 @@ name: Shellcheck
 
 on:
   push:
+    branches: 
+      - master
     paths:
       - fetch
       - sample.config.conf
       - lib/*/*.sh
       - ascii/*.sh
-    branches: [ master ]
   pull_request:
-    branches: [ master ]
+    branches: 
+      - master
   workflow_dispatch:
 
 jobs:

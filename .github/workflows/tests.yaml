@@ -1,7 +1,10 @@
 name: "Output Tests"
 on:
   pull_request:
+    branches: [ master ]
   push:
+    branches: 
+      - master
     paths:
       - fetch
       - sample.config.conf
