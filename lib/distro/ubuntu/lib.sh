@@ -37,10 +37,8 @@ ubuntu_codenames=(
     '(Hirsute Hippo)'           # 21.04
 )
 
-echo "1: ${distro_codename}"
 for each in "${ubuntu_codenames[@]}"; do
     if [[ ${each,,} =~ ${distro_codename,,} ]]; then
         distro_codename="${each}"
-        echo "2: ${distro_codename}"
     fi
 done
