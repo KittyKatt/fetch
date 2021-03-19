@@ -1419,9 +1419,9 @@ print_info() {
     _display=("${_display[@]:1}")
 }
 print_ascii() {
-    local _tmp=
-    local text_padding=
     local logo="${1}"
+    # shellcheck disable=SC2154
+    gap=${config_ascii[gap]}
     # Calculate: (max detected logo width - length of current line)
     _tmp="${logo//\$\{??\}/}"
     _tmp=${_tmp//\\\\/\\}
@@ -1512,9 +1512,6 @@ main() {
     read -r -a _display <<< "${config_global[info]}"
 
     if [ "${config_ascii[display]}" == "on" ]; then
-        # shellcheck disable=SC2154
-        gap=${config_ascii[gap]}
-
         i=0
         # shellcheck disable=SC2154
         while IFS=$'\n' read -r line; do
