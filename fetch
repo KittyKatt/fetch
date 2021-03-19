@@ -19,18 +19,14 @@ shopt -q extglob; extglob_set=$?
 # functions: script output
 verboseOut () {
 	# shellcheck disable=SC2154
-	if [[ ${config_global[verbose]} =~ "on" ]]; then
-		printf '\033[1;31m:: \033[0m%s\n' "${1}"
-	fi
+	case ${config_global[verbose]} in
+		on) printf '\033[1;31m:: \033[0m%s\n' "${1}" ;;
+		*) ;;
+	esac
 }
 errorOut () {
 	printf '\033[1;37m[[ \033[1;31m! \033[1;37m]] \033[0m%s\n' "${1}"
 	exit 1
-}
-stderrOut () {
-	while IFS='' read -r line; do
-		printf '\033[1;37m[[ \033[1;31m! \033[1;37m]] \033[0m%s\n' "${line}"
-	done
 }
 
 # functions: text
@@ -1200,6 +1196,7 @@ detect_cpu () {
 			;;
 		*) return ;;
 	esac
+
 
     # Remove un-needed patterns from cpu output.
     my_cpu="${my_cpu//(TM)}"
