@@ -3,13 +3,13 @@
 # logo width: 38
 # number of colors: 4
 if [ ! "${config_text[color]}" == "off" ]; then
-	c1=$(getColor 'cyan')      # Cyan
-	c2=$(getColor 'blue')      # Blue
-	c3=$(getColor 'green')     # Green
-	c4=$(getColor 'dark grey') # Dark Grey
+    c1=$(getColor 'cyan')      # Cyan
+    c2=$(getColor 'blue')      # Blue
+    c3=$(getColor 'green')     # Green
+    c4=$(getColor 'dark grey') # Dark Grey
 fi
 startline="1"
-read -rd '' asciiLogo <<'EOF'
+read -rd '' asciiLogo << 'EOF'
 ${c1}                        d${c2}c.
 ${c1}                       x${c2}dc.
 ${c1}                  '.${c4}.${c1} d${c2}dlc.

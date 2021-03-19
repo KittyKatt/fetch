@@ -1,7 +1,7 @@
 # shellcheck shell=bash
 # shellcheck disable=SC2034,SC2154
 startline=0
-read -rd '' asciiLogo <<'EOF'
+read -rd '' asciiLogo << 'EOF'
 ${c1}          -------${c2}--------${c3}-------
 ${c1}         | ${c2}404: ${c3}distro ${c4}not ${c5}found |
 ${c1}          -------${c2}--------${c3}-------
