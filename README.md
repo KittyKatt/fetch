@@ -1,6 +1,8 @@
 # fetch
 A BASH system information and distribution logo display tool.
 
+![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/KittyKatt/fetch?color=%23FF1476&label=release) ![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/KittyKatt/fetch/latest?color=%23FF1476) ![GitHub all releases](https://img.shields.io/github/downloads/KittyKatt/fetch/total?color=%23FF1476)
+
 [![Output Tests](https://github.com/KittyKatt/fetch/actions/workflows/tests.yaml/badge.svg)](https://github.com/KittyKatt/fetch/actions/workflows/tests.yaml) [![Shellcheck](https://github.com/KittyKatt/fetch/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/KittyKatt/fetch/actions/workflows/shellcheck.yml) [![Package and Release](https://github.com/KittyKatt/fetch/actions/workflows/release.yaml/badge.svg)](https://github.com/KittyKatt/fetch/actions/workflows/release.yaml)
 
 ## What is fetch?
