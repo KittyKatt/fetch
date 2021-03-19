@@ -1513,6 +1513,14 @@ main() {
 
     if [ "${config_ascii[display]}" == "on" ]; then
         i=0
+        # Get logo max width
+        # shellcheck disable=SC2154
+        while IFS=$'\n' read -r line; do
+            line=${line//\\\\/\\}
+            line=${line//█/ }
+            ((++lines, ${#line} > ascii_len)) && ascii_len="${#line}"
+        done <<< "${asciiLogo//\$\{??\}/}"
+        # Loop over logo and output
         # shellcheck disable=SC2154
         while IFS=$'\n' read -r line; do
             print_ascii "${line}"

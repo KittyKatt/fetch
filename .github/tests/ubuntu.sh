@@ -21,6 +21,7 @@ else
     exit 1
 fi
 
+# shellcheck disable=SC1094
 source ./ascii/ubuntu.sh
 
 n=0
