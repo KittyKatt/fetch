@@ -132,7 +132,6 @@ getColor() {
 #########################################
 # functions: detection
 detect_kernel() {
-    stupid=
     IFS=" " read -ra kernel <<< "$(uname -srm)"
     kernel_name="${kernel[0]}"
     kernel_version="${kernel[1]}"
