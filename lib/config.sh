@@ -29,7 +29,7 @@ fetchConfig() {
                 exit 1
             fi
         else
-            errorOut "Could not find sample configuration file...did you install fetch correctly?" 
+            errorOut "Could not find sample configuration file...did you install fetch correctly?"
             errorOut" Please consult ${FETCH_SRC_LOCATION} or your package manager for installation instructions."
             exit 1
         fi
