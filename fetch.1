@@ -46,6 +46,14 @@ Mac classic logo, and a custom Unknown distro cat art.
 
 .SH OPTIONS
 .TP
+.B \--lib / -l /path/to/directory
+Specify prefix path for fetch library files. The default
+for this is /usr/share/fetch
+.TP
+.B \--config/ -c /path/to/file
+Specify a configuratio file to use. The default for this is
+~/.config/fetch/config
+.TP
 .B \-v
 Verbose output.
 .TP
@@ -60,6 +68,15 @@ to use. Surrounding quotes are required.
 Here you can specify the distribution art that you want
 displayed. This is for when you want your distro
 detected but want to display a different logo.
+.TP
+.B \-T
+Display text only output.
+.TP
+.B \-L
+Display logo only output.
+.TP
+.B \-R
+Display randomly colored logo output.
 .TP
 .B \-V, \-\-version
 Display current script version.
