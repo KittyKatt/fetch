@@ -49,27 +49,6 @@ trim() {
     set +f
 }
 
-# functions: configuration
-fetchConfig() {
-    if [ -f "${1}" ]; then
-        while read -r line; do
-            if [[ ${line} =~ ^\[[[:alnum:]]+\] ]]; then
-                arrname="config_${line//[^[:alnum:]]/}"
-                declare -gA "${arrname}"
-            elif [[ ${line} =~ ^([_[:alpha:]][_[:alnum:]]*)"="(.*) ]]; then
-                # shellcheck disable=SC2086
-                {
-                    _arr=${arrname}[${BASH_REMATCH[1]}]
-                    [ -z ${!_arr} ] && declare -g ${arrname}[${BASH_REMATCH[1]}]="${BASH_REMATCH[2]//\"/}"
-                    unset _arr
-                }
-            fi
-        done < "${1}"
-    else
-        errorOut "No configuration file specified"
-    fi
-}
-
 # functions: color
 # variables: color
 reset='\e[0m'
@@ -235,8 +214,8 @@ versioninfo() {
 main() {
     # shellcheck disable=SC1090
     {
-        . "${FETCH_DATA_DIR}/lib/kernel.sh"
-        . "${FETCH_DATA_DIR}/lib/os.sh"
+        . "${FETCH_DATA_DIR}/lib/detection/kernel.sh"
+        . "${FETCH_DATA_DIR}/lib/detection/os.sh"
     }
 
     # filter {config_global[info]} into a new variable, minus kernel because
@@ -245,7 +224,7 @@ main() {
 
     for g in ${GLOBAL_INFO}; do
         # shellcheck disable=SC1090
-        . "${FETCH_DATA_DIR}/lib/${g}.sh"
+        . "${FETCH_DATA_DIR}/lib/detection/${g}.sh"
     done
 
     # shellcheck disable=SC2154
@@ -275,7 +254,7 @@ main() {
 }
 
 # Catch configuration flag
-[[ $* != *--config* ]] && fetchConfig "${FETCH_DATA_USER_DIR}/${FETCH_CONFIG_FILENAME}"
+[[ $* != *--config* ]] && FETCH_CONFIG="${FETCH_DATA_USER_DIR}/${FETCH_CONFIG_FILENAME}"
 
 # Execution flag detection
 case ${1} in
@@ -289,11 +268,19 @@ case ${1} in
         ;;
     --config)
         FETCH_CONFIG="${2}"
-        fetchConfig "${FETCH_CONFIG}"
+        shift 2
+        ;;
+    --lib)
+        FETCH_DATA_DIR="${2}"
         shift 2
         ;;
     *) : ;;
 esac
+
+# shellcheck disable=SC1090
+. "${FETCH_DATA_DIR}/lib/config.sh"
+
+fetchConfig "${FETCH_CONFIG}"
 
 # shellcheck disable=SC2034
 while getopts ":hvVNRTLD:A:C:" flags; do
@@ -311,7 +298,6 @@ while getopts ":hvVNRTLD:A:C:" flags; do
         D) my_distro="${OPTARG}" ;;
         A) ascii_distro="${OPTARG}" ;;
         N) config_text[color]="off" ;;
-        C) FETCH_DATA_DIR="${OPTARG}" ;;
         T) config_ascii[display]="off" ;;
         L) config_text[display]="off" ;;
         R) config_ascii['colors']="random" ;;
