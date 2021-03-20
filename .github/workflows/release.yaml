@@ -21,11 +21,12 @@ jobs:
       - name: Create package structure
         run: |
           mkdir -p deb_pkg/usr/share/fetch
+          mldor -p deb_pkg/usr/share/man/man.1
           mkdir -p deb_pkg/usr/local/bin
           cp -r ascii lib deb_pkg/usr/share/fetch/
-          cp LICENSE README.md deb_pkg/usr/share/fetch/
-          cp sample.config.conf deb_pkg/usr/share/fetch/config.conf
+          cp LICENSE README.md sample.config.conf deb_pkg/usr/share/fetch/
           cp fetch deb_pkg/usr/local/bin/
+          cp fetch.1 deb_pkg/usr/share/man/man.1/
       - name: Build some variables to use
         run: |
           PVERSION=${{ env.CI_REF_NAME }}
@@ -63,10 +64,11 @@ jobs:
         run: |
           mkdir -p rpm_pkg/usr/share/fetch
           mkdir -p rpm_pkg/usr/local/bin
+          mkdir -p rpm_pkg/usr/share/man/man.1
           cp -r ascii lib rpm_pkg/usr/share/fetch/
-          cp LICENSE README.md rpm_pkg/usr/share/fetch/
-          cp sample.config.conf rpm_pkg/usr/share/fetch/config.conf
+          cp LICENSE README.md sample.config.conf rpm_pkg/usr/share/fetch/
           cp fetch rpm_pkg/usr/local/bin/
+          cp fetch.1 /usr/share/man/man.1/
       - name: Build some variables to use
         run: |
           PVERSION=${{ env.CI_REF_NAME }}
