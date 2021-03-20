@@ -26,8 +26,7 @@ verboseOut() {
     esac
 }
 errorOut() {
-    printf '\033[1;37m[[ \033[1;31m! \033[1;37m]] \033[0m%s\n' "${1}"
-    exit 1
+    printf '\033[1;37m[[ \033[1;31m! \033[1;37m]] \033[0m%b\n' "${1}"
 }
 
 # functions: text
@@ -279,8 +278,13 @@ while [[ $* =~ (--help|-h|--version|-V|--config|-c|--lib|-l) ]]; do
     esac
 done
 
-# shellcheck disable=SC1090
-. "${FETCH_DATA_DIR}/lib/config.sh"
+if [ -f "${FETCH_DATA_DIR:-/usr/share/fetch}/lib/config.sh" ]; then
+    # shellcheck disable=SC1090
+    . "${FETCH_DATA_DIR:-/usr/share/fetch}/lib/config.sh"
+else
+    errorOut "Error: Could not find config.sh library in ${FETCH_DATA_DIR:-/usr/share/fetch}/lib/"
+    exit 1
+fi
 
 fetchConfig "${FETCH_CONFIG}"
 
