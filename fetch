@@ -257,25 +257,27 @@ main() {
 [[ $* != *--config* ]] && FETCH_CONFIG="${FETCH_DATA_USER_DIR}/${FETCH_CONFIG_FILENAME}"
 
 # Execution flag detection
-case ${1} in
-    --help)
-        usage
-        exit 0
-        ;;
-    --version)
-        versioninfo
-        exit 0
-        ;;
-    --config)
-        FETCH_CONFIG="${2}"
-        shift 2
-        ;;
-    --lib)
-        FETCH_DATA_DIR="${2}"
-        shift 2
-        ;;
-    *) : ;;
-esac
+while [[ $* =~ (--help|-h|--version|-V|--config|-c|--lib|-l) ]]; do
+    case ${1} in
+        --help | -h)
+            usage
+            exit 0
+            ;;
+        --version | -V)
+            versioninfo
+            exit 0
+            ;;
+        --config | -c)
+            FETCH_CONFIG="${2}"
+            shift 2
+            ;;
+        --lib | -l)
+            FETCH_DATA_DIR="${2}"
+            shift 2
+            ;;
+        *) break ;;
+    esac
+done
 
 # shellcheck disable=SC1090
 . "${FETCH_DATA_DIR}/lib/config.sh"
@@ -283,17 +285,9 @@ esac
 fetchConfig "${FETCH_CONFIG}"
 
 # shellcheck disable=SC2034
-while getopts ":hvVNRTLD:A:C:" flags; do
+while getopts ":hvVNRTLD:A:" flags; do
     # shellcheck disable=SC2154
     case ${flags} in
-        h)
-            usage
-            exit 0
-            ;;
-        V)
-            versioninfo
-            exit 0
-            ;;
         v) config_global[verbose]="on" ;;
         D) my_distro="${OPTARG}" ;;
         A) ascii_distro="${OPTARG}" ;;
