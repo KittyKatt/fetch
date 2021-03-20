@@ -12,24 +12,21 @@ errorOut () {
 }
 
 
-if [[ $(bash fetch --config sample.config.conf -v --lib .) ]]; then
+if [[ $(bash fetch --lib . --config sample.config.conf -v) ]]; then
     successOut 'Fetched current output:'
-    bash fetch --config sample.config.conf --lib . -v
+    bash fetch --lib . --config sample.config.conf -v
 else
     errorOut 'fetch failed output:'
-    bash fetch --config sample.config.conf --lib . -v
+    bash fetch --lib . --config sample.config.conf -v
     exit 1
 fi
-
-# shellcheck disable=SC1094
-source ./ascii/ubuntu.sh
 
 n=0
 IFS=$'\n'
 while read -r line; do
     _output[${n}]="${line}"
     ((n++))
-done <<< "$(bash fetch --config sample.config.conf -v --lib .)"
+done <<< "$(bash fetch --lib . --config sample.config.conf -v)"
 
 if [[ ! ${_output[0]} =~ ^(.*)'Finding kernel...found as'(.*)'Linux '[[:digit:]]+'.'[[:digit:]]+'.'[[:digit:]]+'-'[[:digit:]]+'-azure' ]]; then
     errorOut "!! Failed on kernel."
