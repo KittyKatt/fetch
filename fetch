@@ -1,11 +1,17 @@
 #!/usr/bin/env bash
 # variables: script global
+# script version
 FETCH_VERSION="0.8.1"
+# directory where fetch library/ascii files live
+# (configurable with -l/--lib)
 FETCH_DATA_DIR="/usr/share/fetch"
+# default directory and filename where fetch config lives
+# (config locdation configurable with --config/-c)
 FETCH_DATA_USER_DIR="${XDG_CONFIG_HOME:-${HOME}}/.config/fetch"
 FETCH_CONFIG_FILENAME="config"
 LC_ALL=C
 LANG=C
+
 # https://github.com/KittyKatt/screenFetch/issues/549
 if [[ ${OSTYPE} =~ linux || ${OSTYPE} == gnu ]]; then
     # issue seems to affect Ubuntu; add LSB directories if it appears on other distros too
