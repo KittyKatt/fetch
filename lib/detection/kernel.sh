@@ -20,6 +20,9 @@ detect_kernel() {
         *) return ;;
     esac
 
+    # Return my_kernel value for print_info()
+    #printf '%b' "$(trim "${my_kernel}")"
+
     # TODO: check verbosity here instead of in function, save function call
     verboseOut "Finding kernel...found as '${my_kernel}'."
 }

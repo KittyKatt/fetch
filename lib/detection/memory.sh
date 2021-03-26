@@ -78,6 +78,9 @@ detect_memory() {
 
     my_memory="${mem_used}${mem_label:-MiB} / ${mem_total}${mem_label:-MiB} ${mem_perc:+(${mem_perc}%)}"
 
+    # Return my_memory value for print_info()
+    #printf '%b' "$(trim "${my_memory}")"
+
     # TODO: check verbosity here instead of in function, save function call
     verboseOut "Finding memory usage...found as '${my_memory}'."
 }

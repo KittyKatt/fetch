@@ -616,6 +616,9 @@ detect_distro() {
     # TODO: turn into case
     [[ ${config_distro[os_arch]} =~ 'on' ]] && my_distro+=" ${kernel_machine}"
 
+    # Return my_distro value for print_info()
+    #printf '%b' "$(trim "${my_distro}")"
+
     # TODO: check verbosity here instead of in function, save function call
     verboseOut "Finding distribution...found as '${my_distro}'."
 }

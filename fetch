@@ -115,43 +115,65 @@ getColor() {
 
 ###############################
 # functions: output
-print_info() {
-    local _info="my_${1}"
-    local _infodisplay="my_${1}"
-    until [ -n "${!_info}" ]; do
-        ((${#_display} < 1)) && break
-        _display=("${_display[@]:1}")
-        _info="my_${1}}"
-    done
+get_info() {
+    # Check for subtitle
+    local info info_subtitle path output
+    info="$(trim "${1}")"
+    info_subtitle="config_${1}[subtitle]"
 
-    if [ -n "${!_info}" ]; then
-        _info_subtitle="config_${1}[subtitle]"
-        if [ -n "${!_info_subtitle}" ]; then
-            # shellcheck disable=SC2154
-            printf '%b\n' "${!_info_subtitle}${config_text[info_separator]} ${!_info}"
+    # Unset printed to start fresh
+    unset -v printed
+
+    # Store library file path to variable
+    path="${FETCH_DATA_DIR}/lib/detection/${info}.sh"
+
+    # Check if library file exists
+    if [ -f "${path}" ]; then
+        # source library file and run detection
+        # shellcheck disable=SC1090
+        . "${path}"
+        "detect_${info}"
+
+        # build variable name
+        infodisplay="my_${info}"
+
+        # if print_info was called manually, break
+        [[ "${printed}" ]] && return
+
+        # Use shell expansion to trim function detection variable
+        output="$(trim "${!infodisplay}")"
+
+        if [ -n "${!info_subtitle}" ]; then
+            print_info "${!info_subtitle}" "${output}"
         else
-            printf '%b\n' "${!_info}"
+            print_info "${output}"
         fi
-    else
-        :
+    fi
+}
+print_info() {
+    local info subtitle
+    info="${1}"
+
+    if [[ "${2}" ]]; then
+        subtitle="$(trim "${1}")"
+        info="${2}"
     fi
 
-    _display=("${_display[@]:1}")
+    if [ -n "${info}" ]; then
+        if [[ "${subtitle}" ]]; then
+            # shellcheck disable=SC2154
+            printf '%b\n' "${text_padding}${subtitle}${config_text[info_separator]} ${info}"
+        else
+            printf '%b\n' "${text_padding}${info}"
+        fi
+    fi
+
+    printed="1"
+
+    ((info_height++))
 }
 print_ascii() {
     local logo="${1}"
-    # shellcheck disable=SC2154
-    gap=${config_ascii[gap]}
-    # Calculate: (max detected logo width - length of current line)
-    _tmp="${logo//\$\{??\}/}"
-    _tmp=${_tmp//\\\\/\\}
-    _tmp=${_tmp//█/ }
-    # shellcheck disable=SC2154
-    if ((${#_tmp} < ascii_len)); then
-        logo_padding=$((ascii_len - ${#_tmp}))
-    else
-        logo_padding=0
-    fi
 
     # Random coloring support
     if [ "${config_ascii['colors']}" == "random" ]; then
@@ -162,6 +184,7 @@ print_ascii() {
             logo="${logo//\$\{c${n}\}/${_randc}}"
             ((n++))
         done
+        unset -v n
     fi
 
     # Expand color variables
@@ -174,34 +197,24 @@ print_ascii() {
 
     # Let's output!
     if [ "${config_text[display]}" == "on" ]; then
+        # shellcheck disable=SC2154
+        gap=${config_ascii[gap]}
+
         # Format line with gap after ASCII for info display
-        ((text_padding = logo_padding + gap))
-        logo="$(printf "%b \e[%sC" "${logo}" "${text_padding}")"
+        ((text_padding = ascii_len + gap))
+        text_padding="\e[${text_padding}C"
+        # logo="$(printf "%b \e[%sC" "${logo}" "${text_padding}")"
 
         # Display ASCII art and detected info
         # shellcheck disable=SC2154
-        if [ "${i}" -lt "${startline}" ]; then
-            printf '%b\n' "${logo}${reset}"
-        elif [ "${i}" -ge "${startline}" ]; then
-            if ((${#_display} > 0)); then
-                _infodisplay="$(print_info "${_display[0]}")"
-                printf '%b\n' "${logo}${reset}${_infodisplay}"
-                _display=("${_display[@]:1}")
-            else
-                printf '%b\n' "${logo}${reset}"
-            fi
-        fi
+        printf '%b\n' "${logo}${reset}"
 
         # Cleanup
         # shellcheck disable=SC2031
         unset _tmp
-        unset text_padding
     else
         printf '%b\n' "${logo}${reset}"
     fi
-
-    # Cleanup
-    unset n
 }
 
 #############################
@@ -247,28 +260,25 @@ cache_uname() {
 }
 
 main() {
+    # cache uname output to use later
     cache_uname
 
+    # get simple info
     # shellcheck disable=SC1090
     {
         . "${FETCH_DATA_DIR}/lib/detection/os.sh"
         . "${FETCH_DATA_DIR}/lib/detection/distro.sh"
     }
-
     detect_os
     detect_distro
 
-    for g in ${config_global[info]}; do
-        # shellcheck disable=SC1090
-        . "${FETCH_DATA_DIR}/lib/detection/${g}.sh"
-        "detect_${g}"
-    done
+    # TRAP script exit, unhide cursor
+    trap 'printf "\e[?25h\e[?7h"' EXIT
+    # hide cursor, disable line wrap
+    printf '\e[?25l\e[?7l'
 
-    # shellcheck disable=SC2154
-    read -r -a _display <<< "${config_global[info]}"
-
+    # ascii display
     if [ "${config_ascii[display]}" == "on" ]; then
-        i=0
         # Get logo max width
         # shellcheck disable=SC2154
         while IFS=$'\n' read -r line; do
@@ -280,13 +290,36 @@ main() {
         # shellcheck disable=SC2154
         while IFS=$'\n' read -r line; do
             print_ascii "${line}"
-            ((i++))
         done <<< "${asciiLogo}"
-        unset i
-    else
-        while ((${#_display} > 0)); do
-            print_info "${_display[0]}"
+
+        # reset cursor back to top to print info
+        printf '\e[%sA\e[9999999D' "${lines:-0}"
+    fi
+
+    # info display
+    if [ "${config_text[display]}" == "on" ]; then
+        # shellcheck disable=SC2154
+        [ "${config_ascii[display]}" == "on" ] &&
+            until ((startline < 1)); do
+                printf '%b' '\n'
+                ((startline--))
+            done
+
+        IFS=" " read -ra display_array <<<"${config_global[info]}"
+        for g in "${display_array[@]}"; do 
+            subtitle="config_${g}[subtitle]"
+            get_info "${g}"
         done
+
+        [ "${config_ascii[display]}" == "on" ] &&
+            # If the ascii art is taller than the info.
+            if ((lines > info_height)); then
+                lines=$((lines - info_height - startline))
+            fi
+            
+
+            printf -v nlines "%${lines}s"
+            printf "%b" "${nlines// /\\n}"
     fi
 }
 
