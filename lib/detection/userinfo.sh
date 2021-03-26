@@ -23,7 +23,6 @@ detect_userinfo() {
         fi
     fi
 
+    # TODO: check verbosity here instead of in function, save function call
     verboseOut "Finding user info...found as '${my_userinfo}'."
 }
-
-detect_userinfo

@@ -76,7 +76,6 @@ detect_uptime() {
             ;;
     esac
 
+    # TODO: check verbosity here instead of in function, save function call
     verboseOut "Finding current uptime...found as '${my_uptime}'."
 }
-
-detect_uptime

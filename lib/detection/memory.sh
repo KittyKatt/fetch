@@ -78,7 +78,6 @@ detect_memory() {
 
     my_memory="${mem_used}${mem_label:-MiB} / ${mem_total}${mem_label:-MiB} ${mem_perc:+(${mem_perc}%)}"
 
+    # TODO: check verbosity here instead of in function, save function call
     verboseOut "Finding memory usage...found as '${my_memory}'."
 }
-
-detect_memory

@@ -20,7 +20,6 @@ detect_kernel() {
         *) return ;;
     esac
 
+    # TODO: check verbosity here instead of in function, save function call
     verboseOut "Finding kernel...found as '${my_kernel}'."
 }
-
-detect_kernel
