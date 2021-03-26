@@ -118,6 +118,10 @@ else
     successOut "Memory succeeded."
 fi
 
+printf '\n'
+successOut "Execution time: "
+time bash fetch -c sample.config.conf -l . 2>/dev/null 1>&2
+
 if ((f == 0)); then
     exit 0
 else
