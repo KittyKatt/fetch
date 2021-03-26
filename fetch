@@ -116,6 +116,11 @@ getColor() {
 ###############################
 # functions: output
 print_info() {
+    #[ -n "${printed}" ] && 
+    #    unset printed
+    #    _display=("${_display[@]:1}")
+    #    return
+
     local _info="my_${1}"
     local _infodisplay="my_${1}"
     until [ -n "${!_info}" ]; do
@@ -216,18 +221,43 @@ versioninfo() {
     printf 'fetch %s\n' "${FETCH_VERSION}"
 }
 
+###############################
+# function: Cache uname
+# cache uname output to not spawn more than one
+# shellcheck disable=SC2034
+cache_uname() {
+    # Cache the output of uname so we don't
+    # have to spawn it multiple times.
+    IFS=" " read -ra uname <<< "$(uname -srm)"
+
+    kernel_name="${uname[0]}"
+    kernel_version="${uname[1]}"
+    kernel_machine="${uname[2]}"
+
+    if [[ "$kernel_name" == "Darwin" ]]; then
+        # macOS can report incorrect versions unless this is 0.
+        # https://github.com/dylanaraps/neofetch/issues/1607
+        export SYSTEM_VERSION_COMPAT=0
+
+        IFS=$'\n' read -d "" -ra sw_vers <<< "$(awk -F'<|>' '/key|string/ {print $3}' \
+                            "/System/Library/CoreServices/SystemVersion.plist")"
+        for ((i=0;i<${#sw_vers[@]};i+=2)) {
+            case ${sw_vers[i]} in
+                ProductName)          darwin_name=${sw_vers[i+1]} ;;
+                ProductVersion)       osx_version=${sw_vers[i+1]} ;;
+                ProductBuildVersion)  osx_build=${sw_vers[i+1]}   ;;
+            esac
+        }
+    fi
+}
+
 main() {
+    cache_uname
+
     # shellcheck disable=SC1090
-    {
-        . "${FETCH_DATA_DIR}/lib/detection/kernel.sh"
-        . "${FETCH_DATA_DIR}/lib/detection/os.sh"
-    }
+    . "${FETCH_DATA_DIR}/lib/detection/os.sh"
 
-    # filter {config_global[info]} into a new variable, minus kernel because
-    # that is already detected above. keep old variable intact for output purposes.
-    GLOBAL_INFO="${config_global[info]//kernel /}"
-
-    for g in ${GLOBAL_INFO}; do
+    for g in ${config_global[info]}; do
         # shellcheck disable=SC1090
         . "${FETCH_DATA_DIR}/lib/detection/${g}.sh"
     done
