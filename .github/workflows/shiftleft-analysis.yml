@@ -6,9 +6,19 @@ name: SL Scan
 on:
   push:
     branches: [ master ]
+    paths:
+      - fetch
+      - sample.config.conf
+      - lib/*/*.sh
+      - ascii/*.sh
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ master ]
+    paths:
+      - fetch
+      - sample.config.conf
+      - lib/*/*.sh
+      - ascii/*.sh
   schedule:
     - cron: '33 0 * * 1'
 
