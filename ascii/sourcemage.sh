@@ -3,7 +3,7 @@
 # logo width: 40
 # number of colors: 1
 if [ ! "${config_text[color]}" == "off" ]; then
-    c1=$(getColor 'dark grey') # Dark Grey
+  c1=$(getColor 'dark grey') # Dark Grey
 fi
 startline="1"
 read -rd '' asciiLogo << 'EOF'
