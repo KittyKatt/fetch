@@ -23,7 +23,6 @@ detect_os() {
             ;;
     esac
 
+    # TODO: check verbosity here instead of in function, save function call
     verboseOut "Finding OS...found as '${my_os}'."
 }
-
-detect_os

@@ -68,7 +68,9 @@ detect_shell() {
     my_shell=${my_shell/options*/}
     my_shell=${my_shell/\(*\)/}
 
+    # Return my_shell value for print_info()
+    #printf '%b' "$(trim "${my_shell}")"
+
+    # TODO: check verbosity here instead of in function, save function call
     verboseOut "Finding current shell...found as '${my_shell}'."
 }
-
-detect_shell

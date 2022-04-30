@@ -76,7 +76,9 @@ detect_uptime() {
             ;;
     esac
 
+    # Return my_uptime value for print_info()
+    #printf '%b' "$(trim "${my_uptime}")"
+
+    # TODO: check verbosity here instead of in function, save function call
     verboseOut "Finding current uptime...found as '${my_uptime}'."
 }
-
-detect_uptime

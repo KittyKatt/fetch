@@ -23,7 +23,9 @@ detect_userinfo() {
         fi
     fi
 
+    # Return my_userinfo value for print_info()
+    #printf '%b' "$(trim "${my_userinfo}")"
+
+    # TODO: check verbosity here instead of in function, save function call
     verboseOut "Finding user info...found as '${my_userinfo}'."
 }
-
-detect_userinfo

@@ -129,7 +129,9 @@ detect_cpu() {
         fi
     }
 
+    # Return my_cpu value for print_info()
+    #printf '%b' "$(trim "${my_cpu}")"
+
+    # TODO: check verbosity here instead of in function, save function call
     verboseOut "Finding CPU...found as '${my_cpu}'."
 }
-
-detect_cpu
