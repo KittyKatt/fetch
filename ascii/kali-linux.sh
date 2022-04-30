@@ -3,8 +3,8 @@
 # logo width: 48
 # number of colors: 2
 if [ ! "${config_text[color]}" == "off" ]; then
-  c1=$(getColor 'light blue') # Light Blue
-  c2=$(getColor 'black')      # Black
+    c1=$(getColor 'light blue') # Light Blue
+    c2=$(getColor 'black')      # Black
 fi
 startline="1"
 read -rd '' asciiLogo << 'EOF'

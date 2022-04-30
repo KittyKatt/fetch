@@ -24,7 +24,7 @@ jobs:
         uses: luizm/action-sh-checker@v0.1.12
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SHFMT_OPTS: -i 2 -ln bash -ci -sr -kp -s -d
+          SHFMT_OPTS: -i 4 -ln bash -ci -sr -kp -s -d
         with:
           sh_checker_shellcheck_disable: true
           sh_checker_comment: true
