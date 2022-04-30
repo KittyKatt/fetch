@@ -185,6 +185,9 @@ detect_packages() {
         my_packages=${my_packages/pacman-key/pacman}
     fi
 
+    # Return my_packages value for print_info()
+    #printf '%b' "$(trim "${my_packages}")"
+
     # TODO: check verbosity here instead of in function, save function call
     verboseOut "Finding current package count...found as '${my_packages}'."
 }
