@@ -209,13 +209,13 @@ print_ascii() {
 
         # Display ASCII art and detected info
         # shellcheck disable=SC2154
-        printf '%b\n' "${logo}${reset}"
+        printf '%b\n' "${logo} ${reset}"
 
         # Cleanup
         # shellcheck disable=SC2031
         unset _tmp
     else
-        printf '%b\n' "${logo}${reset}"
+        printf '%b\n' "${logo} ${reset}"
     fi
 }
 
@@ -244,20 +244,20 @@ cache_uname() {
     kernel_version="${uname[1]}"
     kernel_machine="${uname[2]}"
 
-    if [[ "$kernel_name" == "Darwin" ]]; then
+    if [[ $kernel_name == "Darwin"   ]]; then
         # macOS can report incorrect versions unless this is 0.
         # https://github.com/dylanaraps/neofetch/issues/1607
         export SYSTEM_VERSION_COMPAT=0
 
         IFS=$'\n' read -d "" -ra sw_vers <<< "$(awk -F'<|>' '/key|string/ {print $3}' \
                             "/System/Library/CoreServices/SystemVersion.plist")"
-        for ((i=0;i<${#sw_vers[@]};i+=2)) {
+        for ((i = 0; i < ${#sw_vers[@]}; i += 2)); do
             case ${sw_vers[i]} in
-                ProductName)          darwin_name=${sw_vers[i+1]} ;;
-                ProductVersion)       osx_version=${sw_vers[i+1]} ;;
-                ProductBuildVersion)  osx_build=${sw_vers[i+1]}   ;;
+                ProductName)          darwin_name=${sw_vers[i + 1]} ;;
+                ProductVersion)       osx_version=${sw_vers[i + 1]} ;;
+                ProductBuildVersion)  osx_build=${sw_vers[i + 1]} ;;
             esac
-        }
+        done
     fi
 }
 
@@ -307,8 +307,8 @@ main() {
                 ((startline--))
             done
 
-        IFS=" " read -ra display_array <<<"${config_global[info]}"
-        for g in "${display_array[@]}"; do 
+        IFS=" " read -ra display_array <<< "${config_global[info]}"
+        for g in "${display_array[@]}"; do
             subtitle="config_${g}[subtitle]"
             get_info "${g}"
         done
@@ -318,7 +318,6 @@ main() {
             if ((lines > info_height)); then
                 lines=$((lines - info_height - startline))
             fi
-            
 
             printf -v nlines "%${lines}s"
             printf "%b" "${nlines// /\\n}"
