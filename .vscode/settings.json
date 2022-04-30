@@ -1,16 +1,17 @@
 {
-    "files.eol": "\n",
-    "files.insertFinalNewline": true,
-    "editor.detectIndentation": false,
-    "editor.insertSpaces": true,
-    "workbench.editor.highlightModifiedTabs": true,
-    "[yaml]": {
+  "files.eol": "\n",
+  "files.insertFinalNewline": true,
+  "editor.detectIndentation": false,
+  "editor.insertSpaces": true,
+  "workbench.editor.highlightModifiedTabs": true,
+  "[yaml]": {
 
-        "editor.insertSpaces": true,
-        "editor.tabSize": 2,
-        "editor.autoIndent": "advanced",
-        "gitlens.codeLens.scopes": [
-            "document"
-        ]
-    }
+      "editor.insertSpaces": true,
+      "editor.tabSize": 2,
+      "editor.autoIndent": "advanced",
+      "gitlens.codeLens.scopes": [
+          "document"
+      ]
+  },
+  "editor.tabSize": 2
 }
