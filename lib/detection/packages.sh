@@ -23,6 +23,7 @@ detect_packages() {
     }
   }
   _tot() {
+    # shellcheck disable=SC2312
     IFS=$'\n' read -d "" -ra pkgs <<< "$("$@" 2> /dev/null)"
     ((my_packages += ${#pkgs[@]}))
     _pac "$((${#pkgs[@]} - pkgs_h))"
@@ -31,6 +32,7 @@ detect_packages() {
   # Redefine _tot() for Bedrock Linux.
   [[ -f /bedrock/etc/bedrock-release && ${PATH} == */bedrock/cross/* ]] && {
     _tot() {
+      # shellcheck disable=SC2312
       IFS=$'\n' read -d "" -ra pkgs <<< "$(for s in $(brl list); do strat -r "${s}" "${@}"; done)"
       ((my_packages += "${#pkgs[@]}"))
       _pac "$((${#pkgs[@]} - pkgs_h))"
@@ -62,6 +64,7 @@ detect_packages() {
       _has inary          && _tot inary li
 
       if _has dnf && type -p sqlite3 > /dev/null && [[ -f /var/cache/dnf/packages.db ]]; then
+        # shellcheck disable=SC2312
         _pac "$(sqlite3 /var/cache/dnf/packages.db "SELECT count(pkg) FROM installed")"
       else
         _has rpm && _tot rpm -qa
@@ -72,7 +75,7 @@ detect_packages() {
 
       # file/dir count
       # $br_prefix is apparently fixed and won't change based on user input
-      # shellcheck disable=SC2086
+      # shellcheck disable=SC2086,SC2312
       {
         shopt -s nullglob
         _has brew       && _dir "$(brew --cellar)"/*
@@ -89,6 +92,7 @@ detect_packages() {
       }
 
       # Complex commands
+      # shellcheck disable=SC2312
       _has kpm-pkg        && ((my_packages += $(kpm  --get-selections | grep -cv deinstall$)))
       _has guix           && {
         manager=guix-system && _tot guix package -p "/run/current-system/profile" -I
@@ -124,8 +128,8 @@ detect_packages() {
 
       # Snap hangs if the command is run without the daemon running.
       # Only run snap if the daemon is also running.
-      _has snap && pgrep -x snapd > /dev/null &&
-        pkgs_h=1 _tot snap list && ((my_packages -= 1))
+      _has snap && pgrep -x snapd > /dev/null \
+        && pkgs_h=1 _tot snap list && ((my_packages -= 1))
 
       # This is the only standard location for appimages.
       # See: https://github.com/AppImage/AppImageKit/wiki
@@ -155,8 +159,8 @@ detect_packages() {
 
       # Count chocolatey packages.
       _has choco && _dir /c/ProgramData/chocolatey/lib/*
-      [ -d /cygdrive/c/ProgramData/chocolatey/lib ] &&
-        manager=choco _dir /cygdrive/c/ProgramData/chocolatey/lib/*
+      [[ -d /cygdrive/c/ProgramData/chocolatey/lib ]] \
+        && manager=choco _dir /cygdrive/c/ProgramData/chocolatey/lib/*
       ;;
     Haiku)
       _has pkgman && _dir /boot/system/package-links/*

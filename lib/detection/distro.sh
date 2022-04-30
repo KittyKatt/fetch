@@ -1,11 +1,11 @@
 # shellcheck shell=bash
 # shellcheck disable=SC2154
 detect_distro() {
-  [[ "${my_distro}" ]] && return
+  [[ -n ${my_distro} ]] && return
 
   local distro_detect=
   my_distro="Unknown"
-  if [ "${my_os}" == "Linux" ] && [ "${my_distro}" == "Unknown" ]; then
+  if [[ ${my_os} == "Linux" ]] && [[ ${my_distro} == "Unknown" ]]; then
     # LSB Release Check
     if type -p lsb_release > /dev/null 2>&1; then
       distro_detect="$(lsb_release -si)"
@@ -120,7 +120,7 @@ detect_distro() {
           ;;
         "Ol" | "ol" | "Oracle Linux")
           my_distro="Oracle Linux"
-          [ -f /etc/oracle-release ] && distro_release="$(sed 's/Oracle Linux //' /etc/oracle-release)"
+          [[ -f /etc/oracle-release ]] && distro_release="$(sed 's/Oracle Linux //' /etc/oracle-release)"
           ;;
         "LinuxMint")
           my_distro="Mint"
@@ -150,8 +150,11 @@ detect_distro() {
           ;;
         "RosaDesktopFresh")
           my_distro="ROSA"
-          distro_release=$(grep 'VERSION=' /etc/os-release | cut -d ' ' -f3 | cut -d '"' -f1)
-          distro_codename=$(grep 'PRETTY_NAME=' /etc/os-release | cut -d ' ' -f4,4)
+          # shellcheck disable=SC2312
+          {
+            distro_release=$(grep 'VERSION=' /etc/os-release | cut -d ' ' -f3 | cut -d '"' -f1)
+            distro_codename=$(grep 'PRETTY_NAME=' /etc/os-release | cut -d ' ' -f4,4)
+          }
           ;;
         "SailfishOS")
           my_distro="SailfishOS"
@@ -179,15 +182,16 @@ detect_distro() {
 
     # Existing File Check
     # TODO: Lots of optimization with these if statements to do
-    if [ "${my_distro}" == "Unknown" ]; then
-      if [ -f "/etc/mcst_version" ]; then
+    if [[ ${my_distro} == "Unknown" ]]; then
+      if [[ -f "/etc/mcst_version" ]]; then
         my_distro="OS Elbrus"
         distro_release="$(tail -n 1 /etc/mcst_version)"
-        if [ -n "${distro_release}" ]; then
+        if [[ -n ${distro_release} ]]; then
           distro_more="${distro_release}"
         fi
       fi
-      if [ -n "$(uname -o 2> /dev/null)" ]; then
+      # shellcheck disable=SC2312
+      if [[ -n "$(uname -o 2> /dev/null)" ]]; then
         os="$(uname -o)"
         case ${os} in
           "EndeavourOS") my_distro="EndeavourOS" ;;
@@ -211,13 +215,13 @@ detect_distro() {
         esac
       fi
 
-      if [ "${my_distro}" == "Unknown" ]; then
-        if [ -f /etc/os-release ]; then
+      if [[ ${my_distro} == "Unknown" ]]; then
+        if [[ -f /etc/os-release ]]; then
           os_release="/etc/os-release"
-        elif [ -f /usr/lib/os-release ]; then
+        elif [[ -f /usr/lib/os-release ]]; then
           os_release="/usr/lib/os-release"
         fi
-        if [ -n "${os_release}" ]; then
+        if [[ -n ${os_release} ]]; then
           # shellcheck disable=SC2248
           distrib_id="$(< ${os_release})"
           for l in ${distrib_id}; do
@@ -227,8 +231,8 @@ detect_distro() {
               break 1
             fi
           done
-          if [ -n "${distrib_id}" ]; then
-            if [ "${BASH_VERSINFO[0]}" -ge 4 ]; then
+          if [[ -n ${distrib_id} ]]; then
+            if [[ ${BASH_VERSINFO[0]} -ge 4 ]]; then
               distrib_id=$(for d in ${distrib_id}; do printf '%s' "${d^} "; done)
               my_distro=${distrib_id% }
               unset distrib_id
@@ -245,20 +249,20 @@ detect_distro() {
           fi
 
           # Hotfixes
-          [ "${my_distro}" == "Opensuse-tumbleweed" ] && my_distro="openSUSE" && distro_more="Tumbleweed"
-          [ "${my_distro}" == "Opensuse-leap" ] && my_distro="openSUSE"
-          [ "${my_distro}" == "void" ] && my_distro="Void Linux"
-          [ "${my_distro}" == "evolveos" ] && my_distro="Evolve OS"
-          [ "${my_distro}" == "Sulin" ] && my_distro="Sulin"
+          [[ ${my_distro} == "Opensuse-tumbleweed" ]] && my_distro="openSUSE" && distro_more="Tumbleweed"
+          [[ ${my_distro} == "Opensuse-leap" ]] && my_distro="openSUSE"
+          [[ ${my_distro} == "void" ]] && my_distro="Void Linux"
+          [[ ${my_distro} == "evolveos" ]] && my_distro="Evolve OS"
+          [[ ${my_distro} == "Sulin" ]] && my_distro="Sulin"
           [[ ${my_distro} == "Arch" || ${my_distro} == "Archarm" || ${my_distro} == "archarm" ]] && my_distro="Arch Linux"
-          [ "${my_distro}" == "elementary" ] && my_distro="elementary OS"
+          [[ ${my_distro} == "elementary" ]] && my_distro="elementary OS"
           [[ ${my_distro} == "Fedora" && -d /etc/qubes-rpc ]] && my_distro="qubes" # Inner VM
           [[ ${my_distro} == "Ol" || ${my_distro} == "ol" ]] && my_distro="Oracle Linux"
           if [[ ${my_distro} == "Oracle Linux" && -f /etc/oracle-release ]]; then
             distro_more="$(sed 's/Oracle Linux //' /etc/oracle-release)"
           fi
           # Upstream problem, SL and so EL is using rhel ID in os-release
-          if [ "${my_distro}" == "rhel" ] || [ "${my_distro}" == "Rhel" ]; then
+          if [[ ${my_distro} == "rhel" ]] || [[ ${my_distro} == "Rhel" ]]; then
             my_distro="Red Hat Enterprise Linux"
             if grep -q 'Scientific' /etc/os-release; then
               my_distro="Scientific Linux"
@@ -267,14 +271,16 @@ detect_distro() {
             fi
           fi
 
-          [ "${my_distro}" == "Neon" ] && my_distro="KDE neon"
+          [[ ${my_distro} == "Neon" ]] && my_distro="KDE neon"
           [[ ${my_distro} == "SLED" || ${my_distro} == "sled" || ${my_distro} == "SLES" || ${my_distro} == "sles" ]] && my_distro="SUSE Linux Enterprise"
-          if [ "${my_distro}" == "SUSE Linux Enterprise" ] && [ -f /etc/os-release ]; then
+          if [[ ${my_distro} == "SUSE Linux Enterprise" ]] && [[ -f /etc/os-release ]]; then
+            # shellcheck disable=SC2312
             distro_more="$(awk -F'=' '/^VERSION_ID=/ {print $2}' /etc/os-release | tr -d '"')"
           fi
-          if [ "${my_distro}" == "Debian" ] && [ -f /usr/bin/pveversion ]; then
+          if [[ ${my_distro} == "Debian" ]] && [[ -f /usr/bin/pveversion ]]; then
             my_distro="Proxmox VE"
             unset distro_codename
+            # shellcheck disable=SC2312
             distro_release="$(/usr/bin/pveversion | grep -oP 'pve-manager\/\K\d+\.\d+')"
           fi
         fi
@@ -303,30 +309,31 @@ detect_distro() {
         }')
       fi
 
-      if [ "${my_distro}" == "Unknown" ] && [[ ${OSTYPE} =~ "linux" || ${OSTYPE} == "gnu" ]]; then
+      if [[ ${my_distro} == "Unknown" ]] && [[ ${OSTYPE} =~ "linux" || ${OSTYPE} == "gnu" ]]; then
         for di in arch chakra evolveos exherbo fedora \
           frugalware gentoo kogaion mageia obarun oracle pardus \
           pclinuxos redhat rosa SuSe; do
           # shellcheck disable=SC2248
-          if [ -f /etc/${di}-release ]; then
+          if [[ -f /etc/${di}-release ]]; then
             my_distro=${di}
             break
           fi
         done
-        if [ "${my_distro}" == "oracle" ]; then
+        if [[ ${my_distro} == "oracle" ]]; then
           distro_more="$(sed 's/Oracle Linux //' /etc/oracle-release)"
-        elif [ "${my_distro}" == "SuSe" ]; then
+        elif [[ ${my_distro} == "SuSe" ]]; then
           my_distro="openSUSE"
-          if [ -f /etc/os-release ]; then
+          if [[ -f /etc/os-release ]]; then
             if grep -q -i 'SUSE Linux Enterprise' /etc/os-release; then
               my_distro="SUSE Linux Enterprise"
+              # shellcheck disable=SC2312
               distro_more=$(awk -F'=' '/^VERSION_ID=/ {print $2}' /etc/os-release | tr -d '"')
             fi
           fi
           if [[ ${distro_more} =~ "Tumbleweed" ]]; then
             distro_more="Tumbleweed"
           fi
-        elif [ "${my_distro}" == "redhat" ]; then
+        elif [[ ${my_distro} == "redhat" ]]; then
           grep -q -i 'CentOS' /etc/redhat-release && my_distro="CentOS"
           grep -q -i 'Scientific' /etc/redhat-release && my_distro="Scientific Linux"
           grep -q -i 'EuroLinux' /etc/redhat-release && my_distro="EuroLinux"
@@ -334,10 +341,10 @@ detect_distro() {
         fi
       fi
 
-      if [ "${my_distro}" == "Unknown" ]; then
+      if [[ ${my_distro} == "Unknown" ]]; then
         if [[ ${OSTYPE} =~ "linux" || ${OSTYPE} == "gnu" ]]; then
-          if [ -f /etc/debian_version ]; then
-            if [ -f /etc/issue ]; then
+          if [[ -f /etc/debian_version ]]; then
+            if [[ -f /etc/issue ]]; then
               if grep -q -i 'gNewSense' /etc/issue; then
                 my_distro="gNewSense"
               elif grep -q -i 'KDE neon' /etc/issue; then
@@ -350,24 +357,24 @@ detect_distro() {
             if grep -q -i 'Kali' /etc/debian_version; then
               my_distro="Kali Linux"
             fi
-          elif [ -f /etc/NIXOS ]; then
+          elif [[ -f /etc/NIXOS ]]; then
             my_distro="NixOS"
-          elif [ -f /etc/dragora-version ]; then
+          elif [[ -f /etc/dragora-version ]]; then
             my_distro="Dragora"
             distro_more="$(cut -d, -f1 /etc/dragora-version)"
-          elif [ -f /etc/slackware-version ]; then
+          elif [[ -f /etc/slackware-version ]]; then
             my_distro="Slackware"
-          elif [ -f /usr/share/doc/tc/release.txt ]; then
+          elif [[ -f /usr/share/doc/tc/release.txt ]]; then
             my_distro="TinyCore"
             distro_more="$(cat /usr/share/doc/tc/release.txt)"
-          elif [ -f /etc/sabayon-edition ]; then
+          elif [[ -f /etc/sabayon-edition ]]; then
             my_distro="Sabayon"
           fi
         fi
       fi
 
-      if [ "${my_distro}" == "Unknown" ] && [[ ${OSTYPE} =~ "linux" || ${OSTYPE} == "gnu" ]]; then
-        if [ -f /etc/issue ]; then
+      if [[ ${my_distro} == "Unknown" ]] && [[ ${OSTYPE} =~ "linux" || ${OSTYPE} == "gnu" ]]; then
+        if [[ -f /etc/issue ]]; then
           my_distro=$(awk 'BEGIN {
             distro = "Unknown"
           }
@@ -398,14 +405,14 @@ detect_distro() {
         fi
       fi
 
-      if [ "${my_distro}" == "Unknown" ] && [[ ${OSTYPE} =~ "linux" || ${OSTYPE} == "gnu" ]]; then
-        if [ -f /etc/system-release ]; then
+      if [[ ${my_distro} == "Unknown" ]] && [[ ${OSTYPE} =~ "linux" || ${OSTYPE} == "gnu" ]]; then
+        if [[ -f /etc/system-release ]]; then
           if grep -q -i 'Scientific Linux' /etc/system-release; then
             my_distro="Scientific Linux"
           elif grep -q -i 'Oracle Linux' /etc/system-release; then
             my_distro="Oracle Linux"
           fi
-        elif [ -f /etc/lsb-release ]; then
+        elif [[ -f /etc/lsb-release ]]; then
           if grep -q -i 'CHROMEOS_RELEASE_NAME' /etc/lsb-release; then
             my_distro="$(awk -F'=' '/^CHROMEOS_RELEASE_NAME=/ {print $2}' /etc/lsb-release)"
             distro_more="$(awk -F'=' '/^CHROMEOS_RELEASE_VERSION=/ {print $2}' /etc/lsb-release)"
@@ -413,7 +420,7 @@ detect_distro() {
         fi
       fi
     fi
-  elif [ "${my_os}" == "Windows" ]; then
+  elif [[ ${my_os} == "Windows" ]]; then
     my_distro=$(wmic os get Caption)
     my_distro=${my_distro/Caption/}
     my_distro=$(trim "${my_distro/Microsoft /}")
@@ -448,7 +455,7 @@ detect_distro() {
       arch | arch*linux) my_distro="Arch Linux" ;;
       arch32)
         my_distro="Arch Linux 32"
-        [ -z "${ascii_distro}" ] && ascii_distro="Arch Linux"
+        [[ -z ${ascii_distro} ]] && ascii_distro="Arch Linux"
         ;;
       arcolinux | arcolinux*) my_distro="ArcoLinux" ;;
       artix | artix*linux) my_distro="Artix Linux" ;;
@@ -457,7 +464,7 @@ detect_distro() {
       centos) my_distro="CentOS" ;;
       centos*stream)
         my_distro="CentOS Stream"
-        [ -z "${ascii_distro}" ] && ascii_distro="CentOS"
+        [[ -z ${ascii_distro} ]] && ascii_distro="CentOS"
         ;;
       chakra) my_distro="Chakra" ;;
       chrome* | chromium*) my_distro="Chrome OS" ;;
@@ -492,7 +499,7 @@ detect_distro() {
       haiku) my_distro="Haiku" ;;
       hyperbolagnu | hyperbolagnu/linux-libre | 'hyperbola gnu/linux-libre' | hyperbola)
         my_distro="Hyperbola GNU/Linux-libre"
-        [ -z "${ascii_distro}" ] && ascii_distro="Hyperbola"
+        [[ -z ${ascii_distro} ]] && ascii_distro="Hyperbola"
         ;;
       kali*linux) my_distro="Kali Linux" ;;
       kaos) my_distro="KaOS" ;;
@@ -504,7 +511,7 @@ detect_distro() {
       lmde) my_distro="LMDE" ;;
       lunar | lunar*linux) my_distro="Lunar Linux" ;;
       *"macos"* | *"mac os x"*)
-        [ -z "${ascii_distro}" ] && ascii_distro="macOS"
+        [[ -z ${ascii_distro} ]] && ascii_distro="macOS"
         ;;
       manjaro) my_distro="Manjaro" ;;
       mageia) my_distro="Mageia" ;;
@@ -522,7 +529,7 @@ detect_distro() {
       os*elbrus) my_distro="OS Elbrus" ;;
       parabolagnu | parabolagnu/linux-libre | 'parabola gnu/linux-libre' | parabola)
         my_distro="Parabola GNU/Linux-libre"
-        [ -z "${ascii_distro}" ] && ascii_distro="Parabola"
+        [[ -z ${ascii_distro} ]] && ascii_distro="Parabola"
         ;;
       parrot | parrot*security) my_distro="Parrot Security" ;;
       pclinuxos | pclos) my_distro="PCLinuxOS" ;;
@@ -533,7 +540,7 @@ detect_distro() {
       raspbian) my_distro="Raspbian" ;;
       red*hat* | rhel)
         my_distro="Red Hat Enterprise Linux"
-        [ -z "${ascii_distro}" ] && ascii_distro="RHEL"
+        [[ -z ${ascii_distro} ]] && ascii_distro="RHEL"
         ;;
       rosa) my_distro="ROSA" ;;
       sabayon) my_distro="Sabayon" ;;
@@ -545,7 +552,7 @@ detect_distro() {
       siduction) my_distro="Siduction" ;;
       smgl | source*mage | source*mage*gnu*linux)
         my_distro="Source Mage GNU/Linux"
-        [ -z "${ascii_distro}" ] && ascii_distro="SourceMage"
+        [[ -z ${ascii_distro} ]] && ascii_distro="SourceMage"
         ;;
       solus) my_distro="Solus" ;;
       sparky | sparky*linux) my_distro="SparkyLinux" ;;
@@ -554,7 +561,7 @@ detect_distro() {
       *suse*)
         my_distro="openSUSE"
         . "${FETCH_DATA_DIR}/lib/distro/suse/lib.sh"
-        [ -z "${ascii_distro}" ] && ascii_distro="SUSE"
+        [[ -z ${ascii_distro} ]] && ascii_distro="SUSE"
         ;;
       tinycore | tinycore*linux) my_distro="TinyCore" ;;
       trisquel) my_distro="Trisquel" ;;
@@ -564,7 +571,7 @@ detect_distro() {
         ;;
       void*linux) my_distro="Void Linux" ;;
       *"windows"*)
-        [ -z "${ascii_distro}" ] && ascii_distro="Windows"
+        [[ -z ${ascii_distro} ]] && ascii_distro="Windows"
         ;;
       zorin*) my_distro="Zorin OS" ;;
       *)
@@ -574,11 +581,11 @@ detect_distro() {
     esac
   }
 
-  [ -z "${ascii_distro}" ] && ascii_distro="${my_distro}"
+  [[ -z ${ascii_distro} ]] && ascii_distro="${my_distro}"
 
-  [ -n "${ascii_distro}" ] && ascii_distro="${ascii_distro// /-}"
+  [[ -n ${ascii_distro} ]] && ascii_distro="${ascii_distro// /-}"
 
-  if [ -f "${FETCH_DATA_DIR}/ascii/${ascii_distro,,}.sh" ]; then
+  if [[ -f "${FETCH_DATA_DIR}/ascii/${ascii_distro,,}.sh" ]]; then
     # shellcheck source=/dev/null
     . "${FETCH_DATA_DIR}/ascii/${ascii_distro,,}.sh"
   else
@@ -592,23 +599,23 @@ detect_distro() {
       :
       ;;
     version)
-      [ -n "${distro_release}" ] && my_distro+=" ${distro_release}"
+      [[ -n ${distro_release} ]] && my_distro+=" ${distro_release}"
       ;;
     codename)
-      [ -n "${distro_codename}" ] && my_distro+=" ${distro_codename}"
+      [[ -n ${distro_codename} ]] && my_distro+=" ${distro_codename}"
       ;;
 
     full)
-      [ -n "${distro_release}" ] && my_distro+=" ${distro_release}"
-      [ -n "${distro_codename}" ] && my_distro+=" ${distro_codename}"
+      [[ -n ${distro_release} ]] && my_distro+=" ${distro_release}"
+      [[ -n ${distro_codename} ]] && my_distro+=" ${distro_codename}"
       ;;
     auto | *)
       # shellcheck disable=SC2154
       if [[ ${config_global[short]} =~ 'on' ]]; then
         :
       else
-        [ -n "${distro_release}" ] && my_distro+=" ${distro_release}"
-        [ -n "${distro_codename}" ] && my_distro+=" ${distro_codename}"
+        [[ -n ${distro_release} ]] && my_distro+=" ${distro_release}"
+        [[ -n ${distro_codename} ]] && my_distro+=" ${distro_codename}"
       fi
       ;;
   esac

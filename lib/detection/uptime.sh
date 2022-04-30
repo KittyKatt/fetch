@@ -10,10 +10,11 @@ detect_uptime() {
       _seconds=$((now - boot))
       ;;
     Linux | Windows | [G | g][N | n][U | u])
-      if [ -f /proc/uptime ]; then
+      if [[ -f /proc/uptime ]]; then
         _seconds=$(< /proc/uptime)
         _seconds=${_seconds//.*/}
       else
+        # shellcheck disable=SC2312
         boot=$(date -d"$(uptime -s)" +%s)
         now=$(date +%s)
         _seconds=$((now - boot))
@@ -68,7 +69,7 @@ detect_uptime() {
       ;;
     auto | *)
       # shellcheck disable=SC2154
-      if [ "${config_global[short]}" == 'on' ]; then
+      if [[ ${config_global[short]} == 'on' ]]; then
         my_uptime=${my_uptime/ minutes/ mins}
         my_uptime=${my_uptime/ minute/ min}
         my_uptime=${my_uptime/ seconds/ secs}

@@ -1,5 +1,5 @@
 # shellcheck shell=bash
-# shellcheck disable=SC2034,SC2154
+# shellcheck disable=SC2034,SC2154,SC2312
 if [[ "$(lsb_release -sd)" =~ Funtoo ]]; then
   my_distro="Funtoo"
 else

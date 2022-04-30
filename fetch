@@ -69,8 +69,8 @@ colorize() {
 }
 getColor() {
   local tmp_color=""
-  if [ -n "${1}" ]; then
-    if [ "${BASH_VERSINFO[0]}" -ge '4' ]; then
+  if [[ -n ${1} ]]; then
+    if [[ ${BASH_VERSINFO[0]} -ge '4' ]]; then
       if [[ ${BASH_VERSINFO[0]} -eq '4' && ${BASH_VERSINFO[1]} -gt '1' ]] \
         || [[ ${BASH_VERSINFO[0]} -gt '4'   ]]; then
         tmp_color=${1,,}
@@ -103,6 +103,7 @@ getColor() {
       ?([2])?([5])[0-6]?(,bold))      color_ret=$(colorize "${tmp_color}") ;;
       'rand')
         _color=$((RANDOM % 255))
+        # shellcheck disable=SC2248
         color_ret="$(colorize ${_color})"
         ;;
       *)
@@ -111,7 +112,7 @@ getColor() {
         ;;
     esac
 
-    [ -n "${color_ret}" ] && printf '%b' "${color_ret}"
+    [[ -n ${color_ret} ]] && printf '%b' "${color_ret}"
   fi
 }
 
@@ -130,7 +131,7 @@ get_info() {
   path="${FETCH_DATA_DIR}/lib/detection/${info}.sh"
 
   # Check if library file exists
-  if [ -f "${path}" ]; then
+  if [[ -f ${path} ]]; then
     # source library file and run detection
     # shellcheck disable=SC1090
     . "${path}"
@@ -140,12 +141,12 @@ get_info() {
     infodisplay="my_${info}"
 
     # if print_info was called manually, break
-    [[ "${printed}" ]] && return
+    [[ -n ${printed} ]] && return
 
     # Use shell expansion to trim function detection variable
     output="$(trim "${!infodisplay}")"
 
-    if [ -n "${!info_subtitle}" ]; then
+    if [[ -n ${!info_subtitle} ]]; then
       print_info "${!info_subtitle}" "${output}"
     else
       print_info "${output}"
@@ -156,13 +157,13 @@ print_info() {
   local info subtitle
   info="${1}"
 
-  if [[ "${2}" ]]; then
+  if [[ -n ${2} ]]; then
     subtitle="$(trim "${1}")"
     info="${2}"
   fi
 
-  if [ -n "${info}" ]; then
-    if [[ "${subtitle}" ]]; then
+  if [[ -n ${info} ]]; then
+    if [[ -n ${subtitle} ]]; then
       # shellcheck disable=SC2154
       printf '%b\n' "${text_padding}${subtitle}${config_text[info_separator]} ${info}"
     else
@@ -178,7 +179,7 @@ print_ascii() {
   local logo="${1}"
 
   # Random coloring support
-  if [ "${config_ascii['colors']}" == "random" ]; then
+  if [[ ${config_ascii['colors']} == "random" ]]; then
     declare _randc
     local n=1
     while [[ ${logo} =~ \$\{[c][1-6]\} ]]; do
@@ -190,15 +191,18 @@ print_ascii() {
   fi
 
   # Expand color variables
-  logo="${logo//\$\{c1\}/$c1}"
-  logo="${logo//\$\{c2\}/$c2}"
-  logo="${logo//\$\{c3\}/$c3}"
-  logo="${logo//\$\{c4\}/$c4}"
-  logo="${logo//\$\{c5\}/$c5}"
-  logo="${logo//\$\{c6\}/$c6}"
+  # shellcheck disable=SC2250
+  {
+    logo="${logo//\$\{c1\}/$c1}"
+    logo="${logo//\$\{c2\}/$c2}"
+    logo="${logo//\$\{c3\}/$c3}"
+    logo="${logo//\$\{c4\}/$c4}"
+    logo="${logo//\$\{c5\}/$c5}"
+    logo="${logo//\$\{c6\}/$c6}"
+  }
 
   # Let's output!
-  if [ "${config_text[display]}" == "on" ]; then
+  if [[ ${config_text[display]} == "on" ]]; then
     # shellcheck disable=SC2154
     gap=${config_ascii[gap]}
 
@@ -238,26 +242,28 @@ versioninfo() {
 cache_uname() {
   # Cache the output of uname so we don't
   # have to spawn it multiple times.
+  # shellcheck disable=SC2312
   IFS=" " read -ra uname <<< "$(uname -srm)"
 
   kernel_name="${uname[0]}"
   kernel_version="${uname[1]}"
   kernel_machine="${uname[2]}"
 
-  if [[ $kernel_name == "Darwin"   ]]; then
+  if [[ ${kernel_name} == "Darwin" ]]; then
     # macOS can report incorrect versions unless this is 0.
     # https://github.com/dylanaraps/neofetch/issues/1607
     export SYSTEM_VERSION_COMPAT=0
 
-    IFS=$'\n' read -d "" -ra sw_vers <<< "$(awk -F'<|>' '/key|string/ {print $3}' \
-              "/System/Library/CoreServices/SystemVersion.plist")"
-    for ((i = 0; i < ${#sw_vers[@]}; i += 2)); do
-      case ${sw_vers[i]} in
-        ProductName)          darwin_name=${sw_vers[i + 1]} ;;
-        ProductVersion)       osx_version=${sw_vers[i + 1]} ;;
-        ProductBuildVersion)  osx_build=${sw_vers[i + 1]} ;;
-      esac
-    done
+    # shellcheck disable=SC2312
+    IFS=$'\n' read -d "" -ra sw_vers <<< "$(awk -F'<|>' '/key|string/ {print $3}' "/System/Library/CoreServices/SystemVersion.plist")" \
+      && for ((i = 0; i < ${#sw_vers[@]}; i += 2)); do
+        case ${sw_vers[i]} in
+          ProductName)          darwin_name=${sw_vers[i + 1]} ;;
+          ProductVersion)       osx_version=${sw_vers[i + 1]} ;;
+          ProductBuildVersion)  osx_build=${sw_vers[i + 1]} ;;
+          *)                    osx_build= ;;
+        esac
+      done
   fi
 }
 
@@ -280,7 +286,7 @@ main() {
   printf '\e[?25l\e[?7l'
 
   # ascii display
-  if [ "${config_ascii[display]}" == "on" ]; then
+  if [[ ${config_ascii[display]} == "on" ]]; then
     # Get logo max width
     # shellcheck disable=SC2154
     while IFS=$'\n' read -r line; do
@@ -299,7 +305,7 @@ main() {
   fi
 
   # info display
-  if [ "${config_text[display]}" == "on" ]; then
+  if [[ ${config_text[display]} == "on" ]]; then
     # shellcheck disable=SC2154
     [[ ${config_ascii[display]} == "on"   ]] \
       && until ((startline < 1)); do
@@ -350,7 +356,7 @@ while [[ $* =~ (--help|-h|--version|-V|--config|-c|--lib|-l) ]]; do
   esac
 done
 
-if [ -f "${FETCH_DATA_DIR:-/usr/share/fetch}/lib/config.sh" ]; then
+if [[ -f ${FETCH_DATA_DIR:-/usr/share/fetch}/lib/config.sh ]]; then
   # shellcheck disable=SC1090
   . "${FETCH_DATA_DIR:-/usr/share/fetch}/lib/config.sh"
 else
