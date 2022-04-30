@@ -185,7 +185,6 @@ detect_packages() {
         my_packages=${my_packages/pacman-key/pacman}
     fi
 
+    # TODO: check verbosity here instead of in function, save function call
     verboseOut "Finding current package count...found as '${my_packages}'."
 }
-
-detect_packages

@@ -118,11 +118,6 @@ getColor() {
 ###############################
 # functions: output
 print_info() {
-    #[ -n "${printed}" ] && 
-    #    unset printed
-    #    _display=("${_display[@]:1}")
-    #    return
-
     local _info="my_${1}"
     local _infodisplay="my_${1}"
     until [ -n "${!_info}" ]; do
@@ -257,11 +252,18 @@ main() {
     cache_uname
 
     # shellcheck disable=SC1090
-    . "${FETCH_DATA_DIR}/lib/detection/os.sh"
+    {
+        . "${FETCH_DATA_DIR}/lib/detection/os.sh"
+        . "${FETCH_DATA_DIR}/lib/detection/distro.sh"
+    }
+
+    detect_os
+    detect_distro
 
     for g in ${config_global[info]}; do
         # shellcheck disable=SC1090
         . "${FETCH_DATA_DIR}/lib/detection/${g}.sh"
+        "detect_${g}"
     done
 
     # shellcheck disable=SC2154
