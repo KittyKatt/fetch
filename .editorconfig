@@ -1,11 +1,9 @@
 root = true
 
 [*]
-indent_style = space
-indent_size  = 2
-keep_padding = true
-
-[*.sh]
+indent_style       = space
+indent_size        = 2
+keep_padding       = true
 shell_variant      = bash
 switch_case_indent = true
 binary_next_line   = true
