@@ -46,7 +46,6 @@ detect_packages() {
             _has cpt-list       && _tot cpt-list
             _has pacman-key     && _tot pacman -Qq --color never
             _has apt            && _tot dpkg-query -W   # dpkg-query is much faster than apt
-            _has rpm            && _tot rpm -qa
             _has xbps-query     && _tot xbps-query -list
             _has apk            && _tot apk info
             _has opkg           && _tot opkg list-installed
@@ -61,6 +60,12 @@ detect_packages() {
             _has swupd          && _tot swupd bundle-list --quiet
             _has pisi           && _tot pisi list-installed
             _has inary          && _tot inary li
+
+            if _has dnf && type -p sqlite3 > /dev/null && [[ -f /var/cache/dnf/packages.db ]]; then
+                _pac "$(sqlite3 /var/cache/dnf/packages.db "SELECT count(pkg) FROM installed")"
+            else
+                _has rpm && _tot rpm -qa
+            fi
 
             # 'mine' conflicts with minesweeper games.
             [[ -f /etc/SDE-VERSION ]] && _has mine && _tot mine -q
