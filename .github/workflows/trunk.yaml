@@ -1,0 +1,26 @@
+name: Trunk (Linting and Formatting)
+
+on:
+  push:
+    branches:
+      - workflows
+    # paths:
+    #   - fetch
+    #   - sample.config.conf
+    #   - lib/*/*.sh
+    #   - ascii/*.sh
+  pull_request:
+    branches: 
+      - master
+  workflow_dispatch:
+
+jobs:
+  trunk:
+    name: trunk
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v1
+      - name: Trunk Check
+        uses: trunk-io/trunk-action@v1.0.1
+        with:
+          check-mode: all
