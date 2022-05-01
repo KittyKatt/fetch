@@ -1,15 +1,8 @@
-name: "Output Tests"
+name: "Output Tests - Workflow Tests"
 on:
-  pull_request:
-    branches: [master]
   push:
     branches:
-      - master
-    paths:
-      - fetch
-      - sample.config.conf
-      - lib/*/*.sh
-      - ascii/*.sh
+      - workflows
   workflow_dispatch:
 
 jobs:
