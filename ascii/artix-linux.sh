@@ -2,7 +2,7 @@
 # shellcheck disable=SC2034,SC2154
 # logo width: 38
 # number of colors: 4
-if [ ! "${config_text[color]}" == "off" ]; then
+if [[ ${config_text[color]} != "off" ]]; then
   c1=$(getColor 'cyan')      # Cyan
   c2=$(getColor 'blue')      # Blue
   c3=$(getColor 'green')     # Green
