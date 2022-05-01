@@ -30,6 +30,8 @@ extglob_set=$?
 
 # functions: script output
 verboseOut() {
+    [[ ${config_text[color]} == "off" ]] && reset=""
+    [[ ${config_text[color]} == "off" ]] && verboseStyle=":: "
   # shellcheck disable=SC2154
   verbose+="${verboseStyle}${1}\n"
 }
@@ -214,13 +216,21 @@ print_ascii() {
 
     # Display ASCII art and detected info
     # shellcheck disable=SC2154
-    printf '%b\n' "${logo} ${reset}"
+    if [[ ${config_text[color]} != "off" ]]; then
+      printf '%b\n' "${logo} ${reset}"
+    else
+      printf '%b\n' "${logo}"
+    fi
 
     # Cleanup
     # shellcheck disable=SC2031
     unset _tmp
   else
-    printf '%b\n' "${logo} ${reset}"
+    if [[ ${config_text[color]} != "off" ]]; then
+      printf '%b\n' "${logo} ${reset}"
+    else
+      printf '%b\n' "${logo}"
+    fi
   fi
 }
 
@@ -281,10 +291,12 @@ main() {
   detect_os
   detect_distro
 
-  # TRAP script exit, unhide cursor
-  trap 'printf "\e[?25h\e[?7h"' EXIT
-  # hide cursor, disable line wrap
-  printf '\e[?25l\e[?7l'
+  if [[ ${config_text[color]} != "off" ]]; then
+    # TRAP script exit, unhide cursor
+    trap 'printf "\e[?25h\e[?7h"' EXIT
+    # hide cursor, disable line wrap
+    printf '\e[?25l\e[?7l'
+  fi
 
   # ascii display
   if [[ ${config_ascii[display]} == "on" ]]; then
@@ -331,10 +343,12 @@ main() {
   fi
 
   if [[ ${config_global[verbose]} == "on" ]]; then
-    printf '%b\033[m\n' "${verboseStyle}Current fetch version: ${FETCH_VERSION}${reset}"
-    printf '%b\033[m\n' "${verboseStyle}Configuration sourced: ${FETCH_CONFIG}${reset}"
-    printf '%b\033[m\n' "${verboseStyle}Libraries sourced from: ${FETCH_DATA_DIR}${reset}"
-    printf '%b\033[m' "${verbose}"
+    [[ ${config_text[color]} == "off" ]] && reset=""
+    [[ ${config_text[color]} == "off" ]] && verboseStyle=""
+    printf '%b\n' "${verboseStyle}Current fetch version: ${FETCH_VERSION}${reset}"
+    printf '%b\n' "${verboseStyle}Configuration sourced: ${FETCH_CONFIG}${reset}"
+    printf '%b\n' "${verboseStyle}Libraries sourced from: ${FETCH_DATA_DIR}${reset}"
+    printf '%b' "${verbose}${reset}"
   fi
 }
 

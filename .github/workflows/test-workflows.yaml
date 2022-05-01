@@ -1,0 +1,28 @@
+name: "Output Tests - Workflow Tests"
+on:
+  push:
+    branches:
+      - workflows
+  workflow_dispatch:
+
+jobs:
+  test-ubuntu:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: Testing known Ubuntu output
+        run: bash .github/tests/ubuntu.sh
+  test-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: Testing known macOS output
+        run: |
+          brew install bash
+          /usr/local/bin/bash .github/tests/macos.sh
+  test-windows:
+    runs-on: windows-2019
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: Testing known Windows output
+        run: bash .github/tests/windows.sh
