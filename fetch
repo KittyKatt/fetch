@@ -12,6 +12,10 @@ FETCH_CONFIG_FILENAME="config"
 LC_ALL=C
 LANG=C
 
+# static colorized phrases
+verboseStyle="\033[1;31m:: \033[0m"
+reset="\033[0m"
+
 # https://github.com/KittyKatt/screenFetch/issues/549
 if [[ ${OSTYPE} =~ linux || ${OSTYPE} == gnu ]]; then
   # issue seems to affect Ubuntu; add LSB directories if it appears on other distros too
@@ -27,10 +31,7 @@ extglob_set=$?
 # functions: script output
 verboseOut() {
   # shellcheck disable=SC2154
-  case ${config_global[verbose]} in
-    on) printf '\033[1;31m:: \033[0m%s\n' "${1}" ;;
-    *) ;;
-  esac
+  verbose+="${verboseStyle}${1}\n"
 }
 errorOut() {
   printf '\033[1;37m[[ \033[1;31m! \033[1;37m]] \033[0m%b\n' "${1}"
@@ -327,6 +328,13 @@ main() {
 
       printf -v nlines "%${lines}s"
       printf "%b" "${nlines// /\\n}"
+  fi
+
+  if [[ ${config_global[verbose]} == "on" ]]; then
+    printf '%b\033[m\n' "${verboseStyle}Current fetch version: ${FETCH_VERSION}${reset}"
+    printf '%b\033[m\n' "${verboseStyle}Configuration sourced: ${FETCH_CONFIG}${reset}"
+    printf '%b\033[m\n' "${verboseStyle}Libraries sourced from: ${FETCH_DATA_DIR}${reset}"
+    printf '%b\033[m' "${verbose}"
   fi
 }
 
