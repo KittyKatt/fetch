@@ -302,7 +302,7 @@ main() {
     done <<< "${asciiLogo}"
 
     # reset cursor back to top to print info
-    printf '\e[%sA\e[9999999D' "${lines:-0}"
+    [[ ${config_text[display]} == "on" ]] && printf '\e[%sA\e[9999999D' "${lines:-0}"
   fi
 
   # info display
