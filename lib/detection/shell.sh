@@ -10,10 +10,10 @@ detect_shell() {
 
   # if version_info is off, then return what we have now
   # shellcheck disable=SC2154
-  [ "${config_shell[version]}" != "on" ] && my_shell="${shell_type}" && return
+  [[ ${config_shell[version]} != "on" ]] && my_shell="${shell_type}" && return
 
   # Possible Windows problem
-  [ "${my_os}" == "Windows" ] && shell_name="${shell_type//\.exe/}"
+  [[ ${my_os} == "Windows" ]] && shell_name="${shell_type//\.exe/}"
 
   # get shell versions
   my_shell="${shell_name:=${shell_type}} "
@@ -21,7 +21,7 @@ detect_shell() {
   case ${shell_name:=${SHELL##*/}} in
     bash)
       # shellcheck disable=SC2016
-      [ -n "${BASH_VERSION}" ] || BASH_VERSION=$("${SHELL}" -c 'printf %s "$BASH_VERSION"')
+      [[ -n ${BASH_VERSION} ]] || BASH_VERSION=$("${SHELL}" -c 'printf %s "$BASH_VERSION"')
       my_shell+="${BASH_VERSION/-*/}"
       ;;
     sh | ash | dash | es) ;;
@@ -53,7 +53,7 @@ detect_shell() {
       ;;
     fish)
       # shellcheck disable=SC2016
-      [ -n "${FISH_VERSION}" ] || FISH_VERSION=$("${SHELL}" -c 'printf %s "$FISH_VERSION"')
+      [[ -n ${FISH_VERSION} ]] || FISH_VERSION=$("${SHELL}" -c 'printf %s "$FISH_VERSION"')
       my_shell+="${FISH_VERSION}"
       ;;
     *)

@@ -10,7 +10,7 @@ on:
       - lib/*/*.sh
       - ascii/*.sh
   pull_request:
-    branches: 
+    branches:
       - master
   workflow_dispatch:
 
@@ -37,4 +37,3 @@ jobs:
       - name: Check line count doesn't exceed 100
         run: |
           if grep '.\{102\}' fetch; then (exit 1); else (exit 0); fi
-

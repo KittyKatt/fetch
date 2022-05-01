@@ -1,9 +1,8 @@
-
 name: Shellcheck
 
 on:
   push:
-    branches: 
+    branches:
       - master
     paths:
       - fetch
@@ -17,8 +16,8 @@ jobs:
     name: Shellcheck
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v2
-    - name: Import Problem Matchers
-      uses: lumaxis/shellcheck-problem-matchers@v1
-    - name: Run ShellCheck
-      run: shellcheck -S warning -a -x -f gcc fetch
+      - uses: actions/checkout@v2
+      - name: Import Problem Matchers
+        uses: lumaxis/shellcheck-problem-matchers@v1
+      - name: Run ShellCheck
+        run: shellcheck -S warning -a -x -f gcc fetch

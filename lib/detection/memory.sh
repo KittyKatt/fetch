@@ -1,5 +1,6 @@
 # shellcheck shell=bash
 # shellcheck disable=SC2154
+# shellcheck disable=SC2312
 detect_memory() {
   case ${my_os} in
     "Linux" | "Windows")
@@ -18,10 +19,11 @@ detect_memory() {
           "MemAvailable")
             mem_avail=${b/kB/}
             ;;
+          *) ;;
         esac
       done < /proc/meminfo
 
-      if [ -n "${mem_avail}" ]; then
+      if [[ -n ${mem_avail} ]]; then
         mem_used=$(((mem_total - mem_avail) / 1024))
       else
         mem_used="$((mem_used / 1024))"
@@ -71,10 +73,14 @@ detect_memory() {
       mem_used="$(sysinfo -mem | awk -F '\\/|)' '{print $2; exit}')"
       mem_used="$((${mem_used/max/} / 1024 / 1024))"
       ;;
+    *)
+      mem_total=
+      mem_used=
+      ;;
   esac
 
   # shellcheck disable=SC2154
-  [ "${config_memory[percent]}" == "on" ] && ((mem_perc = mem_used * 100 / mem_total))
+  [[ ${config_memory[percent]} == "on" ]] && ((mem_perc = mem_used * 100 / mem_total))
 
   my_memory="${mem_used}${mem_label:-MiB} / ${mem_total}${mem_label:-MiB} ${mem_perc:+(${mem_perc}%)}"
 

@@ -1,18 +1,15 @@
-name: Trunk (Linting and Formatting)
-
+name: "Trunk (Linting and Formatting)"
 on:
+  pull_request:
+    branches: [master]
   push:
     branches:
-      - workflows
-      - development
-  pull_request:
-    branches:
       - master
+      - workflows
   workflow_dispatch:
 
 jobs:
-  trunk:
-    name: trunk
+  trunk-checks:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v1

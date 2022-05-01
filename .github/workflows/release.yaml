@@ -1,16 +1,15 @@
 name: Package and Release
-
 on:
   push:
     tags:
-      - 'v*.*.*'
-      - 'v*.*'
+      - "v*.*.*"
+      - "v*.*"
 
 env:
-  APP_NAME: 'fetch'
-  MAINTAINER: 'Brett Bohnenkamper <kittykatt@kittykatt.co>'
-  DESC: 'fetch is a BASH screenshot, system information, and distribution ASCII logo display tool.'
-  HOMEPAGE: 'https://github.com/KittyKatt/fetch'
+  APP_NAME: "fetch"
+  MAINTAINER: "Katie Bohnenkamper <kittykatt@kittykatt.co>"
+  DESC: "fetch is a BASH screenshot, system information, and distribution ASCII logo display tool."
+  HOMEPAGE: "https://github.com/KittyKatt/fetch"
 
 jobs:
   build-debian-package:
@@ -36,8 +35,8 @@ jobs:
         uses: bpicode/github-action-fpm@master
         id: deb_build
         with:
-          fpm_args: './'
-          fpm_opts: "--log warn -t deb -a all -n ${{ env.APP_NAME }} -v ${{ env.PVERSION }} -m \"${{ env.MAINTAINER }}\" --description \"${{ env.DESC }}\" --url \"${{ env.HOMEPAGE }}\" --license MIT --category 'Utils' --deb-priority 'extra' ${{ env.PDEPENDS }} -C deb_pkg -s dir"
+          fpm_args: "./"
+          fpm_opts: '--log warn -t deb -a all -n ${{ env.APP_NAME }} -v ${{ env.PVERSION }} -m "${{ env.MAINTAINER }}" --description "${{ env.DESC }}" --url "${{ env.HOMEPAGE }}" --license MIT --category ''Utils'' --deb-priority ''extra'' ${{ env.PDEPENDS }} -C deb_pkg -s dir'
       - name: Check output files
         run: |
           ls -l *.deb
@@ -78,8 +77,8 @@ jobs:
         uses: bpicode/github-action-fpm@master
         id: rpm_build
         with:
-          fpm_args: './'
-          fpm_opts: "--log warn -t rpm -a noarch -n ${{ env.APP_NAME }} -v ${{ env.PVERSION }} -m \"${{ env.MAINTAINER }}\" --description \"${{ env.DESC }}\" --url \"${{ env.HOMEPAGE }}\" --license MIT --category 'Productivity/Text/Utilities' ${{ env.PDEPENDS }} -C rpm_pkg -s dir"
+          fpm_args: "./"
+          fpm_opts: '--log warn -t rpm -a noarch -n ${{ env.APP_NAME }} -v ${{ env.PVERSION }} -m "${{ env.MAINTAINER }}" --description "${{ env.DESC }}" --url "${{ env.HOMEPAGE }}" --license MIT --category ''Productivity/Text/Utilities'' ${{ env.PDEPENDS }} -C rpm_pkg -s dir'
       - name: Check output files
         run: |
           ls -l *.rpm
