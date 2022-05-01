@@ -141,12 +141,12 @@ get_info() {
     infodisplay="my_${info}"
 
     # if print_info was called manually, break
-    [[ "${printed}" ]] && return
+    [[ -n ${printed} ]] && return
 
     # Use shell expansion to trim function detection variable
     output="$(trim "${!infodisplay}")"
 
-    if [ -n "${!info_subtitle}" ]; then
+    if [[ -n ${!info_subtitle} ]]; then
       print_info "${!info_subtitle}" "${output}"
     else
       print_info "${output}"
@@ -157,13 +157,13 @@ print_info() {
   local info subtitle
   info="${1}"
 
-  if [[ "${2}" ]]; then
+  if [[ -n ${2} ]]; then
     subtitle="$(trim "${1}")"
     info="${2}"
   fi
 
-  if [ -n "${info}" ]; then
-    if [[ "${subtitle}" ]]; then
+  if [[ -n ${info} ]]; then
+    if [[ -n ${subtitle} ]]; then
       # shellcheck disable=SC2154
       printf '%b\n' "${text_padding}${subtitle}${config_text[info_separator]} ${info}"
     else
@@ -179,7 +179,7 @@ print_ascii() {
   local logo="${1}"
 
   # Random coloring support
-  if [ "${config_ascii['colors']}" == "random" ]; then
+  if [[ ${config_ascii['colors']} == "random" ]]; then
     declare _randc
     local n=1
     while [[ ${logo} =~ \$\{[c][1-6]\} ]]; do
@@ -191,15 +191,18 @@ print_ascii() {
   fi
 
   # Expand color variables
-  logo="${logo//\$\{c1\}/$c1}"
-  logo="${logo//\$\{c2\}/$c2}"
-  logo="${logo//\$\{c3\}/$c3}"
-  logo="${logo//\$\{c4\}/$c4}"
-  logo="${logo//\$\{c5\}/$c5}"
-  logo="${logo//\$\{c6\}/$c6}"
+  # shellcheck disable=SC2250
+  {
+    logo="${logo//\$\{c1\}/$c1}"
+    logo="${logo//\$\{c2\}/$c2}"
+    logo="${logo//\$\{c3\}/$c3}"
+    logo="${logo//\$\{c4\}/$c4}"
+    logo="${logo//\$\{c5\}/$c5}"
+    logo="${logo//\$\{c6\}/$c6}"
+  }
 
   # Let's output!
-  if [ "${config_text[display]}" == "on" ]; then
+  if [[ ${config_text[display]} == "on" ]]; then
     # shellcheck disable=SC2154
     gap=${config_ascii[gap]}
 
@@ -353,7 +356,7 @@ while [[ $* =~ (--help|-h|--version|-V|--config|-c|--lib|-l) ]]; do
   esac
 done
 
-if [ -f "${FETCH_DATA_DIR:-/usr/share/fetch}/lib/config.sh" ]; then
+if [[ -f ${FETCH_DATA_DIR:-/usr/share/fetch}/lib/config.sh ]]; then
   # shellcheck disable=SC1090
   . "${FETCH_DATA_DIR:-/usr/share/fetch}/lib/config.sh"
 else

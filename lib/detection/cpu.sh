@@ -17,7 +17,7 @@ detect_cpu() {
           ;;
         "ia64" | "m32r")
           my_cpu="$(awk -F':' '/model/ {print $2; exit}' "${_file}")"
-          [ -z "${my_cpu}" ] && my_cpu="$(awk -F':' '/family/ {printf $2; exit}' "${_file}")"
+          [[ -z ${my_cpu} ]] && my_cpu="$(awk -F':' '/family/ {printf $2; exit}' "${_file}")"
           ;;
         *)
           my_cpu="$(awk -F '\\s*: | @' \
@@ -29,9 +29,10 @@ detect_cpu() {
       _speed_dir="/sys/devices/system/cpu/cpu0/cpufreq"
 
       # Select the right temperature file.
-      [[ -d /sys/class/hwmon && -n "$(ls -A /sys/class/hwmon)" ]] &&
-        for temp_dir in /sys/class/hwmon/*; do
-          if [ -n "${temp_dir}" ]; then
+      _temperature_files="$(ls -A /sys/class/hwmon)"
+      [[ -d /sys/class/hwmon && -n ${_temperature_files} ]] \
+        && for temp_dir in /sys/class/hwmon/*; do
+          if [[ -n ${temp_dir} ]]; then
             [[ "$(< "${temp_dir}/name")" =~ (cpu_thermal|coretemp|fam15h_power|k10temp) ]] && {
               temp_dirs=("${temp_dir}"/temp*_input)
               temp_dir=${temp_dirs[0]}
@@ -41,10 +42,10 @@ detect_cpu() {
         done
 
       # Get CPU speed.
-      if [ -d "${_speed_dir}" ]; then
-        _speed="$(< "${_speed_dir}/bios_limit")" ||
-          _speed="$(< "${_speed_dir}/scaling_max_freq")" ||
-          _speed="$(< "${_speed_dir}/cpuinfo_max_freq")"
+      if [[ -d ${_speed_dir} ]]; then
+        _speed="$(< "${_speed_dir}/bios_limit")" \
+          || _speed="$(< "${_speed_dir}/scaling_max_freq")" \
+          || _speed="$(< "${_speed_dir}/cpuinfo_max_freq")"
         _speed="$((_speed / 1000))"
       else
         _speed="$(awk -F ': |\\.' '/cpu MHz|^clock/ {printf $2; exit}' "${_file}")"
@@ -52,7 +53,7 @@ detect_cpu() {
       fi
 
       # Get CPU temp.
-      [ -f "${temp_dir}" ] && _deg="$(($(< "${temp_dir}") * 100 / 10000))"
+      [[ -f ${temp_dir} ]] && _deg="$(($(< "${temp_dir}") * 100 / 10000))"
 
       # Get CPU cores.
       _cores="$(grep -c "^processor" "${_file}")"
@@ -90,7 +91,7 @@ detect_cpu() {
 
   # Remove CPU brand from the output.
   # shellcheck disable=SC2154
-  if [ "${config_cpu[brand]}" == "off" ]; then
+  if [[ ${config_cpu[brand]} == "off" ]]; then
     my_cpu="${my_cpu/AMD /}"
     my_cpu="${my_cpu/Intel /}"
     my_cpu="${my_cpu/Core? Duo /}"
@@ -99,8 +100,8 @@ detect_cpu() {
 
   # Add CPU cores to the output.
   # shellcheck disable=SC2154
-  [[ ${config_cpu[cores]} != "off" && -n ${_cores} ]] &&
-    case ${my_os} in
+  [[ ${config_cpu[cores]} != "off" && -n ${_cores} ]] \
+    && case ${my_os} in
       "Mac OS X" | "macOS")   my_cpu="${my_cpu/@/(${_cores}) @}" ;;
       *)                      my_cpu="${my_cpu} (${_cores})" ;;
     esac
@@ -122,7 +123,7 @@ detect_cpu() {
     if [[ ${config_cpu[temp]} != "off" && -n ${_deg} ]]; then
       _deg="${_deg//./}"
       # Convert to Fahrenheit if enabled
-      [ "${config_cpu[temp]}" == "F" ] && _deg="$((_deg * 90 / 50 + 320))"
+      [[ ${config_cpu[temp]} == "F" ]] && _deg="$((_deg * 90 / 50 + 320))"
       # Format the output
       _deg="[${_deg/${_deg: -1}/}.${_deg: -1}°${config_cpu[temp]:-C}]"
       my_cpu="${my_cpu} ${_deg}"
