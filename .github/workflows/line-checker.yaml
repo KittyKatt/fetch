@@ -15,20 +15,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  sh-checker:
-    name: shfmt
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v1
-      - name: Run the sh-checker
-        uses: luizm/action-sh-checker@v0.1.12
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SHFMT_OPTS: -i 2 -ln bash -ci -sr -kp -s -d
-        with:
-          sh_checker_shellcheck_disable: true
-          sh_checker_comment: true
-          sh_checker_exclude: ".github"
   line-checker:
     name: Line Checker
     runs-on: ubuntu-20.04

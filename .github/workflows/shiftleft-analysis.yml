@@ -5,7 +5,7 @@ name: Shiftleft Analysis
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
     paths:
       - fetch
       - sample.config.conf
@@ -13,40 +13,40 @@ on:
       - ascii/*.sh
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [ master ]
+    branches: [master]
     paths:
       - fetch
       - sample.config.conf
       - lib/*/*.sh
       - ascii/*.sh
   schedule:
-    - cron: '33 0 * * 1'
+    - cron: "33 0 * * 1"
 
 jobs:
   Scan-Build:
     # Scan runs on ubuntu, mac and windows
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    # Instructions
-    # 1. Setup JDK, Node.js, Python etc depending on your project type
-    # 2. Compile or build the project before invoking scan
-    #    Example: mvn compile, or npm install or pip install goes here
-    # 3. Invoke Scan with the github token. Leave the workspace empty to use relative url
+      - uses: actions/checkout@v2
+      # Instructions
+      # 1. Setup JDK, Node.js, Python etc depending on your project type
+      # 2. Compile or build the project before invoking scan
+      #    Example: mvn compile, or npm install or pip install goes here
+      # 3. Invoke Scan with the github token. Leave the workspace empty to use relative url
 
-    - name: Perform Scan
-      uses: ShiftLeftSecurity/scan-action@master
-      env:
-        WORKSPACE: ""
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SCAN_AUTO_BUILD: true
-      with:
-        output: reports
-        # Scan auto-detects the languages in your project. To override uncomment the below variable and set the type
-        # type: credscan,java
-        # type: python
+      - name: Perform Scan
+        uses: ShiftLeftSecurity/scan-action@master
+        env:
+          WORKSPACE: ""
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SCAN_AUTO_BUILD: true
+        with:
+          output: reports
+          # Scan auto-detects the languages in your project. To override uncomment the below variable and set the type
+          # type: credscan,java
+          # type: python
 
-    - name: Upload report
-      uses: github/codeql-action/upload-sarif@v1
-      with:
-        sarif_file: reports
+      - name: Upload report
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: reports
